@@ -1,0 +1,29 @@
+{
+	"Player": {
+		"texture": "player_ver2",
+		"posx": 0,
+		"posy": 0,
+		"width": 32,
+		"height": 32,
+		"Base_speed": 5
+	},
+	"Enemy": {
+		"texture": "enemy_spear_ver1",
+		"posx": 200,
+		"posy": 200,
+		"width": 20,
+		"height": 20,
+		"Base_speed": 2
+	},
+	"Window": {
+		"width": 1400,
+		"height": 800,
+		"game_name": "pepega_game",
+		"framerate_cap": 80
+	},
+	"Worldmap": {
+		"name": "worldmap",
+		"width": 2560,
+		"height": 1440
+	}
+}
