@@ -3,32 +3,38 @@
 #include "Components.h"
 #include "vec2.h"
 
-enum class EntityType;
+
+enum class EntityType {
+	player, enemy, NONE
+};
+
 
 class Entity {
 
 	friend class EntityManager;
 
-	SDL_FRect bb;
+	SDL_FRect boundingBox;
 	SDL_Texture* texture = nullptr;
 	int ID = 0;
-	EntityType type;
-	bool isActive = true;
+	EntityType type = EntityType::NONE;
+	bool isActive = false;
 
-	Entity(const int id, EntityType Type, const SDL_FRect& box, SDL_Texture* textPtr) :texture(textPtr), bb(box), ID(id), type(Type) {}
+	Entity(const int id, EntityType Type, const SDL_FRect& box, SDL_Texture* textPtr) :texture(textPtr), boundingBox(box), ID(id), type(Type) {}
+
+	void Enable();
 public:
 
-	SDL_Texture* GetTexture()const;
-	SDL_FRect* GetBB();
-	EntityType GetType()const;
 	int GetID()const;
-	void Kill();
+	EntityType GetType()const;
 	bool IsActive()const;
-	vec2f GetPosition()const;
+
+
+	SDL_Texture* GetTexture()const;
+	SDL_FRect* GetBounds();
+
+
+	void Kill();
 
 };
 
 
-enum class EntityType {
-	player, enemy
-};

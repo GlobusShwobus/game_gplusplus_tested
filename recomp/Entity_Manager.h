@@ -5,11 +5,11 @@
 
 class EntityManager {
 
-	std::vector<std::shared_ptr<Entity>> add_next_frame;
-	std::vector<std::shared_ptr<Entity>> all;
-	std::map<EntityType, std::vector<std::shared_ptr<Entity>>> per_type;
+	std::vector<Entity*> addNextFrame;
+	std::vector<Entity*> generalContainer;
+	std::map<EntityType, std::vector<Entity*>> typeBasedContainer;
 
-	size_t total_entities = 0;
+	size_t totalEntities = 0;
 	void RemoveInactive();
 
 public:
@@ -17,14 +17,14 @@ public:
 	EntityManager() {}
 
 	void Update();
-	void ResteatType(int entity_id, EntityType current_type, const EntityType change_to);
+	void ResteatType(int entityID, EntityType currentType, const EntityType changeTo);
 
 
-	void AddEntity(const nlohmann::json& entity_config, EntityType type, const TextureManager& txtm);
+	void AddEntity(const nlohmann::json& entityConfig, EntityType type, const TextureManager& txtm);
 
-	const std::vector<std::shared_ptr<Entity>>& GetEntities()const;
-	const std::vector<std::shared_ptr<Entity>>& GetEntities(const EntityType t);
-	const std::map<EntityType, std::vector<std::shared_ptr<Entity>>>& GetEntitiesMap()const;
+	const std::vector<Entity*>& GetEntities()const;
+	const std::vector<Entity*>& GetEntities(const EntityType type);
+	const std::map<EntityType, std::vector<Entity*>>& GetEntitiesMap()const;
 
 	/*
 	bool PosIsFree(vec2& pos)const {

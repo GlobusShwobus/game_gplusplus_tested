@@ -12,9 +12,9 @@ enum TileState {
 };
 
 enum NextTile {
-	up = SDL_SCANCODE_W,
-	down = SDL_SCANCODE_S,
-	left = SDL_SCANCODE_A,
+	up    = SDL_SCANCODE_W,
+	down  = SDL_SCANCODE_S,
+	left  = SDL_SCANCODE_A,
 	right = SDL_SCANCODE_D
 };
 
@@ -27,25 +27,22 @@ class InstancedGrid {
 	int width = 0;
 	int height = 0;
 
-	vec2i GetMoveDir(NextTile move_dir);
-
-	vec2i PixelToGrid(int x, int y);
-	vec2f GridToPixel(int grid_x, int grid_y);
+	vec2i getMoveDirection(NextTile move_dir);
+	vec2i pixelToGrid(int pixel_x, int pixel_y);
+	vec2f gridToPixel(int grid_x, int grid_y);
 
 
 public:
 
-	InstancedGrid(int image_width, int image_height) : width(image_width / tile_w), height(image_height / tile_h) {
-
+	InstancedGrid(int screenWidth, int screenHeight) : width(screenWidth / tile_w), height(screenHeight / tile_h) {
 		is_occupied = new bool[width * height] {false};
-
 	}
 
-	bool IsFilled(int x, int y);
-	bool isNextFilled(int curr_x, int curr_y, NextTile move_dir);
+	bool isFilled(int cord_x, int cord_y);
+	bool isNextFilled(int currPixel_x, int currPixel_y, NextTile move_dir);
 
-	void SetTile(int x, int y, TileState state); //0 being free it, 1 being fill it
-	void SetNextTile(NextTile move_dir, SDL_FRect* to_update); //0 being free it, 1 being fill it
+	void setTile(int grid_x, int grid_y, TileState state); //0 being free it, 1 being fill it
+	void setNextTile(NextTile move_dir, SDL_FRect* toUpdate); //0 being free it, 1 being fill it
 
 
 	~InstancedGrid() {

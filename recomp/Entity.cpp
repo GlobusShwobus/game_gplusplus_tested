@@ -1,24 +1,27 @@
 #include "Entity.h"
 
 
-EntityType Entity::GetType()const {
-	return type;
-}
 int Entity::GetID()const {
 	return ID;
 }
-void Entity::Kill() {
-	isActive = false;
+EntityType Entity::GetType()const {
+	return type;
 }
 bool Entity::IsActive()const {
 	return isActive;
 }
-vec2f Entity::GetPosition()const {
-	return { bb.x, bb.y };
+
+void Entity::Enable() {
+	isActive = true;
 }
+void Entity::Kill() {
+	isActive = false;
+}
+
+
 SDL_Texture* Entity::GetTexture()const {
 	return texture;
 }
-SDL_FRect* Entity::GetBB() {
-	return &bb;
+SDL_FRect* Entity::GetBounds() {
+	return &boundingBox;
 }

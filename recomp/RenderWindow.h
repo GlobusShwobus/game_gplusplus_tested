@@ -11,11 +11,11 @@ public:
 
 	RenderWindow(const char* title, int width, int height);
 
-	bool Good()const;//can be depricated into a more global generic func that checks pointers
-	void Clear();
-	void Display();
-	void Render(SDL_Texture* texture, const SDL_FRect* bb);
-	SDL_Texture* UniqueTextureLoad(const char* path);
+	bool good()const;//can be depricated into a more global generic func that checks pointers
+	void clear();
+	void display();
+	void render(SDL_Texture* texture, const SDL_FRect* bb);
+	SDL_Texture* loadNewTexture(const char* path);
 
 	~RenderWindow() {
 		SDL_DestroyRenderer(renderer);

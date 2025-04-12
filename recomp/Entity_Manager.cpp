@@ -4,72 +4,73 @@
 
 void EntityManager::Update()
 {
-	for (std::shared_ptr<Entity>& ent : add_next_frame) {
-		all.push_back(ent);
-		per_type[ent->GetType()].push_back(ent);
+	for (Entity* ent : addNextFrame) {
+		generalContainer.push_back(ent);
+		typeBasedContainer[ent->GetType()].push_back(ent);
 	}
 
-	add_next_frame.clear();
+	addNextFrame.clear();
 	RemoveInactive();
 }
 void EntityManager::RemoveInactive()
 {
-	all.erase(std::remove_if(all.begin(), all.end(), [&](std::shared_ptr<Entity>& ent) {
+	generalContainer.erase(std::remove_if(generalContainer.begin(), generalContainer.end(), [](Entity* ent) {
 		return !ent->IsActive() || ent == nullptr;
-		}), all.end());
+		}), generalContainer.end());
 
 
-	for (auto& [key, val] : per_type) {
-		val.erase(std::remove_if(val.begin(), val.end(), [&](std::shared_ptr<Entity>& ent) {
+	for (auto& [type, vector] : typeBasedContainer) {
+		vector.erase(std::remove_if(vector.begin(), vector.end(), [](Entity* ent) {
 			return !ent->IsActive() || ent == nullptr;
-			}), val.end());
+			}), vector.end());
 	}
 }
-void EntityManager::ResteatType(int entity_id, EntityType current_type, const EntityType change_to) {
+void EntityManager::ResteatType(int entityID, EntityType currentType, const EntityType changeTo) {
 
-	for (auto& [key, val] : per_type) {
-		if (key != current_type) {
+	for (auto& [type, vector] : typeBasedContainer) {
+		if (type != currentType) {
 			continue;
 		}
 
-		auto it = std::remove_if(val.begin(), val.end(), [&](std::shared_ptr<Entity>& each) {
-			if (each->GetID() == entity_id) {
-				each->type = change_to;
-				per_type[change_to].push_back(std::move(each));
+		auto it = std::remove_if(vector.begin(), vector.end(), [&](Entity* ent) {
+			if (ent->GetID() == entityID) {
+				ent->type = changeTo;
+				typeBasedContainer[changeTo].push_back(ent);
 				return true;
 			}
 			return false;
 			});
 
-		val.erase(it, val.end());
+		vector.erase(it, vector.end());
 	}
 
 }
 
-const std::vector<std::shared_ptr<Entity>>& EntityManager::GetEntities()const {
-	return all;
+const std::vector<Entity*>& EntityManager::GetEntities()const {
+	return generalContainer;
 }
-const std::vector<std::shared_ptr<Entity>>& EntityManager::GetEntities(const EntityType t) {
-	return per_type[t];
+const std::vector<Entity*>& EntityManager::GetEntities(const EntityType type) {
+	return typeBasedContainer[type];
 }
-const std::map<EntityType, std::vector<std::shared_ptr<Entity>>>& EntityManager::GetEntitiesMap()const {
-	return per_type;
+const std::map<EntityType, std::vector<Entity*>>& EntityManager::GetEntitiesMap()const {
+	return typeBasedContainer;
 }
 
 
 
-
-
-void EntityManager::AddEntity(const nlohmann::json& entity_config, EntityType type, const TextureManager& txtm) {
+void EntityManager::AddEntity(const nlohmann::json& entityConfig, EntityType type, const TextureManager& txtm) {
 
 	SDL_FRect bb;
-	bb.x = entity_config["posx"];
-	bb.y = entity_config["posy"];
-	bb.w = entity_config["width"];
-	bb.h = entity_config["height"];
+	bb.x = entityConfig["posx"];
+	bb.y = entityConfig["posy"];
+	bb.w = entityConfig["width"];
+	bb.h = entityConfig["height"];
 
-	SDL_Texture* txt = txtm.GetTexture(entity_config["texture"].get<std::string>());
-	auto make = std::shared_ptr<Entity>(new Entity(total_entities++, type, bb, txt));
+	SDL_Texture* txt = txtm.GetTexture(entityConfig["texture"].get<std::string>());
 
-	add_next_frame.push_back(make);
+	Entity* newEntry = new Entity(totalEntities++, type, bb, txt);
+	
+	newEntry->Enable();//if not manually called, entity is marked as dead and it be immediately cleaned up, shittest kind of
+
+	addNextFrame.push_back(newEntry);
 }

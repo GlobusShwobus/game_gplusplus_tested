@@ -3,23 +3,31 @@
 #include "File_Manager.h"
 
 class JSONConfig {
-    std::unique_ptr<nlohmann::json> config;
+    nlohmann::json* config = nullptr;
 
 public:
-    JSONConfig() = default;
-
-    void Init(std::unique_ptr<nlohmann::json> config);
-    const nlohmann::json& Get()const;
-    //kinda shitty atm, need to work with enums if i plan on just having a single big dick config file
-    const nlohmann::json* Get(const char* specific)const {
-
-
-        if (config && config->contains(specific)) {
-            return &(*config)[specific];
+    JSONConfig() = delete;
+    JSONConfig(nlohmann::json* takeOwnership) {
+        if (takeOwnership == nullptr) {
+            throw std::exception("Recieved nullptr initalizing config recieved by FileManager (wrong path?)");
         }
-        return nullptr;
-
+        config = takeOwnership;
     }
 
-    bool Good()const;
+    const nlohmann::json& Get()const;
+    //can return nullptr
+    const nlohmann::json* Get(const char* specific)const;
+public:
+
+    JSONConfig(const JSONConfig& copy) = delete;
+    JSONConfig(JSONConfig&& move)noexcept = delete;
+    JSONConfig& operator=(const JSONConfig& assign) = delete;
+    JSONConfig& operator=(JSONConfig&& assign)noexcept = delete;
+
+    ~JSONConfig() {
+        if (config) {
+            delete config;
+            config = nullptr;
+        }
+    }
 };

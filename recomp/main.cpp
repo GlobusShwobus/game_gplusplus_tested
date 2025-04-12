@@ -6,9 +6,12 @@
 #include "Grid.h"
 
 /*
-spawn player with right click
-despawn player with left click
 
+SMALL REWRITE: use proper c++ meaning pointers
+JSON get specific am not happy with
+grid is i think fucked because it does not adjust current pos/and current pos pixel, with grid and itstead does calcualtions raw
+fix movement
+remove junk test code and encapsulate behavior
 figure a way to make map manager
 */
 
@@ -32,15 +35,8 @@ struct WindowInit {
 int main() {
 
     //initialize config and file manager, (and window but probably should move window at some point)
-    FileManager fileman;
-    JSONConfig config;
 
-    config.Init(fileman.GetEntityConfig("Config.json"));
-
-    if (!config.Good()) {
-        MessageBoxW(nullptr, L"Config failed init", L"error init", MB_OK | MB_ICONERROR);
-        return -1;
-    }
+    JSONConfig config(FileManager::getNewConfig("Config.json"));//will throw if nullptr, but does not check for any specific json recieved, meaning it can still fuck up down the line
 
     WindowInit wParams(config.Get());
 
@@ -52,7 +48,7 @@ int main() {
 
     RenderWindow window(wParams.title.c_str(), wParams.width, wParams.height);
 
-    if (!window.Good()) {
+    if (!window.good()) {
         MessageBoxW(nullptr, L"Window failed init", L"error init", MB_OK | MB_ICONERROR);
         return -1;
     }
@@ -61,13 +57,8 @@ int main() {
 
     TextureManager textman;
 
-    for (const auto& paths : fileman.GetTextureFolderContents("../Textures")) {
-
-        SDL_Texture* passownershiptoidkdoireallycareifsomeonereadsthis = window.UniqueTextureLoad(paths.string().c_str());
-
-        textman.InitializeTexture(paths.stem().string(), passownershiptoidkdoireallycareifsomeonereadsthis);
-
-
+    for (const auto& paths : FileManager::getPNGs("../Textures")) {
+        textman.cacheTexture(paths.stem().string(), window.loadNewTexture(paths.string().c_str()));
     }
 
     //initialize EntityManager, and grid
@@ -112,31 +103,31 @@ int main() {
         }
         //move~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         else if (event.type == SDL_EVENT_KEY_DOWN) {
-            for (auto& ent : entman.GetEntities()) {//fuck it it's just test code
-                auto* bb = ent->GetBB();
+            for (Entity* entity: entman.GetEntities()) {//fuck it it's just test code
+                auto* bb = entity->GetBounds();
                 switch (event.key.scancode) {
                 case SDL_SCANCODE_W:
                     printf("Up is pressed\n");
                     if (!mapgrid.isNextFilled(bb->x, bb->y, up)) {
-                        mapgrid.SetNextTile(up, bb);
+                        mapgrid.setNextTile(up, bb);
                     }
                     break;
                 case SDL_SCANCODE_A:
                     printf("left is pressed\n");
                     if (!mapgrid.isNextFilled(bb->x, bb->y, left)) {
-                        mapgrid.SetNextTile(left, bb);
+                        mapgrid.setNextTile(left, bb);
                     }
                     break;
                 case SDL_SCANCODE_S:
                     printf("down is pressed\n");
                     if (!mapgrid.isNextFilled(bb->x, bb->y, down)) {
-                        mapgrid.SetNextTile(down, bb);
+                        mapgrid.setNextTile(down, bb);
                     }
                     break;
                 case SDL_SCANCODE_D:
                     printf("right is pressed\n");
                     if (!mapgrid.isNextFilled(bb->x, bb->y, right)) {
-                        mapgrid.SetNextTile(right, bb);
+                        mapgrid.setNextTile(right, bb);
                     }
                     break;
                 default://fuck off
@@ -146,13 +137,13 @@ int main() {
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        window.Clear();
+        window.clear();
 
 
-        window.Render(TESTMAP, nullptr);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
+        window.render(TESTMAP, nullptr);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
 
-        for (auto& ent : entman.GetEntities()) {
-            window.Render(ent->GetTexture(), ent->GetBB());
+        for (Entity* entity : entman.GetEntities()) {
+            window.render(entity->GetTexture(), entity->GetBounds());
         }
 
 
@@ -162,7 +153,7 @@ int main() {
         //printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
 
 
-        window.Display();
+        window.display();
 
     }
 

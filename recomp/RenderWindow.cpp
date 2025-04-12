@@ -11,23 +11,23 @@ RenderWindow::RenderWindow(const char* title, int width, int height)
 
 }
 
-void RenderWindow::Clear()
+void RenderWindow::clear()
 {
 	SDL_RenderClear(renderer);
 }
-bool RenderWindow::Good()const {
+bool RenderWindow::good()const {
 	return window && renderer;
 }
 
-void RenderWindow::Display()
+void RenderWindow::display()
 {
 	SDL_RenderPresent(renderer);
 }
-void RenderWindow::Render(SDL_Texture* texture, const SDL_FRect* bb)
+void RenderWindow::render(SDL_Texture* texture, const SDL_FRect* bb)
 {
 	SDL_RenderTexture(renderer, texture, nullptr, bb);
 }
-SDL_Texture* RenderWindow::UniqueTextureLoad(const char* path)
+SDL_Texture* RenderWindow::loadNewTexture(const char* path)
 {
 	return IMG_LoadTexture(renderer, path);
 }
