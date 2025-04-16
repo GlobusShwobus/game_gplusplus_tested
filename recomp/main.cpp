@@ -64,10 +64,14 @@ int main() {
 
     EntityManager* entman = new EntityManager();
 
-    auto TESTMAP = textman.GetTexture("worldmap");
-    InstancedGrid mapgrid(TESTMAP->w, TESTMAP->h);
+
+    const nlohmann::json* mapJson = config.Get("Worldmap");
+    const float w = (*mapJson)["width"].get<int>();
+    const float h = (*mapJson)["height"].get<int>();
+    Sprite TESTMAP = Sprite(textman.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
 
 
+    InstancedGrid mapgrid(TESTMAP.source.w, TESTMAP.source.h);
 
     //main game loop
 
@@ -105,30 +109,30 @@ int main() {
         else if (event.type == SDL_EVENT_KEY_DOWN) {
             for (auto& entity : entman->GetEntities()) {
                 if ((entity.GetDescription() & ed_canMove)) {
-                    /*
-                    * broken move
+                    
+                   /*
                     switch (event.key.scancode) {
                     case SDL_SCANCODE_W:
                         printf("Up is pressed\n");
-                        if (!mapgrid.isNextFilled(entity.GetTexture(), bb->y, up)) {
-                            mapgrid.setNextTile(up, bb);
+                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, up)) {
+                            mapgrid.setNextTile(up, entity.GetSprite().source);
                         }
                         break;
                     case SDL_SCANCODE_A:
                         printf("left is pressed\n");
-                        if (!mapgrid.isNextFilled(bb->x, bb->y, left)) {
+                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, left)) {
                             mapgrid.setNextTile(left, bb);
                         }
                         break;
                     case SDL_SCANCODE_S:
                         printf("down is pressed\n");
-                        if (!mapgrid.isNextFilled(bb->x, bb->y, down)) {
+                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, down)) {
                             mapgrid.setNextTile(down, bb);
                         }
                         break;
                     case SDL_SCANCODE_D:
                         printf("right is pressed\n");
-                        if (!mapgrid.isNextFilled(bb->x, bb->y, right)) {
+                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, right)) {
                             mapgrid.setNextTile(right, bb);
                         }
                         break;
@@ -149,7 +153,7 @@ int main() {
 
         for (auto& entity : entman->GetEntities()) {
 
-            window.render(entity.GetTexture());
+            window.render(entity.GetSprite());
         }
 
 

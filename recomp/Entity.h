@@ -12,22 +12,33 @@ enum EntityDescriptor {
 	ed_Kill   = 1 << 1,
 	ed_canMove  = 1 << 2 
 };
- 
+typedef uint64_t Descriptor;
+
+struct Sprite {
+	SDL_Texture* texture = nullptr;
+	SDL_FRect source = { 0,0,32,32 };
+	SDL_FRect destination = { 0,0,32,32 };
+
+	Sprite(SDL_Texture* pTexture) :texture(pTexture) {}
+	Sprite(SDL_Texture* pTexture, SDL_FRect src, SDL_FRect dest) :texture(pTexture), source(src), destination(dest) {}
+};
+
+
 class Entity {
 
 	friend class EntityManager;
 
-	SDL_Texture* texture = nullptr;
+	Sprite sprite;
 	uint64_t description = 0;
 
-	Entity(uint64_t description, SDL_Texture* textPtr) :texture(textPtr), description(description) {}
+	Entity(uint64_t description, Sprite textPtr) :sprite(textPtr), description(description) {}
 
 public:
 
-	SDL_Texture* GetTexture()const;
+	const Sprite& GetSprite()const;
 	uint64_t GetDescription()const;
-	void AddDescription(const int addDescription);
-	void RemoveDescription(const int removeDescription);
+	void AddDescription(const Descriptor addDescription);
+	void RemoveDescription(const Descriptor removeDescription);
 };
 
 class EntityManager {
@@ -43,11 +54,9 @@ public:
 
 	void Update();
 
-	void AddEntity(uint64_t description, SDL_Texture* pTexture);
+	void AddEntity(Descriptor description, SDL_Texture* pTexture);
 
-	std::vector<Entity>& GetEntities() {
-		return entities;
-	}
+	std::vector<Entity>& GetEntities();
 
 };
 

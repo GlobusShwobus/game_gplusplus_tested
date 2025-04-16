@@ -2,6 +2,7 @@
 
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
+#include "Entity.h"
 
 class RenderWindow {
 
@@ -15,7 +16,7 @@ public:
 	bool good()const;//can be depricated into a more global generic func that checks pointers
 	void clear();
 	void display();
-	void render(SDL_Texture* texture);
+	void render(const Sprite& sprite);
 	SDL_Texture* loadNewTexture(const char* path);
 
 	~RenderWindow() {
