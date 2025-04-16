@@ -155,7 +155,7 @@ int main() {
 
         int cont_size = entman->GetEntities().size();
 
-        printf("grid size: %d x %d == %d\n", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
+        printf("\grid size: %d x %d == %d", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
         printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
 
 
