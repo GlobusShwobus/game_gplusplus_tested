@@ -23,9 +23,9 @@ void RenderWindow::display()
 {
 	SDL_RenderPresent(renderer);
 }
-void RenderWindow::render(SDL_Texture* texture, const SDL_FRect* bb)
+void RenderWindow::render(SDL_Texture* texture)
 {
-	SDL_RenderTexture(renderer, texture, nullptr, bb);
+	SDL_RenderTexture(renderer, texture, nullptr, nullptr);
 }
 SDL_Texture* RenderWindow::loadNewTexture(const char* path)
 {

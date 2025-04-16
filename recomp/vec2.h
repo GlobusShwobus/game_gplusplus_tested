@@ -1,5 +1,4 @@
 #pragma once
-
 template <typename T> class vec2 {
 public:
 	T x = 0;
@@ -54,5 +53,3 @@ public:
 
 typedef vec2<int> vec2i;
 typedef vec2<float> vec2f;
-
-typedef vec2<int> pos2i;

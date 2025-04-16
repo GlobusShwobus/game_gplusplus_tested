@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Components.h"
+#include "SDL3/SDL.h"
+#include "SDL3_image/SDL_image.h"
 
 class RenderWindow {
 
@@ -14,7 +15,7 @@ public:
 	bool good()const;//can be depricated into a more global generic func that checks pointers
 	void clear();
 	void display();
-	void render(SDL_Texture* texture, const SDL_FRect* bb);
+	void render(SDL_Texture* texture);
 	SDL_Texture* loadNewTexture(const char* path);
 
 	~RenderWindow() {

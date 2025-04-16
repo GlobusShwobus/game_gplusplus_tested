@@ -1,9 +1,8 @@
-#include <fstream>
 #include "JSON_Config.h"
 #include "Texture_Manager.h"
-#include "Entity_Manager.h"
 #include "RenderWindow.h"
 #include "Grid.h"
+#include "Entity.h"
 
 /*
 
@@ -42,14 +41,14 @@ int main() {
 
     //initalize SDL and RenderWIndow
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        MessageBoxW(nullptr, L"SDL init fail", L"error init", MB_OK | MB_ICONERROR);
+        printf("\n\nCRASH:: SDL_init Failure");
         return -1;
     }
 
     RenderWindow window(wParams.title.c_str(), wParams.width, wParams.height);
 
     if (!window.good()) {
-        MessageBoxW(nullptr, L"Window failed init", L"error init", MB_OK | MB_ICONERROR);
+        printf("\n\nCRASH:: Window init Failure");
         return -1;
     }
 
@@ -63,7 +62,7 @@ int main() {
 
     //initialize EntityManager, and grid
 
-    EntityManager entman;
+    EntityManager* entman = new EntityManager();
 
     auto TESTMAP = textman.GetTexture("worldmap");
     InstancedGrid mapgrid(TESTMAP->w, TESTMAP->h);
@@ -77,7 +76,7 @@ int main() {
 
     while (gameRunning) {
 
-        entman.Update();
+        entman->Update();
 
 
         SDL_PollEvent(&event);
@@ -87,52 +86,58 @@ int main() {
         }
         else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
             if (event.button.button == SDL_BUTTON_LEFT) {
+                for (auto& entity:entman->GetEntities()) {
 
-                for (auto& ent : entman.GetEntities()) {
-
-                    ent->Kill();
-
+                    entity.RemoveDescription(ed_isActive);
                 }
 
             }
             else if (event.button.button == SDL_BUTTON_RIGHT) {
-
-                entman.AddEntity(*config.Get("Player"), EntityType::player, textman);
-
+                //
+                const nlohmann::json* playerJson = config.Get("Player");
+                std::string texName = (*playerJson)["texture"].get<std::string>();
+                SDL_Texture* texture = textman.GetTexture(texName);
+                //
+                entman->AddEntity(ed_isActive | ed_canMove, texture);
             }
         }
         //move~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         else if (event.type == SDL_EVENT_KEY_DOWN) {
-            for (Entity* entity: entman.GetEntities()) {//fuck it it's just test code
-                auto* bb = entity->GetBounds();
-                switch (event.key.scancode) {
-                case SDL_SCANCODE_W:
-                    printf("Up is pressed\n");
-                    if (!mapgrid.isNextFilled(bb->x, bb->y, up)) {
-                        mapgrid.setNextTile(up, bb);
+            for (auto& entity : entman->GetEntities()) {
+                if ((entity.GetDescription() & ed_canMove)) {
+                    /*
+                    * broken move
+                    switch (event.key.scancode) {
+                    case SDL_SCANCODE_W:
+                        printf("Up is pressed\n");
+                        if (!mapgrid.isNextFilled(entity.GetTexture(), bb->y, up)) {
+                            mapgrid.setNextTile(up, bb);
+                        }
+                        break;
+                    case SDL_SCANCODE_A:
+                        printf("left is pressed\n");
+                        if (!mapgrid.isNextFilled(bb->x, bb->y, left)) {
+                            mapgrid.setNextTile(left, bb);
+                        }
+                        break;
+                    case SDL_SCANCODE_S:
+                        printf("down is pressed\n");
+                        if (!mapgrid.isNextFilled(bb->x, bb->y, down)) {
+                            mapgrid.setNextTile(down, bb);
+                        }
+                        break;
+                    case SDL_SCANCODE_D:
+                        printf("right is pressed\n");
+                        if (!mapgrid.isNextFilled(bb->x, bb->y, right)) {
+                            mapgrid.setNextTile(right, bb);
+                        }
+                        break;
+                    default://fuck off
+                        break;
                     }
-                    break;
-                case SDL_SCANCODE_A:
-                    printf("left is pressed\n");
-                    if (!mapgrid.isNextFilled(bb->x, bb->y, left)) {
-                        mapgrid.setNextTile(left, bb);
-                    }
-                    break;
-                case SDL_SCANCODE_S:
-                    printf("down is pressed\n");
-                    if (!mapgrid.isNextFilled(bb->x, bb->y, down)) {
-                        mapgrid.setNextTile(down, bb);
-                    }
-                    break;
-                case SDL_SCANCODE_D:
-                    printf("right is pressed\n");
-                    if (!mapgrid.isNextFilled(bb->x, bb->y, right)) {
-                        mapgrid.setNextTile(right, bb);
-                    }
-                    break;
-                default://fuck off
-                    break;
+                    */
                 }
+
             }
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,17 +145,18 @@ int main() {
         window.clear();
 
 
-        window.render(TESTMAP, nullptr);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
+        window.render(TESTMAP);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
 
-        for (Entity* entity : entman.GetEntities()) {
-            window.render(entity->GetTexture(), entity->GetBounds());
+        for (auto& entity : entman->GetEntities()) {
+
+            window.render(entity.GetTexture());
         }
 
 
-        int cont_size = entman.GetEntities().size();
+        int cont_size = entman->GetEntities().size();
 
-        //printf("grid size: %d x %d == %d\n", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
-        //printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
+        printf("grid size: %d x %d == %d\n", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
+        printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
 
 
         window.display();
@@ -160,6 +166,7 @@ int main() {
 
     window.~RenderWindow();
     SDL_Quit();
+    delete entman;
 
     return 0;
 }

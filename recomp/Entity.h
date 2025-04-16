@@ -1,39 +1,53 @@
 #pragma once
 
-#include "Components.h"
-#include "vec2.h"
+#define PI 3.14159265
+#define NOMINMAX
 
+#include "SDL3/SDL.h"
+#include "SDL3_image/SDL_image.h"
+#include <vector>
 
-enum class EntityType {
-	player, enemy, NONE
+enum EntityDescriptor {
+	ed_isActive = 1 << 0,
+	ed_Kill   = 1 << 1,
+	ed_canMove  = 1 << 2 
 };
-
-
+ 
 class Entity {
 
 	friend class EntityManager;
 
-	SDL_FRect boundingBox;
 	SDL_Texture* texture = nullptr;
-	int ID = 0;
-	EntityType type = EntityType::NONE;
-	bool isActive = false;
+	uint64_t description = 0;
 
-	Entity(const int id, EntityType Type, const SDL_FRect& box, SDL_Texture* textPtr) :texture(textPtr), boundingBox(box), ID(id), type(Type) {}
+	Entity(uint64_t description, SDL_Texture* textPtr) :texture(textPtr), description(description) {}
 
-	void Enable();
 public:
 
-	int GetID()const;
-	EntityType GetType()const;
-	bool IsActive()const;
-
-
 	SDL_Texture* GetTexture()const;
-	SDL_FRect* GetBounds();
+	uint64_t GetDescription()const;
+	void AddDescription(const int addDescription);
+	void RemoveDescription(const int removeDescription);
+};
 
+class EntityManager {
 
-	void Kill();
+	std::vector<Entity> temporaryEntities;
+	std::vector<Entity> entities;
+
+	void RemoveInactive();
+
+public:
+
+	EntityManager() {}
+
+	void Update();
+
+	void AddEntity(uint64_t description, SDL_Texture* pTexture);
+
+	std::vector<Entity>& GetEntities() {
+		return entities;
+	}
 
 };
 

@@ -1,7 +1,5 @@
 #include "Grid.h"
 
-//#include <iostream> 
-
 bool InstancedGrid::isFilled(int cord_x, int cord_y) {
 	assert(cord_x >= 0 && cord_x < width && cord_y >= 0 && cord_y < height);//just crash because code err
 	return is_occupied[cord_y * width + cord_x];
