@@ -14,7 +14,7 @@ vec2i InstancedGrid::getNext(const vec2i& currentPos, const Direction direction)
 
 void InstancedGrid::setTile(const vec2i& position, const SetTile state) {//0 being free it, 1 being fill it
 	assert(position.x >= 0 && position.x < width && position.y >= 0 && position.y < height);//just crash because code err
-	is_occupied[position.y * width + position.y] = state;
+	is_occupied[position.y * width + position.x] = state;
 }
 
 vec2i InstancedGrid::getMoveDirection(const Direction direction) {
