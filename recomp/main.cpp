@@ -3,6 +3,7 @@
 #include "RenderWindow.h"
 #include "Grid.h"
 #include "Entity.h"
+#include "Player.h"
 
 /*
 
@@ -60,18 +61,18 @@ int main() {
         textman.cacheTexture(paths.stem().string(), window.loadNewTexture(paths.string().c_str()));
     }
 
-    //initialize EntityManager, and grid
-
-    EntityManager* entman = new EntityManager();
-
+    //garbanzo for now,
 
     const nlohmann::json* mapJson = config.Get("Worldmap");
     const float w = (*mapJson)["width"].get<int>();
     const float h = (*mapJson)["height"].get<int>();
     Sprite TESTMAP = Sprite(textman.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
 
+    //player
 
-    InstancedGrid mapgrid(TESTMAP.source.w, TESTMAP.source.h);
+    Player player = Player(textman.GetTexture("player_ver2"));
+
+
 
     //main game loop
 
@@ -80,37 +81,18 @@ int main() {
 
     while (gameRunning) {
 
-        entman->Update();
-
-
         SDL_PollEvent(&event);
 
         if (event.type == SDL_EventType::SDL_EVENT_QUIT) {
             gameRunning = false;
         }
-        else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                for (auto& entity:entman->GetEntities()) {
 
-                    entity.RemoveDescription(ed_isActive);
-                }
-
-            }
-            else if (event.button.button == SDL_BUTTON_RIGHT) {
-                //
-                const nlohmann::json* playerJson = config.Get("Player");
-                std::string texName = (*playerJson)["texture"].get<std::string>();
-                SDL_Texture* texture = textman.GetTexture(texName);
-                //
-                entman->AddEntity(ed_isActive | ed_canMove, texture);
-            }
-        }
         //move~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        else if (event.type == SDL_EVENT_KEY_DOWN) {
+        if (event.type == SDL_EVENT_KEY_DOWN) {
             for (auto& entity : entman->GetEntities()) {
                 if ((entity.GetDescription() & ed_canMove)) {
                     
-                   /*
+                   
                     switch (event.key.scancode) {
                     case SDL_SCANCODE_W:
                         printf("Up is pressed\n");
@@ -139,7 +121,7 @@ int main() {
                     default://fuck off
                         break;
                     }
-                    */
+                    
                 }
 
             }
@@ -159,8 +141,8 @@ int main() {
 
         int cont_size = entman->GetEntities().size();
 
-        printf("\grid size: %d x %d == %d", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
-        printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
+        //printf("\grid size: %d x %d == %d", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
+        //printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
 
 
         window.display();

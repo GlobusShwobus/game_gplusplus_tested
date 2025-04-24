@@ -12,7 +12,7 @@ SDL_Texture* TextureManager::GetTexture(const std::string& name) const
 		return it->second;
 	}
 
-	return nullptr;
+	return nullptr;//MAKE IT RETURN SOME DEFAULT ERROR TEXTURE
 }
 
 TextureManager::~TextureManager()
