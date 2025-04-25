@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "Grid.h"
 
 struct Keyboard {
 	bool moveUp    = false;
@@ -20,10 +21,38 @@ struct Keyboard {
             }
         }
 	}
-	void processMove() {
-
+	void processMove(Grid& grid, vec2f& pos) {
+				
+		if (moveUp) {
+			move(grid, pos, Direction::up, moveUp);
+		}
+		else if (moveDown) {
+			move(grid, pos, Direction::down, moveDown);
+		}
+		else if (moveLeft) {
+			move(grid, pos, Direction::left, moveLeft);
+		}
+		else if (moveRight) {
+			move(grid, pos, Direction::right, moveRight);
+		}
 	}
 
+private:
+	void move(Grid& grid, vec2f& pos, const Direction direction, bool& key) {
+
+		const vec2f current = grid.convertToGrid(pos);
+		const vec2f next = current + grid.getDirection(direction);
+
+		if (!grid.isFilled(next)) {
+			grid.setTile(current, false);
+			grid.setTile(next, true);
+
+			pos = grid.convertToPixel(next);
+			
+			printf("\nyes i moved");
+		}
+		key = false;
+	}
 
 };
 

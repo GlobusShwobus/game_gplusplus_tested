@@ -68,9 +68,17 @@ int main() {
     const float h = (*mapJson)["height"].get<int>();
     Sprite TESTMAP = Sprite(textman.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
 
+    //grid
+    Grid grid = Grid(w, h);
+
     //player
 
     Player player = Player(textman.GetTexture("player_ver2"));
+
+
+
+
+
 
 
 
@@ -87,64 +95,24 @@ int main() {
             gameRunning = false;
         }
 
-        //move~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        if (event.type == SDL_EVENT_KEY_DOWN) {
-            for (auto& entity : entman->GetEntities()) {
-                if ((entity.GetDescription() & ed_canMove)) {
-                    
-                   
-                    switch (event.key.scancode) {
-                    case SDL_SCANCODE_W:
-                        printf("Up is pressed\n");
-                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, up)) {
-                            mapgrid.setNextTile(up, entity.GetSprite().source);
-                        }
-                        break;
-                    case SDL_SCANCODE_A:
-                        printf("left is pressed\n");
-                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, left)) {
-                            mapgrid.setNextTile(left, bb);
-                        }
-                        break;
-                    case SDL_SCANCODE_S:
-                        printf("down is pressed\n");
-                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, down)) {
-                            mapgrid.setNextTile(down, bb);
-                        }
-                        break;
-                    case SDL_SCANCODE_D:
-                        printf("right is pressed\n");
-                        if (!mapgrid.isNextFilled(entity.GetSprite().source.w, entity.GetSprite().source.h, right)) {
-                            mapgrid.setNextTile(right, bb);
-                        }
-                        break;
-                    default://fuck off
-                        break;
-                    }
-                    
-                }
+        player.keyboard.queueMove(&event);//reads event key press moves
 
-            }
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        vec2f playerMoveTest = { player.sprite.destination.x, player.sprite.destination.y };
+
+        player.keyboard.processMove(grid, playerMoveTest);
+        
+        player.sprite.setDestination(playerMoveTest);
+
 
         window.clear();
 
 
+
         window.render(TESTMAP);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
-
-        for (auto& entity : entman->GetEntities()) {
-
-            window.render(entity.GetSprite());
-        }
-
-
-        int cont_size = entman->GetEntities().size();
-
-        //printf("\grid size: %d x %d == %d", mapgrid.getW(), mapgrid.getH(), mapgrid.getW()* mapgrid.getH()); //testing to make sure the grid is correct size
-        //printf("\n%s%d", "Entity size: ", cont_size);  //testing how many entities on exist
-
-
+        window.render(player.sprite);
+        
+        
         window.display();
 
     }
@@ -152,7 +120,6 @@ int main() {
 
     window.~RenderWindow();
     SDL_Quit();
-    delete entman;
 
     return 0;
 }

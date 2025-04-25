@@ -14,7 +14,7 @@ enum class Direction {
 	right,
 };
 
-class InstancedGrid {
+class Grid {
 
 	static constexpr int tile_w = 32;
 	static constexpr int tile_h = 32;
@@ -25,29 +25,27 @@ class InstancedGrid {
 
 public:
 
-	InstancedGrid(int screenWidth, int screenHeight) : width(screenWidth / tile_w), height(screenHeight / tile_h) {
+	Grid(int screenWidth, int screenHeight) : width(screenWidth / tile_w), height(screenHeight / tile_h) {
 		is_occupied = new bool[width * height] {false};
 	}
 
-	bool isFilled(const vec2i& position);
-	vec2i getNext(const vec2i& currentPos, const Direction direction);
-	void setTile(const vec2i& position, const SetTile state); //0 being free it, 1 being fill it
+	bool isFilled(const vec2f& position)const;
+	vec2f convertToGrid(const vec2f& position)const;
+	vec2f convertToPixel(const vec2f& position)const;
+	vec2f getDirection(const Direction direction)const;
+	void setTile(const vec2f& position, const SetTile state); //0 being free it, 1 being fill it
+	
 
-	~InstancedGrid() {
+	~Grid() {
 		delete[] is_occupied;
 		is_occupied = nullptr;
 	}
 
 private:
-	vec2i convertToGrid(const vec2i& position);
-	vec2i convertToPixel(const vec2i& position);
 
-	vec2i getMoveDirection(const Direction direction);
-
-
-	InstancedGrid(const InstancedGrid&) = delete;
-	InstancedGrid(InstancedGrid&&) = delete;
-	InstancedGrid& operator=(const InstancedGrid&) = delete;
+	Grid(const Grid&) = delete;
+	Grid(Grid&&) = delete;
+	Grid& operator=(const Grid&) = delete;
 };
 
 
