@@ -30,16 +30,22 @@ public:
 	}
 
 	bool isFilled(const vec2f& position)const;
-	vec2f convertToGrid(const vec2f& position)const;
-	vec2f convertToPixel(const vec2f& position)const;
-	vec2f getDirection(const Direction direction)const;
 	void setTile(const vec2f& position, const SetTile state); //0 being free it, 1 being fill it
+	bool isSameTile(const vec2f& first, const vec2f& second)const {
+		vec2f a = convertToGrid(first);
+		vec2f b = convertToGrid(second);
+		return a == b;
+	}
 	
-
 	~Grid() {
 		delete[] is_occupied;
 		is_occupied = nullptr;
 	}
+
+private:
+
+	vec2f convertToGrid(const vec2f& position)const;
+	vec2f convertToPixel(const vec2f& position)const;
 
 private:
 

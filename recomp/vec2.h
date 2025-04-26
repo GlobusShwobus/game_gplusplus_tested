@@ -6,7 +6,7 @@ public:
 	float y = 0;
 
 	vec2f(const float X, const float Y) :x(X), y(Y) {}
-
+	vec2f() = default;
 	//equate
 	bool operator==(const vec2f& other)const {
 		return(x == other.x) && (y == other.y);

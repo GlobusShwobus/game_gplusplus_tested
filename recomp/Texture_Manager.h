@@ -3,9 +3,6 @@
 #include "SDL3/SDL.h"
 #include "File_Manager.h"
 
-
-enum class TextureName;
-
 class TextureManager {
 
 	std::map<std::string, SDL_Texture*> textures;
@@ -24,6 +21,3 @@ public:
 	TextureManager& operator=(const TextureManager&) = delete;
 };
 
-enum class TextureName {
-	player_ver1,
-};
