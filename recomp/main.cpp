@@ -100,7 +100,7 @@ int main() {
 
         vec2f playerMoveTest = { player.sprite.destination.x, player.sprite.destination.y };
 
-        player.keyboard.processMove(grid, playerMoveTest);
+        player.keyboard.processMove(grid, playerMoveTest, player.speed);
         
         player.sprite.setDestination(playerMoveTest);
 

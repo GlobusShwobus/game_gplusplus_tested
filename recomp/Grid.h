@@ -3,16 +3,26 @@
 #include <assert.h>
 #include "vec2.h"
 
-//need inforamtion save/laod feature using binary files
-
 typedef bool SetTile;
 
-enum class Direction {
+enum class Direction {	//yeet this function in misc pile
 	up,
 	down,
 	left,
 	right,
 };
+
+/*
+
+NOTE TO SELF!!!
+
+There is a missmatch between tile positions and real pixel positions, how SDL_FRect is floats so it's simple to just work with floats
+This means there is a truncation issue. Currently it works as intended by truncating floats to integers and accessing correct tiles since floats trunc in one direction
+
+But there is always an invisible asshole (potential) bug to keep in mind
+
+*/
+
 
 class Grid {
 
@@ -31,11 +41,6 @@ public:
 
 	bool isFilled(const vec2f& position)const;
 	void setTile(const vec2f& position, const SetTile state); //0 being free it, 1 being fill it
-	bool isSameTile(const vec2f& first, const vec2f& second)const {
-		vec2f a = convertToGrid(first);
-		vec2f b = convertToGrid(second);
-		return a == b;
-	}
 	
 	~Grid() {
 		delete[] is_occupied;

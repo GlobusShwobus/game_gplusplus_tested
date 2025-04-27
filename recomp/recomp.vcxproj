@@ -159,6 +159,7 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="JSON_Config.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Texture_Manager.cpp" />
   </ItemGroup>
