@@ -4,6 +4,7 @@
 #include "vec2.h"
 
 typedef bool SetTile;
+typedef bool WalkAbleState;
 
 enum class Direction {	//yeet this function in misc pile
 	up,
@@ -23,40 +24,59 @@ But there is always an invisible asshole (potential) bug to keep in mind
 
 */
 
+enum TileDataFlags {
+	TFLAG_EMPTY = 1 << 0,
+	TFLAG_WALKABLE = 1 << 1,
+};
+typedef int TFLAG;
 
 class Grid {
 
-	static constexpr int tile_w = 32;
-	static constexpr int tile_h = 32;
+	static constexpr int tileWidth = 32;
+	static constexpr int tileHeight = 32;
 
-	bool* is_occupied = nullptr;
-	int width = 0;
-	int height = 0;
+	const int tilesInX = 0;
+	const int tilesInY = 0;
+
+	const int pixelsInX = 0;
+	const int pixelsInY = 0;
+
+
+	class Tile {
+	public:
+		Tile() = default;
+
+		void addData(const TFLAG data);
+		void removeData(const TFLAG data);
+		bool doesContain(const TFLAG data)const;
+		bool isWalkable()const;
+	private:
+		int tileData = TFLAG_EMPTY | TFLAG_WALKABLE;
+	};
+
+	
+	Tile* tiles = nullptr;
+
 
 public:
 
-	Grid(int screenWidth, int screenHeight) : width(screenWidth / tile_w), height(screenHeight / tile_h) {
-		is_occupied = new bool[width * height] {false};
+	Grid(const int mapWidth, const int mapHeight) : tilesInX(mapWidth / tileWidth), tilesInY(mapHeight / tileHeight), pixelsInX(mapWidth), pixelsInY(mapHeight){
+		tiles = new Tile[tilesInX * tilesInY]();
 	}
 
-	bool isFilled(const vec2f& position)const;
-	void setTile(const vec2f& position, const SetTile state); //0 being free it, 1 being fill it
-	
+	bool isValid(const vec2f& position)const;
+	Tile& getTile(const vec2f& position);
+
 	~Grid() {
-		delete[] is_occupied;
-		is_occupied = nullptr;
+		delete[] tiles;
+		tiles = nullptr;
 	}
-
-private:
-
-	vec2f convertToGrid(const vec2f& position)const;
-	vec2f convertToPixel(const vec2f& position)const;
 
 private:
 
 	Grid(const Grid&) = delete;
 	Grid(Grid&&) = delete;
 	Grid& operator=(const Grid&) = delete;
-};
 
+};
 

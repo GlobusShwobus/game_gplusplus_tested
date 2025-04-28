@@ -15,7 +15,6 @@ struct Keyboard {
 
 private:
 
-	//need a second look after grid works with tile types
 	void move(Grid& grid, vec2f& current, const Direction direction, const int speed)const;
 
 	//yeet this function in misc pile
@@ -40,9 +39,10 @@ public:
 	Keyboard keyboard;
 	static constexpr int speed = 5;
 
-	//add speed variable
-	//move based on speed variable (in pixel measure)
-	//create a secondary move function which checks next but moves based on speed not next, basically a simple second solution, 
+	//movement
+	//camera
+	//animation
+
 
 	Player(Sprite texture) :sprite(texture) {}
 

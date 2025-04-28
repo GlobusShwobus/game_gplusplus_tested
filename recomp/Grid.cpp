@@ -1,25 +1,27 @@
 #include "Grid.h"
 
+bool Grid::isValid(const vec2f& position)const {
+	return (position.x >= 0 && position.x < (pixelsInX - tileWidth)) &&
+		(position.y >= 0 && position.y < (pixelsInY - tileHeight));
+}
+Grid::Tile& Grid::getTile(const vec2f& position) {
+	const int atX = position.x / tileWidth;
+	const int atY = position.y / tileHeight;
 
-
-bool Grid::isFilled(const vec2f& position)const {
-	vec2f tile = convertToGrid(position);
-
-	if (tile.x < 0 || tile.x >= width || tile.y < 0 || tile.y >= height) {//edges
-		return true;
-	}
-
-	return is_occupied[int(tile.y * width + tile.x)];
+	return tiles[atY * tilesInX + atX];
 }
 
-void Grid::setTile(const vec2f& position, const SetTile state) {//0 being free it, 1 being fill it
-	vec2f tile = convertToGrid(position);	
-	is_occupied[int(tile.y * width + tile.x)] = state;
-}
 
-vec2f Grid::convertToGrid(const vec2f& position)const {
-	return { position.x / tile_w, position.y / tile_h };
+
+void Grid::Tile::addData(const TFLAG data) {
+	tileData |= data;
 }
-vec2f Grid::convertToPixel(const vec2f& position)const {
-	return { position.x * tile_w , position.y * tile_h };
+void Grid::Tile::removeData(const TFLAG data) {
+	tileData &= ~data;
+}
+bool Grid::Tile::doesContain(const TFLAG data)const {
+	return tileData & data;
+}
+bool Grid::Tile::isWalkable()const {
+	return tileData & TFLAG_WALKABLE;
 }

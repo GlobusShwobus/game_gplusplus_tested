@@ -5,15 +5,8 @@
 #include "Entity.h"
 #include "Player.h"
 
-/*
 
-SMALL REWRITE: use proper c++ meaning pointers
-JSON get specific am not happy with
-grid is i think fucked because it does not adjust current pos/and current pos pixel, with grid and itstead does calcualtions raw
-fix movement
-remove junk test code and encapsulate behavior
-figure a way to make map manager
-*/
+#include "TESTS.h"
 
 struct WindowInit {
 
@@ -78,8 +71,14 @@ int main() {
 
 
 
+    //****************
+
+    //TESTSCODE:
+
+    TESTS::SetNoWalkingZone(grid);
 
 
+    //****************
 
 
     //main game loop
@@ -111,6 +110,9 @@ int main() {
 
         window.render(TESTMAP);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
         window.render(player.sprite);
+        
+
+        TESTS::TestNoWalkingZone(window.getRenderer());
         
         
         window.display();

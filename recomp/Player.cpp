@@ -23,9 +23,17 @@ void Keyboard::processMove(Grid& grid, vec2f& pos, const int speed) {
 void Keyboard::move(Grid& grid, vec2f& current, const Direction direction, const int speed)const {
 
 	const vec2f newPosition = current + speedOffset(direction, speed);
-	const bool isFilled = grid.isFilled(newPosition);
+	const bool isValid = grid.isValid(newPosition);
 
-	if (isFilled) {
+
+	if (!isValid) {
+		return;
+	}
+	
+	auto& tile = grid.getTile(newPosition);
+	const bool isWalkable = tile.isWalkable();
+
+	if (!isWalkable) {
 		return;
 	}
 
