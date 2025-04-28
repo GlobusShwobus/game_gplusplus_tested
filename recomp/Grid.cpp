@@ -11,6 +11,13 @@ Grid::Tile& Grid::getTile(const vec2f& position) {
 	return tiles[atY * tilesInX + atX];
 }
 
+//grid isValid only makes sure the texture is within the bounds of the map, nothing more
+//it is not able to check the bounds of any tile inside the map, only access them
+
+//tile class does not care where it exists, it simply holds description of the tile
+
+//i need to be able check if the next tile, from the textures right and bottom, to tiles top and left
+//AND i need to check if the next tile, from the textures top and left, to tiles bottom and right is not walkable
 
 
 void Grid::Tile::addData(const TFLAG data) {

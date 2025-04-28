@@ -31,9 +31,9 @@ void Keyboard::move(Grid& grid, vec2f& current, const Direction direction, const
 	}
 	
 	auto& tile = grid.getTile(newPosition);
-	const bool isWalkable = tile.isWalkable();
+	const bool isEnabled = tile.isWalkable();
 
-	if (!isWalkable) {
+	if (!isEnabled) {
 		return;
 	}
 
