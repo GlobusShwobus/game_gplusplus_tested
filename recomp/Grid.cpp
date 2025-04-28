@@ -19,6 +19,8 @@ Grid::Tile& Grid::getTile(const vec2f& position) {
 //i need to be able check if the next tile, from the textures right and bottom, to tiles top and left
 //AND i need to check if the next tile, from the textures top and left, to tiles bottom and right is not walkable
 
+//this means i should use SDL_FRect instead of vec2f because at this point that should be the correct one
+
 
 void Grid::Tile::addData(const TFLAG data) {
 	tileData |= data;
