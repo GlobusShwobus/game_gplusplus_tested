@@ -12,30 +12,24 @@ void Keyboard::queueMove(const SDL_Event* const event) {
     }
 }
 
-void Keyboard::processMove(Grid& grid, vec2f& pos, const int speed) {
+void Keyboard::processMove(Grid& grid, SDL_FRect* position, const int speed) {
 
-	if      (moveUp)    {      move(grid, pos, Direction::up,    speed);      moveUp    = false; }
-	else if (moveDown)  {      move(grid, pos, Direction::down,  speed);      moveDown  = false; }
-	else if (moveLeft)  {      move(grid, pos, Direction::left,  speed);      moveLeft  = false; }
-	else if (moveRight) {      move(grid, pos, Direction::right, speed);      moveRight = false; }
+	if      (moveUp)    {      move(grid, position, Direction::up,    speed);      moveUp    = false; }
+	else if (moveDown)  {      move(grid, position, Direction::down,  speed);      moveDown  = false; }
+	else if (moveLeft)  {      move(grid, position, Direction::left,  speed);      moveLeft  = false; }
+	else if (moveRight) {      move(grid, position, Direction::right, speed);      moveRight = false; }
 }
 
-void Keyboard::move(Grid& grid, vec2f& current, const Direction direction, const int speed)const {
+void Keyboard::move(Grid& grid, SDL_FRect* current, const Direction direction, const int speed)const {
 
-	const vec2f newPosition = current + speedOffset(direction, speed);
-	const bool isValid = grid.isValid(newPosition);
+	const SDL_FRect newPosition = speedOffSet(current, direction, speed);
+	auto corners = getPoints(newPosition);
 
-
-	if (!isValid) {
-		return;
-	}
-	
-	auto& tile = grid.getTile(newPosition);
-	const bool isEnabled = tile.isWalkable();
-
-	if (!isEnabled) {
-		return;
+	for (const auto& point : corners) {
+		if (!grid.isValidTile(point) || !grid.getTile(point).doesContain(TFLAG_WALKABLE)) {
+			return;
+		}
 	}
 
-	current = newPosition;
+	*current = newPosition;
 }

@@ -97,12 +97,8 @@ int main() {
         player.keyboard.queueMove(&event);//reads event key press moves
 
 
-        vec2f playerMoveTest = { player.sprite.destination.x, player.sprite.destination.y };
-
-        player.keyboard.processMove(grid, playerMoveTest, player.speed);
+        player.keyboard.processMove(grid, &player.sprite.destination, player.speed);
         
-        player.sprite.setDestination(playerMoveTest);
-
 
         window.clear();
 

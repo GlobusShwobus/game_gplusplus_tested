@@ -1,12 +1,10 @@
 #pragma once
 
-#include <assert.h>
+
+#include "SDL3/SDL.h"
 #include "vec2.h"
 
-typedef bool SetTile;
-typedef bool WalkAbleState;
-
-enum class Direction {	//yeet this function in misc pile
+enum class Direction {	//don't like it here/or at all
 	up,
 	down,
 	left,
@@ -25,7 +23,7 @@ But there is always an invisible asshole (potential) bug to keep in mind
 */
 
 enum TileDataFlags {
-	TFLAG_EMPTY = 1 << 0,
+	TFLAG_EMPTY    = 1 << 0,
 	TFLAG_WALKABLE = 1 << 1,
 };
 typedef int TFLAG;
@@ -49,14 +47,11 @@ class Grid {
 		void addData(const TFLAG data);
 		void removeData(const TFLAG data);
 		bool doesContain(const TFLAG data)const;
-		bool isWalkable()const;
 	private:
 		int tileData = TFLAG_EMPTY | TFLAG_WALKABLE;
 	};
 
-	
 	Tile* tiles = nullptr;
-
 
 public:
 
@@ -64,9 +59,9 @@ public:
 		tiles = new Tile[tilesInX * tilesInY]();
 	}
 
-	bool isValid(const vec2f& position)const;
-	Tile& getTile(const vec2f& position);
-
+	bool isValidTile(const SDL_FPoint& point)const;
+	Tile& getTile(const SDL_FPoint& point);
+	
 	~Grid() {
 		delete[] tiles;
 		tiles = nullptr;
@@ -77,6 +72,5 @@ private:
 	Grid(const Grid&) = delete;
 	Grid(Grid&&) = delete;
 	Grid& operator=(const Grid&) = delete;
-
 };
 

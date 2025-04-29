@@ -9,7 +9,8 @@ void TESTS::SetNoWalkingZone(Grid& grid) {
 
     for (int x = 0; x < 5; x++) {
         for (int y = 0; y < 5; y++) {
-            auto& tile = grid.getTile({ startX + (32 * x), startY + (32 * y) });
+            const SDL_FPoint point{ startX + (32 * x), startY + (32 * y) };
+            auto& tile = grid.getTile(point);
             tile.removeData(TFLAG_WALKABLE);
         }
     }
