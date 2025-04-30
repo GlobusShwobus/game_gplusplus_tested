@@ -18,13 +18,7 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="File_Manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Grid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="JSON_Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderWindow.h">
@@ -45,18 +39,12 @@
     <ClInclude Include="TESTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="File_Manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="JSON_Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -72,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TESTS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,13 +4,6 @@
 #include "SDL3/SDL.h"
 #include "vec2.h"
 
-enum class Direction {	//don't like it here/or at all
-	up,
-	down,
-	left,
-	right,
-};
-
 /*
 
 NOTE TO SELF!!!

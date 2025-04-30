@@ -144,22 +144,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="File_Manager.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="MyUtils.h" />
     <ClInclude Include="TESTS.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture_Manager.h" />
-    <ClInclude Include="JSON_Config.h" />
     <ClInclude Include="vec2.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="File_Manager.cpp" />
     <ClCompile Include="Grid.cpp" />
-    <ClCompile Include="JSON_Config.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyUtils.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="TESTS.cpp" />

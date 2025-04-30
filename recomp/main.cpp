@@ -1,45 +1,33 @@
-#include "JSON_Config.h"
 #include "Texture_Manager.h"
 #include "RenderWindow.h"
 #include "Grid.h"
-#include "Entity.h"
 #include "Player.h"
 
+#include "MyUtils.h"
+using namespace MyUtils;
 
 #include "TESTS.h"
-
-struct WindowInit {
-
-    std::string title;
-    unsigned int width = 0;
-    unsigned int height = 0;
-
-    WindowInit(const nlohmann::json& json) {
-
-        auto& wStuff = json["Window"];
-
-        title = wStuff["game_name"];
-        width = wStuff["width"];
-        height = wStuff["height"];
-    }
-};
 
 
 int main() {
 
-    //initialize config and file manager, (and window but probably should move window at some point)
+    
+    //config
+    Config::jConfig config("Config.json");
 
-    JSONConfig config(FileManager::getNewConfig("Config.json"));//will throw if nullptr, but does not check for any specific json recieved, meaning it can still fuck up down the line
-
-    WindowInit wParams(config.Get());
-
-    //initalize SDL and RenderWIndow
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        printf("\n\nCRASH:: SDL_init Failure");
+    if (!config.isValid()) {
+        printf("\nERROR:: Config as nullptr (not existing in directory or wrong name)\n");
         return -1;
     }
 
-    RenderWindow window(wParams.title.c_str(), wParams.width, wParams.height);
+
+    //initalize SDL and RenderWIndow
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        printf("\nCRASH:: SDL_init Failure");
+        return -1;
+    }
+
+    RenderWindow window(config.Get());
 
     if (!window.good()) {
         printf("\n\nCRASH:: Window init Failure");
@@ -47,41 +35,23 @@ int main() {
     }
 
     //initialize TextureManager
-
-    TextureManager textman;
-
-    for (const auto& paths : FileManager::getPNGs("../Textures")) {
-        textman.cacheTexture(paths.stem().string(), window.loadNewTexture(paths.string().c_str()));
+    TextureManager textureManager;
+    for (const auto& paths : Files::getPNGs("../Textures")) {
+        textureManager.cacheTexture(paths.stem().string(), window.loadNewTexture(paths.string().c_str()));
     }
 
-    //garbanzo for now,
+    //garbanzo for now, plz fix
 
     const nlohmann::json* mapJson = config.Get("Worldmap");
     const float w = (*mapJson)["width"].get<int>();
     const float h = (*mapJson)["height"].get<int>();
-    Sprite TESTMAP = Sprite(textman.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
+    Sprite worldMap = Sprite(textureManager.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
 
     //grid
     Grid grid = Grid(w, h);
-
     //player
+    Player player = Player(textureManager.GetTexture("player_ver2"));
 
-    Player player = Player(textman.GetTexture("player_ver2"));
-
-
-
-
-    //****************
-
-    //TESTSCODE:
-
-    TESTS::SetNoWalkingZone(grid);
-
-
-    //****************
-
-
-    //main game loop
 
     bool gameRunning = true;
     SDL_Event event;
@@ -93,26 +63,22 @@ int main() {
         if (event.type == SDL_EventType::SDL_EVENT_QUIT) {
             gameRunning = false;
         }
-
+        //EVENTS
         player.keyboard.queueMove(&event);//reads event key press moves
+        //-------------------------
 
-
-        player.keyboard.processMove(grid, &player.sprite.destination, player.speed);
-        
+        //MOVEMENT
+        SDL_FRect tPos = player.keyboard.getNewPosition(&player.sprite.destination, player.speed);
+        MyUtils::updatePosition(grid, tPos, &player.sprite.destination);
+        //--------------------------
 
         window.clear();
 
-
-
-        window.render(TESTMAP);//idk wtf to do with this atm, i guess whenever i am ready to make rendering funcs more detailed, also order of drawing matters
+        window.render(worldMap);
         window.render(player.sprite);
         
-
-        TESTS::TestNoWalkingZone(window.getRenderer());
-        
-        
+       
         window.display();
-
     }
 
 

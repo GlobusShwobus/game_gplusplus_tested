@@ -2,7 +2,8 @@
 
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
-#include "Entity.h"
+#include "Sprite.h"
+#include "json.hpp"
 
 class RenderWindow {
 
@@ -11,7 +12,7 @@ class RenderWindow {
 
 public:
 
-	RenderWindow(const char* title, int width, int height);
+	RenderWindow(const nlohmann::json* const config);
 
 	bool good()const;//can be depricated into a more global generic func that checks pointers
 	void clear();
