@@ -14,7 +14,7 @@ RenderWindow::RenderWindow(const nlohmann::json* const config) {
 		std::exit(EXIT_FAILURE);
 	}
 
-	std::string title = windowParams["game_name"];
+	const std::string title = windowParams["game_name"];
 	const int width = windowParams["width"];
 	const int height = windowParams["height"];
 
@@ -44,10 +44,6 @@ bool RenderWindow::good()const {
 void RenderWindow::display()
 {
 	SDL_RenderPresent(renderer);
-}
-void RenderWindow::render(const Sprite& sprite)
-{
-	SDL_RenderTexture(renderer, sprite.texture, &sprite.source, &sprite.destination);
 }
 SDL_Texture* RenderWindow::loadNewTexture(const char* path)
 {

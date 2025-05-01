@@ -32,3 +32,14 @@ SDL_FRect Keyboard::getNewPosition(const SDL_FRect* const position, const int sp
 	}
 	return newPos;
 }
+void Camera::update(const SDL_FRect* const playerPos, const SDL_FRect* const worldMap) {
+	//camera top left = player top left - camera width in half + player width in half (same for height)
+	camera.x = playerPos->x - (camera.w / 2) + (playerPos->w / 2);
+	camera.y = playerPos->y - (camera.h / 2) + (playerPos->h / 2);
+
+	//stop the camera at edges, (at edges don't follow player) 
+	if (camera.x < 0) { camera.x = 0; }
+	if (camera.y < 0) { camera.y = 0; }
+	if (camera.x + camera.w > worldMap->w) { camera.x = worldMap->w - camera.w; }
+	if (camera.y + camera.h > worldMap->h) { camera.y = worldMap->h - camera.h; }
+}

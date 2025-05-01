@@ -29,11 +29,6 @@ int main() {
 
     RenderWindow window(config.Get());
 
-    if (!window.good()) {
-        printf("\n\nCRASH:: Window init Failure");
-        return -1;
-    }
-
     //initialize TextureManager
     TextureManager textureManager;
     for (const auto& paths : Files::getPNGs("../Textures")) {
@@ -72,10 +67,17 @@ int main() {
         MyUtils::updatePosition(grid, tPos, &player.sprite.destination);
         //--------------------------
 
+        //CAMERA
+        player.camera.update(&player.sprite.destination, &worldMap.source);
+        //--------------------------
+
+
         window.clear();
 
-        window.render(worldMap);
-        window.render(player.sprite);
+        window.renderMap(worldMap, &player.camera.camera);
+
+
+        window.renderBasic(player.sprite, player.camera.camera);
         
        
         window.display();
