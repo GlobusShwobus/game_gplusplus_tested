@@ -10,18 +10,24 @@ struct Keyboard {
 
 
 	void queueMove(const SDL_Event* const event);
-	
-	//left as 'if' not 'else if'; test it out see what feels good
-	SDL_FRect getNewPosition(const SDL_FRect* const position, const int speed);
+	SDL_FRect getNewPosition(const SDL_FRect* const position, const int speed);//make it work diagonally??
 };
 
-struct Camera {
+class Camera {
 
-	SDL_FRect camera{ 0,0,0,0 };
+	SDL_FPoint center{ 0,0 };
+	int radiusWidth = 0;
+	int radiusHeight = 0;
 
-	Camera(float renderedWidth, float renderedHeight) :camera{ 0,0,renderedWidth,renderedHeight } {}
+	//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
+public:
 
-	void update(const SDL_FRect* const playerPos, const SDL_FRect* const worldMap);
+	Camera(const int diameterWidth, const int diameterHeight) :radiusWidth(diameterWidth / 2), radiusHeight(diameterHeight / 2) {}
+
+	void setFocus(const SDL_FRect* const playerPos);
+	void setClamp(const SDL_FRect* const worldMap);
+	const SDL_FPoint getCenter()const;
+	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
 
@@ -35,8 +41,10 @@ public:
 
 	static constexpr int speed = 5;
 
-	//camera
 	//animation
 
-	Player(Sprite texture) :sprite(texture), camera(800.f, 600.f) {}
+	//frameLimiter
+	//NPCs->handle new/delete inbetween frames
+
+	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
 };

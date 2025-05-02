@@ -9,6 +9,9 @@ using namespace MyUtils;
 #include "TESTS.h"
 
 
+static constexpr int logicalRendererWidthInitial = 1280;
+static constexpr int logicalRendererHeightInitial = 720;
+
 int main() {
 
     
@@ -29,6 +32,9 @@ int main() {
 
     RenderWindow window(config.Get());
 
+    window.setLogicalRenderingSize(logicalRendererWidthInitial, logicalRendererHeightInitial);
+
+
     //initialize TextureManager
     TextureManager textureManager;
     for (const auto& paths : Files::getPNGs("../Textures")) {
@@ -45,8 +51,7 @@ int main() {
     //grid
     Grid grid = Grid(w, h);
     //player
-    Player player = Player(textureManager.GetTexture("player_ver2"));
-
+    Player player = Player(textureManager.GetTexture("player_ver2"), SDL_FPoint{ logicalRendererWidthInitial, logicalRendererHeightInitial });
 
     bool gameRunning = true;
     SDL_Event event;
@@ -58,6 +63,8 @@ int main() {
         if (event.type == SDL_EventType::SDL_EVENT_QUIT) {
             gameRunning = false;
         }
+
+
         //EVENTS
         player.keyboard.queueMove(&event);//reads event key press moves
         //-------------------------
@@ -68,18 +75,15 @@ int main() {
         //--------------------------
 
         //CAMERA
-        player.camera.update(&player.sprite.destination, &worldMap.source);
+        player.camera.setFocus(&player.sprite.destination);
+        player.camera.setClamp(&worldMap.source);
         //--------------------------
 
 
         window.clear();
+        Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
+        Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
 
-        window.renderMap(worldMap, &player.camera.camera);
-
-
-        window.renderBasic(player.sprite, player.camera.camera);
-        
-       
         window.display();
     }
 

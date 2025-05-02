@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "SDL3/SDL.h"
 #include "Grid.h"
+#include "Player.h"
 
 namespace MyUtils {
 
@@ -39,4 +40,10 @@ namespace MyUtils {
                 jConfig& operator=(jConfig&& assign)noexcept = delete;
         };
 	}
+    namespace Rendering {
+        //later sepparate logic for player rendering and world objects as that will enable ignoring rendering outside of camera area
+        //for now, don't have NPCs for that to set up
+        void renderBasic(SDL_Renderer* renderer, const Sprite& sprite, const Camera& cam);
+
+    }
 }

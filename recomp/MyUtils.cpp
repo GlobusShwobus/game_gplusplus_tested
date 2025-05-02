@@ -69,4 +69,11 @@ namespace MyUtils {
 		}
 	}
 
+	namespace Rendering {
+		void renderBasic(SDL_Renderer* renderer, const Sprite& sprite, const Camera& cam) {
+			SDL_FRect dest = cam.toCameraSpace(&sprite.destination);
+			SDL_RenderTexture(renderer, sprite.texture, &sprite.source, &dest);
+		}
+
+	}
 }

@@ -6,8 +6,7 @@
 	"Window": {
 		"width": 1400,
 		"height": 800,
-		"game_name": "pepega_game",
-		"framerate_cap": 80
+		"game_name": "pepega_game"
 	},
 	"Worldmap": {
 		"name": "worldmap",
