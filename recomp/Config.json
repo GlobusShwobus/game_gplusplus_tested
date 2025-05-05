@@ -1,6 +1,8 @@
 {
 	"Player": {
-		"texture": "player_ver2",
+		"texture_name": "player_ver2",
+		"frame_width": 32,
+		"frame_height": 32,
 		"speed": 5
 	},
 	"Window": {
@@ -9,8 +11,6 @@
 		"game_name": "pepega_game"
 	},
 	"Worldmap": {
-		"name": "worldmap",
-		"width": 2560,
-		"height": 1440
+		"texture_name": "worldmap"
 	}
 }

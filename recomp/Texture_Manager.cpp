@@ -1,9 +1,5 @@
 #include "Texture_Manager.h"
 
-void TextureManager::cacheTexture(const std::string& name, SDL_Texture* texture)
-{
-	textures.emplace(name, texture);
-}
 
 SDL_Texture* TextureManager::GetTexture(const std::string& name) const
 {
@@ -12,7 +8,7 @@ SDL_Texture* TextureManager::GetTexture(const std::string& name) const
 		return it->second;
 	}
 
-	return nullptr;//MAKE IT RETURN SOME DEFAULT ERROR TEXTURE
+	throw "why you enter wrong/missing name baka?";
 }
 
 TextureManager::~TextureManager()

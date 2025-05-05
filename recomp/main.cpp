@@ -36,27 +36,23 @@ int main() {
 
 
     //initialize TextureManager
-    TextureManager textureManager;
-    for (const auto& paths : Files::getPNGs("../Textures")) {
-        textureManager.cacheTexture(paths.stem().string(), window.loadNewTexture(paths.string().c_str()));
-    }
+    TextureManager textureManager(window.getRenderer(), "../Textures");
 
-    //garbanzo for now, plz fix
 
-    const nlohmann::json* mapJson = config.Get("Worldmap");
-    const float w = (*mapJson)["width"].get<int>();
-    const float h = (*mapJson)["height"].get<int>();
-    Sprite worldMap = Sprite(textureManager.GetTexture("worldmap"), { 0,0,w,h }, { 0,0,w,h });
+    //TEST (later scene?) worldmap
+    Sprite worldMap = textureManager.createSprite(config.Get("Worldmap"));
 
     //grid
-    Grid grid = Grid(w, h);
+    Grid grid = Grid(worldMap.getTexture()->w, worldMap.getTexture()->h);
     //player
-    Player player = Player(textureManager.GetTexture("player_ver2"), SDL_FPoint{ logicalRendererWidthInitial, logicalRendererHeightInitial });
+    Player player = Player(textureManager.createSprite(config.Get("Player")) , SDL_FPoint{ logicalRendererWidthInitial, logicalRendererHeightInitial });
 
     bool gameRunning = true;
     SDL_Event event;
 
     while (gameRunning) {
+
+        window.updateBegin();
 
         SDL_PollEvent(&event);
 
@@ -70,21 +66,22 @@ int main() {
         //-------------------------
 
         //MOVEMENT
-        SDL_FRect tPos = player.keyboard.getNewPosition(&player.sprite.destination, player.speed);
-        MyUtils::updatePosition(grid, tPos, &player.sprite.destination);
+        SDL_FRect tPos = player.keyboard.getNewPosition(player.sprite.getDestination(), player.speed);
+        MyUtils::updatePosition(grid, tPos, player.sprite.getDestination());
         //--------------------------
 
         //CAMERA
-        player.camera.setFocus(&player.sprite.destination);
-        player.camera.setClamp(&worldMap.source);
+        player.camera.setFocus(player.sprite.getDestination());
+        player.camera.setClamp(worldMap.getSource());
         //--------------------------
 
 
-        window.clear();
+
         Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
         Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
 
-        window.display();
+
+        window.updateEnd();
     }
 
 

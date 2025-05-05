@@ -22,21 +22,6 @@ namespace MyUtils {
 		*previousPosition = updatedLocation;
 	}
 
-	namespace Files {
-		const std::vector<std::filesystem::path> getPNGs(const char* folderPath)
-		{
-			std::vector<std::filesystem::path> paths;
-
-			for (const auto& entry : std::filesystem::directory_iterator(folderPath)) {
-				if (entry.path().extension() == ".png") {
-					paths.push_back(entry);
-				}
-			}
-
-			return paths;
-		}
-	}
-
 	namespace Config {
 		jConfig::jConfig(const char* folderPath) {
 
@@ -59,7 +44,7 @@ namespace MyUtils {
 			if (config->contains(request)) {
 				return &(*config)[request];
 			}
-			return nullptr;
+			throw "\nwhy are you entering a wrong thingy?\n";
 		}
 		jConfig::~jConfig() {
 			if (config) {
@@ -70,9 +55,9 @@ namespace MyUtils {
 	}
 
 	namespace Rendering {
-		void renderBasic(SDL_Renderer* renderer, const Sprite& sprite, const Camera& cam) {
-			SDL_FRect dest = cam.toCameraSpace(&sprite.destination);
-			SDL_RenderTexture(renderer, sprite.texture, &sprite.source, &dest);
+		void renderBasic(SDL_Renderer* renderer, Sprite& sprite, const Camera& cam) {
+			SDL_FRect dest = cam.toCameraSpace(sprite.getDestination());
+			SDL_RenderTexture(renderer, sprite.getTexture(), sprite.getSource(), &dest);
 		}
 
 	}

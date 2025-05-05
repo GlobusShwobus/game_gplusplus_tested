@@ -33,19 +33,6 @@ RenderWindow::RenderWindow(const nlohmann::json* const config) {
 	}
 }
 
-void RenderWindow::clear()
-{
-	SDL_RenderClear(renderer);
-}
-
-void RenderWindow::display()
-{
-	SDL_RenderPresent(renderer);
-}
-SDL_Texture* RenderWindow::loadNewTexture(const char* path)
-{
-	return IMG_LoadTexture(renderer, path);
-}
 SDL_Renderer* RenderWindow::getRenderer() {
 	return renderer;
 }
