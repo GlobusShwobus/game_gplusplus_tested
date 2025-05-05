@@ -54,16 +54,17 @@ int main() {
 
         window.updateBegin();
 
-        SDL_PollEvent(&event);
 
-        if (event.type == SDL_EventType::SDL_EVENT_QUIT) {
-            gameRunning = false;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EVENT_QUIT) {
+                gameRunning = false;
+            }
+
+            //EVENTS
+            player.keyboard.queueMove(&event);//reads event key press moves
+            //-------------------------
+
         }
-
-
-        //EVENTS
-        player.keyboard.queueMove(&event);//reads event key press moves
-        //-------------------------
 
         //MOVEMENT
         SDL_FRect tPos = player.keyboard.getNewPosition(player.sprite.getDestination(), player.speed);
@@ -79,7 +80,6 @@ int main() {
 
         Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
         Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
-
 
         window.updateEnd();
     }

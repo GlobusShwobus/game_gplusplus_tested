@@ -28,11 +28,10 @@ public:
 		SDL_RenderPresent(renderer);
 
 		frameDuration = SDL_GetTicks() - frameBegin;
-
-		//weird fuckyness when mouse is moved in window, causes massive lag, sdl_evnet to blame? fuck knows
 		if (frameDelay > frameDuration) {
-			//SDL_Delay(frameDelay - frameDuration);
+			SDL_Delay(frameDelay - frameDuration);
 		}
+
 	}
 
 	SDL_Renderer* getRenderer();
