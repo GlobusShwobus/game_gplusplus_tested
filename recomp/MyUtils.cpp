@@ -10,6 +10,25 @@ namespace MyUtils {
 		};
 		return corners;
 	}
+
+	SDL_FRect getNewPosition(const SDL_FRect* const position, const int movementStatus, const int speed) {
+		SDL_FRect newPos = *position;
+
+		if (movementStatus & MovementStatusFlags::MFLAG_KEY_W) {
+			newPos.y -= speed;
+		}
+		if (movementStatus & MovementStatusFlags::MFLAG_KEY_S) {
+			newPos.y += speed;
+		}
+		if (movementStatus & MovementStatusFlags::MFLAG_KEY_A) {
+			newPos.x -= speed;
+		}
+		if (movementStatus & MovementStatusFlags::MFLAG_KEY_D) {
+			newPos.x += speed;
+		}
+		return newPos;
+	}
+
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {
 
 		auto corners = getCorners(updatedLocation);

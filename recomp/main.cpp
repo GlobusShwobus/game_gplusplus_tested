@@ -61,13 +61,13 @@ int main() {
             }
 
             //EVENTS
-            player.keyboard.queueMove(&event);//reads event key press moves
+            player.movement.moveBegin(&event);//reads event key press moves
             //-------------------------
 
         }
 
         //MOVEMENT
-        SDL_FRect tPos = player.keyboard.getNewPosition(player.sprite.getDestination(), player.speed);
+        SDL_FRect tPos = MyUtils::getNewPosition(player.sprite.getDestination(), player.movement.getMovementStatus(), player.speed);
         MyUtils::updatePosition(grid, tPos, player.sprite.getDestination());
         //--------------------------
 
@@ -77,10 +77,10 @@ int main() {
         //--------------------------
 
 
-
         Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
         Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
 
+        player.movement.moveEnd();
         window.updateEnd();
     }
 

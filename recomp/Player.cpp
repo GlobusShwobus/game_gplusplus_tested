@@ -1,36 +1,27 @@
 #include "Player.h"
 
-void Keyboard::queueMove(const SDL_Event* const event) {
+void Movement::moveBegin(const SDL_Event* const event) {
 	if (event->type == SDL_EVENT_KEY_DOWN) {
 		switch (event->key.scancode) {
-		case SDL_SCANCODE_W: moveUp = true; break;
-		case SDL_SCANCODE_S: moveDown = true; break;
-		case SDL_SCANCODE_A: moveLeft = true; break;
-		case SDL_SCANCODE_D: moveRight = true; break;
+		case SDL_SCANCODE_W: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_W); break;
+		case SDL_SCANCODE_S: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_S); break;
+		case SDL_SCANCODE_A: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_A); break;
+		case SDL_SCANCODE_D: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_D); break;
 		default:break;
 		}
 	}
 }
-
-SDL_FRect Keyboard::getNewPosition(const SDL_FRect* const position, const int speed) {
-	SDL_FRect newPos = *position;
-	if (moveUp) {
-		newPos.y -= speed;
-		moveUp = false;
-	}
-	if (moveDown) {
-		newPos.y += speed;
-		moveDown = false;
-	}
-	if (moveLeft) {
-		newPos.x -= speed;
-		moveLeft = false;
-	}
-	if (moveRight) {
-		newPos.x += speed;
-		moveRight = false;
-	}
-	return newPos;
+void Movement::moveEnd() {
+	movementStatus &= ~(MFLAG_KEY_W | MFLAG_KEY_S | MFLAG_KEY_A | MFLAG_KEY_D | MFLAG_IS_MOVING);
+}
+int Movement::getMovementStatus()const {
+	return movementStatus;
+}
+void Movement::setStatusFlags(const MFLAG flags) {
+	movementStatus |= flags;
+}
+void Movement::removeStatusFlags(const MFLAG flags) {
+	movementStatus &= ~flags;
 }
 void Camera::setFocus(const SDL_FRect* const playerPos) {
 	//camera center at player's center
