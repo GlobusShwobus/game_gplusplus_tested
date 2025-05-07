@@ -149,7 +149,6 @@
     <ClInclude Include="TESTS.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture_Manager.h" />
     <ClInclude Include="vec2.h" />
   </ItemGroup>

@@ -1,33 +1,47 @@
 #pragma once
 
-#include "Sprite.h"
+#include "SDL3/SDL.h"
 
-enum MovementStatusFlags {
-	MFLAG_KEY_W = 1 << 0,
-	MFLAG_KEY_S = 1 << 1,
-	MFLAG_KEY_A = 1 << 2,
-	MFLAG_KEY_D = 1 << 3,
 
-	MFLAG_FACING_UP = 1 << 4,
-	MFLAG_FACING_DOWN = 1 << 5,
-	MFLAG_FACING_LEFT = 1 << 6,
-	MFLAG_FACING_RIGHT = 1 << 7,
-	MFLAG_IS_MOVING = 1 << 8
+enum MovementStatus {
+
+	MOVE_UP,
+	MOVE_DOWN,
+	MOVE_LEFT,
+	MOVE_RIGHT,
+
+	MOVE_UP_LEFT,
+	MOVE_UP_RIGHT,
+	MOVE_DOWN_LEFT,
+	MOVE_DOWN_RIGHT,
+
+	FACING_UP,
+	FACING_DOWN,
+	FACING_LEFT,
+	FACING_RIGHT,
+	MOVEMENT_STATUS_NULL
 };
-typedef int MFLAG;
+//movement flags
 
 class Movement {
 
-	int movementStatus = 0;
+	MovementStatus movementStatus = MOVEMENT_STATUS_NULL;
+	MovementStatus facingDirection = MOVEMENT_STATUS_NULL;
 
 	//movement can be refined to work diagonally in an intended way, currently it is possible but it is a bug
 public:
 
 	void moveBegin(const SDL_Event* const event);
 	void moveEnd();
-	void setStatusFlags(const MFLAG flags);
-	void removeStatusFlags(const MFLAG flags);
-	int getMovementStatus()const;
+
+
+	MovementStatus getMovementStatus()const {
+		return movementStatus;
+	}
+	MovementStatus getFacingDirection()const {
+		return facingDirection;
+	}
+
 };
 
 class Camera {
@@ -46,6 +60,53 @@ public:
 	const SDL_FPoint getCenter()const;
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
+
+class Sprite {
+
+	SDL_Texture* texture = nullptr;//not owner
+	SDL_FRect source = { 0,0,0,0 };
+	SDL_FRect destination = { 0,0,0,0 };
+
+
+	bool isAnimated = false;
+	int currentAnimationDescription = 0;
+	int frameWidth = 0;
+	int frameHeight = 0;
+
+	void ifIdleAnimation() {
+
+	}
+
+public:
+
+	Sprite(SDL_Texture* Texture) :texture(Texture) {
+		//defaults
+		source.w = texture->w;
+		source.h = texture->h;
+
+		destination.w = texture->w;
+		destination.h = texture->h;
+	}
+
+	//if a texture is animated, but framewidth and height are not set, then it is not animated, duhh
+	void initFrame(int frameW, int frameH) {
+		frameWidth = frameW;
+		frameHeight = frameH;
+		isAnimated = true;//the only place it is set
+	}
+
+	SDL_Texture* getTexture() {
+		return texture;
+	}
+	SDL_FRect* getSource() {
+		return &source;
+	}
+	SDL_FRect* getDestination() {
+		return &destination;
+	}
+
+};
+
 
 
 class Player {

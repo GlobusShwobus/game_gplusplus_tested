@@ -1,28 +1,58 @@
 #include "Player.h"
 
 void Movement::moveBegin(const SDL_Event* const event) {
-	if (event->type == SDL_EVENT_KEY_DOWN) {
-		switch (event->key.scancode) {
-		case SDL_SCANCODE_W: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_W); break;
-		case SDL_SCANCODE_S: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_S); break;
-		case SDL_SCANCODE_A: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_A); break;
-		case SDL_SCANCODE_D: movementStatus |= (MFLAG_IS_MOVING | MFLAG_KEY_D); break;
-		default:break;
-		}
+
+	if (event->type != SDL_EVENT_KEY_DOWN) {
+		return;
 	}
+
+	const auto* keystate = SDL_GetKeyboardState(nullptr);
+
+	bool w = keystate[SDL_SCANCODE_W];
+	bool a = keystate[SDL_SCANCODE_A];
+	bool s = keystate[SDL_SCANCODE_S];
+	bool d = keystate[SDL_SCANCODE_D];
+
+	if (w && a) {
+		movementStatus = MOVE_UP_LEFT;
+		facingDirection = FACING_UP;
+	}
+	else if (w && d) {
+		movementStatus = MOVE_UP_RIGHT;
+		facingDirection = FACING_UP;
+	}
+	else if (s && a) {
+		movementStatus = MOVE_DOWN_LEFT;
+		facingDirection = FACING_DOWN;
+	}
+	else if (s && d) {
+		movementStatus = MOVE_DOWN_RIGHT;
+		facingDirection = FACING_DOWN;
+	}
+	else if (w) {
+		movementStatus = MOVE_UP;
+		facingDirection = FACING_UP;
+	}
+	else if (s) {
+		movementStatus = MOVE_DOWN;
+		facingDirection = FACING_DOWN;
+	}
+	else if (a) {
+		movementStatus = MOVE_LEFT;
+		facingDirection = FACING_LEFT;
+	}
+	else if (d) {
+		movementStatus = MOVE_RIGHT;
+		facingDirection = FACING_RIGHT;
+	}
+	else {
+		movementStatus = MOVEMENT_STATUS_NULL;
+	}	
 }
 void Movement::moveEnd() {
-	movementStatus &= ~(MFLAG_KEY_W | MFLAG_KEY_S | MFLAG_KEY_A | MFLAG_KEY_D | MFLAG_IS_MOVING);
+	movementStatus = MOVEMENT_STATUS_NULL;
 }
-int Movement::getMovementStatus()const {
-	return movementStatus;
-}
-void Movement::setStatusFlags(const MFLAG flags) {
-	movementStatus |= flags;
-}
-void Movement::removeStatusFlags(const MFLAG flags) {
-	movementStatus &= ~flags;
-}
+
 void Camera::setFocus(const SDL_FRect* const playerPos) {
 	//camera center at player's center
 	center.x = playerPos->x + (playerPos->w / 2);

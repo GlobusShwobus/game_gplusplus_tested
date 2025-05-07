@@ -6,8 +6,8 @@
 
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
-#include "Sprite.h"
 #include "json.hpp"
+#include "Player.h"
 
 //add better throw exceptions
 

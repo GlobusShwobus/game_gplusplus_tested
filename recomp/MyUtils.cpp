@@ -11,20 +11,42 @@ namespace MyUtils {
 		return corners;
 	}
 
-	SDL_FRect getNewPosition(const SDL_FRect* const position, const int movementStatus, const int speed) {
+	SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const int speed) {
 		SDL_FRect newPos = *position;
 
-		if (movementStatus & MovementStatusFlags::MFLAG_KEY_W) {
+		const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
+
+		switch (movementStatus) {
+		case MOVE_UP:
 			newPos.y -= speed;
-		}
-		if (movementStatus & MovementStatusFlags::MFLAG_KEY_S) {
+			break;
+		case MOVE_DOWN:
 			newPos.y += speed;
-		}
-		if (movementStatus & MovementStatusFlags::MFLAG_KEY_A) {
+			break;
+		case MOVE_LEFT:
 			newPos.x -= speed;
-		}
-		if (movementStatus & MovementStatusFlags::MFLAG_KEY_D) {
+			break;
+		case MOVE_RIGHT:
 			newPos.x += speed;
+			break;
+		case MOVE_UP_LEFT:
+			newPos.y -= diagonalSpeed;
+			newPos.x -= diagonalSpeed;
+			break;
+		case MOVE_UP_RIGHT:
+			newPos.y -= diagonalSpeed;
+			newPos.x += diagonalSpeed;
+			break;
+		case MOVE_DOWN_LEFT:
+			newPos.y += diagonalSpeed;
+			newPos.x -= diagonalSpeed;
+			break;
+		case MOVE_DOWN_RIGHT:
+			newPos.y += diagonalSpeed;
+			newPos.x += diagonalSpeed;
+			break;
+		default:
+			break;
 		}
 		return newPos;
 	}
