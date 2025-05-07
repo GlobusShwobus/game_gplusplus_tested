@@ -17,31 +17,31 @@ namespace MyUtils {
 		const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
 
 		switch (movementStatus) {
-		case MOVE_UP:
+		case MovementStatus::MOVE_UP:
 			newPos.y -= speed;
 			break;
-		case MOVE_DOWN:
+		case MovementStatus::MOVE_DOWN:
 			newPos.y += speed;
 			break;
-		case MOVE_LEFT:
+		case MovementStatus::MOVE_LEFT:
 			newPos.x -= speed;
 			break;
-		case MOVE_RIGHT:
+		case MovementStatus::MOVE_RIGHT:
 			newPos.x += speed;
 			break;
-		case MOVE_UP_LEFT:
+		case MovementStatus::MOVE_UP_LEFT:
 			newPos.y -= diagonalSpeed;
 			newPos.x -= diagonalSpeed;
 			break;
-		case MOVE_UP_RIGHT:
+		case MovementStatus::MOVE_UP_RIGHT:
 			newPos.y -= diagonalSpeed;
 			newPos.x += diagonalSpeed;
 			break;
-		case MOVE_DOWN_LEFT:
+		case MovementStatus::MOVE_DOWN_LEFT:
 			newPos.y += diagonalSpeed;
 			newPos.x -= diagonalSpeed;
 			break;
-		case MOVE_DOWN_RIGHT:
+		case MovementStatus::MOVE_DOWN_RIGHT:
 			newPos.y += diagonalSpeed;
 			newPos.x += diagonalSpeed;
 			break;
@@ -49,6 +49,32 @@ namespace MyUtils {
 			break;
 		}
 		return newPos;
+	}
+	AnimationData getAnimationData(MovementStatus movementStatus, MovementStatus facingDirection) {
+		//hardcoded memes, coordinates based on my textureSheet which is intended for all NPC types, fuck it just get it working
+		switch (movementStatus) {
+		case MS::MOVE_DOWN:  return { 0, 0,   256, 0 };
+		case MS::MOVE_UP:    return { 0, 32,  256, 32 };
+		case MS::MOVE_LEFT:  return { 0, 64,  256, 64 };
+		case MS::MOVE_RIGHT: return { 0, 96,  256, 96 };
+
+		case MS::MOVE_UP_LEFT:   return { 0, 96, 256, 96 };   //don't have diagonal animations
+		case MS::MOVE_UP_RIGHT:  return { 0, 64, 256, 64 };   //don't have diagonal animations
+		case MS::MOVE_DOWN_LEFT: return { 0, 96, 256, 96 };  //don't have diagonal animations
+		case MS::MOVE_DOWN_RIGHT:return { 0, 64, 256, 64 };   //don't have diagonal animations
+
+		case MS::MOVEMENT_STATUS_NULL:
+			switch (facingDirection) {
+			case MS::FACING_UP:    return { 64,128,128,128 };
+			case MS::FACING_DOWN:  return { 0,128,64,128 };
+			case MS::FACING_LEFT:  return { 192,128,256,128 };
+			case MS::FACING_RIGHT: return { 128,128,192,128 };
+			default: break;
+			}
+			break;
+		default: break;
+		}
+		return { 0, 0, 0,0 };
 	}
 
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {

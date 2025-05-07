@@ -14,43 +14,43 @@ void Movement::moveBegin(const SDL_Event* const event) {
 	bool d = keystate[SDL_SCANCODE_D];
 
 	if (w && a) {
-		movementStatus = MOVE_UP_LEFT;
-		facingDirection = FACING_UP;
+		movementStatus = MS::MOVE_UP_LEFT;
+		facingDirection = MS::FACING_UP;
 	}
 	else if (w && d) {
-		movementStatus = MOVE_UP_RIGHT;
-		facingDirection = FACING_UP;
+		movementStatus = MS::MOVE_UP_RIGHT;
+		facingDirection = MS::FACING_UP;
 	}
 	else if (s && a) {
-		movementStatus = MOVE_DOWN_LEFT;
-		facingDirection = FACING_DOWN;
+		movementStatus = MS::MOVE_DOWN_LEFT;
+		facingDirection = MS::FACING_DOWN;
 	}
 	else if (s && d) {
-		movementStatus = MOVE_DOWN_RIGHT;
-		facingDirection = FACING_DOWN;
+		movementStatus = MS::MOVE_DOWN_RIGHT;
+		facingDirection = MS::FACING_DOWN;
 	}
 	else if (w) {
-		movementStatus = MOVE_UP;
-		facingDirection = FACING_UP;
+		movementStatus = MS::MOVE_UP;
+		facingDirection = MS::FACING_UP;
 	}
 	else if (s) {
-		movementStatus = MOVE_DOWN;
-		facingDirection = FACING_DOWN;
+		movementStatus = MS::MOVE_DOWN;
+		facingDirection = MS::FACING_DOWN;
 	}
 	else if (a) {
-		movementStatus = MOVE_LEFT;
-		facingDirection = FACING_LEFT;
+		movementStatus = MS::MOVE_LEFT;
+		facingDirection = MS::FACING_LEFT;
 	}
 	else if (d) {
-		movementStatus = MOVE_RIGHT;
-		facingDirection = FACING_RIGHT;
+		movementStatus = MS::MOVE_RIGHT;
+		facingDirection = MS::FACING_RIGHT;
 	}
 	else {
-		movementStatus = MOVEMENT_STATUS_NULL;
+		movementStatus = MS::MOVEMENT_STATUS_NULL;
 	}	
 }
 void Movement::moveEnd() {
-	movementStatus = MOVEMENT_STATUS_NULL;
+	movementStatus = MS::MOVEMENT_STATUS_NULL;
 }
 
 void Camera::setFocus(const SDL_FRect* const playerPos) {

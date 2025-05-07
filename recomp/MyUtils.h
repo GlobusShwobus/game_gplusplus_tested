@@ -15,6 +15,7 @@ namespace MyUtils {
 	std::array<SDL_FPoint, 4> getCorners(const SDL_FRect& position);
     SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const int speed);
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition);
+    AnimationData getAnimationData(MovementStatus movementStatus, MovementStatus facingDirection);
 
 	namespace Config {
         

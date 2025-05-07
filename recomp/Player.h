@@ -3,7 +3,7 @@
 #include "SDL3/SDL.h"
 
 
-enum MovementStatus {
+enum class MovementStatus {
 
 	MOVE_UP,
 	MOVE_DOWN,
@@ -21,12 +21,13 @@ enum MovementStatus {
 	FACING_RIGHT,
 	MOVEMENT_STATUS_NULL
 };
+typedef MovementStatus MS;
 //movement flags
 
 class Movement {
 
-	MovementStatus movementStatus = MOVEMENT_STATUS_NULL;
-	MovementStatus facingDirection = MOVEMENT_STATUS_NULL;
+	MovementStatus movementStatus  = MS::MOVEMENT_STATUS_NULL;
+	MovementStatus facingDirection = MS::MOVEMENT_STATUS_NULL;
 
 	//movement can be refined to work diagonally in an intended way, currently it is possible but it is a bug
 public:
@@ -61,21 +62,17 @@ public:
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
+struct AnimationData {
+	int frameBeginX = 0;
+	int frameBeginY = 0;
+	int frameEndX = 0;
+	int frameEndY = 0;
+};
 class Sprite {
 
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
-
-
-	bool isAnimated = false;
-	int currentAnimationDescription = 0;
-	int frameWidth = 0;
-	int frameHeight = 0;
-
-	void ifIdleAnimation() {
-
-	}
 
 public:
 
@@ -88,11 +85,8 @@ public:
 		destination.h = texture->h;
 	}
 
-	//if a texture is animated, but framewidth and height are not set, then it is not animated, duhh
-	void initFrame(int frameW, int frameH) {
-		frameWidth = frameW;
-		frameHeight = frameH;
-		isAnimated = true;//the only place it is set
+	void setNextFrame(const AnimationData animData) {
+
 	}
 
 	SDL_Texture* getTexture() {

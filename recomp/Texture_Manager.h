@@ -53,14 +53,6 @@ public:
 
 		Sprite sprite(textures[key]);
 
-		//if object is animated, it should have the data in the json, if it doesn't then how tf am i supposed to magically generate it? code doesn't know!
-		if (data->contains("frame_width") && data->contains("frame_height")) {
-			const int frameW = (*data)["frame_width"];
-			const int frameH = (*data)["frame_height"];
-
-			sprite.initFrame(frameW, frameH);
-		}
-
 		return sprite;
 	}
 

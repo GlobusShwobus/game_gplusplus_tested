@@ -1,8 +1,6 @@
 {
 	"Player": {
 		"texture_name": "player_ver2",
-		"frame_width": 32,
-		"frame_height": 32,
 		"speed": 5
 	},
 	"Window": {
