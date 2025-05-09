@@ -1,11 +1,6 @@
 #include "Player.h"
 
-void Movement::moveBegin(const SDL_Event* const event) {
-
-	if (event->type != SDL_EVENT_KEY_DOWN) {
-		return;
-	}
-
+void Movement::movementUpdate() {
 	const auto* keystate = SDL_GetKeyboardState(nullptr);
 
 	bool w = keystate[SDL_SCANCODE_W];
@@ -15,44 +10,46 @@ void Movement::moveBegin(const SDL_Event* const event) {
 
 	if (w && a) {
 		movementStatus = MS::MOVE_UP_LEFT;
-		facingDirection = MS::FACING_UP;
+		lastMove = MS::MOVE_UP_LEFT;
 	}
 	else if (w && d) {
 		movementStatus = MS::MOVE_UP_RIGHT;
-		facingDirection = MS::FACING_UP;
+		lastMove = MS::MOVE_UP_RIGHT;
 	}
 	else if (s && a) {
 		movementStatus = MS::MOVE_DOWN_LEFT;
-		facingDirection = MS::FACING_DOWN;
+		lastMove = MS::MOVE_DOWN_LEFT;
 	}
 	else if (s && d) {
 		movementStatus = MS::MOVE_DOWN_RIGHT;
-		facingDirection = MS::FACING_DOWN;
+		lastMove = MS::MOVE_DOWN_RIGHT;
 	}
 	else if (w) {
 		movementStatus = MS::MOVE_UP;
-		facingDirection = MS::FACING_UP;
+		lastMove = MS::MOVE_UP;
 	}
 	else if (s) {
 		movementStatus = MS::MOVE_DOWN;
-		facingDirection = MS::FACING_DOWN;
+		lastMove = MS::MOVE_DOWN;
 	}
 	else if (a) {
 		movementStatus = MS::MOVE_LEFT;
-		facingDirection = MS::FACING_LEFT;
+		lastMove = MS::MOVE_LEFT;
 	}
 	else if (d) {
 		movementStatus = MS::MOVE_RIGHT;
-		facingDirection = MS::FACING_RIGHT;
+		lastMove = MS::MOVE_RIGHT;
 	}
 	else {
-		movementStatus = MS::MOVEMENT_STATUS_NULL;
-	}	
+		movementStatus = MS::MOVEMENT_STATUS_NOTHING;
+	}
 }
-void Movement::moveEnd() {
-	movementStatus = MS::MOVEMENT_STATUS_NULL;
+MovementStatus Movement::getCurrentMove()const {
+	return movementStatus;
 }
-
+MovementStatus Movement::getLastMove()const {
+	return lastMove;
+}
 void Camera::setFocus(const SDL_FRect* const playerPos) {
 	//camera center at player's center
 	center.x = playerPos->x + (playerPos->w / 2);
@@ -77,5 +74,75 @@ SDL_FRect Camera::toCameraSpace(const SDL_FRect* const entity)const {
 	screenPos.h = entity->h;
 
 	return screenPos;
+}
+
+void Sprite::play(const ClipID clipID) {
+	//if this status, then nothing to do here
+	if (clipID == ClipID::none) return;
+
+	const auto& clipIt = clips->find(clipID);
+
+	//maybe entered a clip which is not appropriate to the texture, then gtfo
+	if (clipIt == clips->end()) return;
+
+	const AnimationClip& clip = clipIt->second;
+
+	//if clips changed, reset local vars related to frames
+	if (clipID != previousClip) {
+		previousClip = clipID;
+		frameIndex = 0;
+		clipTimer = 0;
+
+		source.x = clip.x;
+		source.y = clip.y;
+		source.w = clip.w;
+		source.h = clip.h;
+		return;
+	}
+
+	//if frame is of looping type and we reached the end of the animation, don't repeat it
+	if (!clip.isLooping && frameIndex >= clip.frameCount) return;
+
+
+	clipTimer++;
+	//if we haven't reached the treshhold to update frame, leave
+	if (clipTimer < clip.frameDelay)return;
+
+	clipTimer = 0;
+
+	frameIndex++;
+	//reset it if it is looping type and reached the end
+	if (clip.isLooping && frameIndex >= clip.frameCount) {
+		frameIndex = 0;
+	}
+	//do the actual magic
+	source.x = clip.x + (clip.w * frameIndex);
+	source.y = clip.y;
+	source.w = clip.w;
+	source.h = clip.h;
+}
+void Sprite::setClips(std::map<ClipID, AnimationClip>* clips) {
+	this->clips = clips;
+}
+const SpriteID Sprite::getID()const {
+	return textureID;
+}
+bool Sprite::isAnimated()const {
+	return clips;
+}
+int Sprite::clipsCount()const {
+	if (clips) {
+		return clips->size();
+	}
+	return 0;
+}
+SDL_Texture* Sprite::getTexture() {
+	return texture;
+}
+SDL_FRect* Sprite::getSource() {
+	return &source;
+}
+SDL_FRect* Sprite::getDestination() {
+	return &destination;
 }
 

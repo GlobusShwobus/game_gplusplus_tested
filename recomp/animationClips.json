@@ -1,0 +1,88 @@
+{
+	"player_sheet": {
+		"texture_id": 1,
+		"walk_up": {
+			"clip_id": 1,
+			"begin_x": 0,
+			"begin_y": 0,
+			"width": 32,
+			"height": 32,
+			"frame_count": 8,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"walk_down": {
+			"clip_id": 2,
+			"begin_x": 0,
+			"begin_y": 32,
+			"width": 32,
+			"height": 32,
+			"frame_count": 8,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"walk_left": {
+			"clip_id": 3,
+			"begin_x": 0,
+			"begin_y": 64,
+			"width": 32,
+			"height": 32,
+			"frame_count": 8,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"walk_right": {
+			"clip_id": 4,
+			"begin_x": 0,
+			"begin_y": 96,
+			"width": 32,
+			"height": 32,
+			"frame_count": 8,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"idle_up": {
+			"clip_id": 5,
+			"begin_x": 0,
+			"begin_y": 128,
+			"width": 32,
+			"height": 32,
+			"frame_count": 2,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"idle_down": {
+			"clip_id": 6,
+			"begin_x": 64,
+			"begin_y": 128,
+			"width": 32,
+			"height": 32,
+			"frame_count": 2,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"idle_left": {
+			"clip_id": 7,
+			"begin_x": 128,
+			"begin_y": 128,
+			"width": 32,
+			"height": 32,
+			"frame_count": 2,
+			"frame_delay": 6,
+			"loops": true
+		},
+		"idle_right": {
+			"clip_id": 8,
+			"begin_x": 192,
+			"begin_y": 128,
+			"width": 32,
+			"height": 32,
+			"frame_count": 2,
+			"frame_delay": 6,
+			"loops": true
+		}
+	},
+	"Worldmap": {
+		"texture_id": 2
+	}
+}

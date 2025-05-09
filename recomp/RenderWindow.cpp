@@ -32,6 +32,18 @@ RenderWindow::RenderWindow(const nlohmann::json* const config) {
 		std::exit(EXIT_FAILURE);
 	}
 }
+void RenderWindow::updateBegin() {
+	SDL_RenderClear(renderer);
+	frameBegin = SDL_GetTicks();
+}
+void RenderWindow::updateEnd() {
+	SDL_RenderPresent(renderer);
+
+	frameDuration = SDL_GetTicks() - frameBegin;
+	if (frameDelay > frameDuration) {
+		SDL_Delay(frameDelay - frameDuration);
+	}
+}
 
 SDL_Renderer* RenderWindow::getRenderer() {
 	return renderer;

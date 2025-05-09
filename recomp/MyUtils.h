@@ -3,7 +3,6 @@
 
 #include <array>
 #include <fstream>
-#include <filesystem>
 
 #include "json.hpp"
 #include "SDL3/SDL.h"
@@ -13,31 +12,12 @@
 namespace MyUtils {
 
 	std::array<SDL_FPoint, 4> getCorners(const SDL_FRect& position);
-    SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const int speed);
+    SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const float speed);
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition);
-    AnimationData getAnimationData(MovementStatus movementStatus, MovementStatus facingDirection);
+    nlohmann::json* initJSON(const char* path);
 
-	namespace Config {
-        
-        class jConfig {
-            nlohmann::json* config = nullptr;
+    ClipID getClipBasedOnMovement(const Movement movementData);
 
-        public:
-            jConfig() = delete;
-            jConfig(const char* folderPath);
-            bool isValid()const;
-            const nlohmann::json* const Get()const;
-            const nlohmann::json* const Get(const char* request)const;
-
-            ~jConfig();
-            private:
-
-                jConfig(const jConfig& copy) = delete;
-                jConfig(jConfig&& move)noexcept = delete;
-                jConfig& operator=(const jConfig& assign) = delete;
-                jConfig& operator=(jConfig&& assign)noexcept = delete;
-        };
-	}
     namespace Rendering {
         //later sepparate logic for player rendering and world objects as that will enable ignoring rendering outside of camera area
         //for now, don't have NPCs for that to set up

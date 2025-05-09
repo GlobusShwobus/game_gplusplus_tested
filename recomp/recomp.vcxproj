@@ -161,6 +161,9 @@
     <ClCompile Include="TESTS.cpp" />
     <ClCompile Include="Texture_Manager.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="animationClips.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

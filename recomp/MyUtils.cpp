@@ -11,7 +11,7 @@ namespace MyUtils {
 		return corners;
 	}
 
-	SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const int speed) {
+	SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const float speed) {
 		SDL_FRect newPos = *position;
 
 		const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
@@ -50,32 +50,6 @@ namespace MyUtils {
 		}
 		return newPos;
 	}
-	AnimationData getAnimationData(MovementStatus movementStatus, MovementStatus facingDirection) {
-		//hardcoded memes, coordinates based on my textureSheet which is intended for all NPC types, fuck it just get it working
-		switch (movementStatus) {
-		case MS::MOVE_DOWN:  return { 0, 0,   256, 0 };
-		case MS::MOVE_UP:    return { 0, 32,  256, 32 };
-		case MS::MOVE_LEFT:  return { 0, 64,  256, 64 };
-		case MS::MOVE_RIGHT: return { 0, 96,  256, 96 };
-
-		case MS::MOVE_UP_LEFT:   return { 0, 96, 256, 96 };   //don't have diagonal animations
-		case MS::MOVE_UP_RIGHT:  return { 0, 64, 256, 64 };   //don't have diagonal animations
-		case MS::MOVE_DOWN_LEFT: return { 0, 96, 256, 96 };  //don't have diagonal animations
-		case MS::MOVE_DOWN_RIGHT:return { 0, 64, 256, 64 };   //don't have diagonal animations
-
-		case MS::MOVEMENT_STATUS_NULL:
-			switch (facingDirection) {
-			case MS::FACING_UP:    return { 64,128,128,128 };
-			case MS::FACING_DOWN:  return { 0,128,64,128 };
-			case MS::FACING_LEFT:  return { 192,128,256,128 };
-			case MS::FACING_RIGHT: return { 128,128,192,128 };
-			default: break;
-			}
-			break;
-		default: break;
-		}
-		return { 0, 0, 0,0 };
-	}
 
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {
 
@@ -89,36 +63,50 @@ namespace MyUtils {
 		*previousPosition = updatedLocation;
 	}
 
-	namespace Config {
-		jConfig::jConfig(const char* folderPath) {
+	nlohmann::json* initJSON(const char* path) {
+		//look into assurances that the path is a json so we catch exception early
+		std::ifstream in(path);
+		nlohmann::json* json = nullptr;
+		if (in.good()) {
+			json = new nlohmann::json();
+			in >> *json;
+		}
+		in.close();
 
-			std::ifstream in(folderPath);
+		return json;
+	}
+	ClipID getClipBasedOnMovement(const Movement movementData) {
 
-			if (in.good()) {
-				config = new nlohmann::json();
-				in >> *config;
-			}
+		MovementStatus moving = movementData.getCurrentMove();
+		MovementStatus ifIdle = movementData.getLastMove();
 
-			in.close();
+		if (moving == MovementStatus::MOVE_UP) {
+			return ClipID::walk_up;
 		}
-		bool jConfig::isValid()const {
-			return config;
+		else if (moving == MovementStatus::MOVE_DOWN) {
+			return ClipID::walk_down;
 		}
-		const nlohmann::json* const jConfig::Get()const {
-			return config;
+		else if (moving == MovementStatus::MOVE_LEFT || moving == MovementStatus::MOVE_UP_LEFT || moving == MovementStatus::MOVE_DOWN_LEFT) {
+			return ClipID::walk_left;
 		}
-		const nlohmann::json* const jConfig::Get(const char* request)const {
-			if (config->contains(request)) {
-				return &(*config)[request];
-			}
-			throw "\nwhy are you entering a wrong thingy?\n";
+		else if (moving == MovementStatus::MOVE_RIGHT || moving == MovementStatus::MOVE_UP_RIGHT || moving == MovementStatus::MOVE_DOWN_RIGHT) {
+			return ClipID::walk_right;
 		}
-		jConfig::~jConfig() {
-			if (config) {
-				delete config;
-				config = nullptr;
-			}
+		//if none of the above is satisfied
+		if (ifIdle == MovementStatus::MOVE_UP) {
+			return ClipID::idle_up;
 		}
+		else if (ifIdle == MovementStatus::MOVE_DOWN) {
+			return ClipID::idle_down;
+		}
+		else if (ifIdle == MovementStatus::MOVE_LEFT || ifIdle == MovementStatus::MOVE_UP_LEFT || ifIdle == MovementStatus::MOVE_DOWN_LEFT) {
+			return ClipID::idle_left;
+		}
+		else if (ifIdle == MovementStatus::MOVE_RIGHT || ifIdle == MovementStatus::MOVE_UP_RIGHT || ifIdle == MovementStatus::MOVE_DOWN_RIGHT) {
+			return ClipID::idle_right;
+		}
+
+		return ClipID::none;
 	}
 
 	namespace Rendering {

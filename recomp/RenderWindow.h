@@ -19,20 +19,8 @@ public:
 
 	RenderWindow(const nlohmann::json* const config);
 
-
-	void updateBegin() {
-		SDL_RenderClear(renderer);
-		frameBegin = SDL_GetTicks();
-	}
-	void updateEnd() {
-		SDL_RenderPresent(renderer);
-
-		frameDuration = SDL_GetTicks() - frameBegin;
-		if (frameDelay > frameDuration) {
-			SDL_Delay(frameDelay - frameDuration);
-		}
-
-	}
+	void updateBegin();
+	void updateEnd();
 
 	SDL_Renderer* getRenderer();
 	void setLogicalRenderingSize(const int width, const int height);

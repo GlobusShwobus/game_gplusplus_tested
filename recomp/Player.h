@@ -1,10 +1,9 @@
 #pragma once
 
 #include "SDL3/SDL.h"
-
+#include <map>
 
 enum class MovementStatus {
-
 	MOVE_UP,
 	MOVE_DOWN,
 	MOVE_LEFT,
@@ -14,35 +13,21 @@ enum class MovementStatus {
 	MOVE_UP_RIGHT,
 	MOVE_DOWN_LEFT,
 	MOVE_DOWN_RIGHT,
-
-	FACING_UP,
-	FACING_DOWN,
-	FACING_LEFT,
-	FACING_RIGHT,
-	MOVEMENT_STATUS_NULL
+	MOVEMENT_STATUS_NOTHING
 };
 typedef MovementStatus MS;
 //movement flags
 
 class Movement {
 
-	MovementStatus movementStatus  = MS::MOVEMENT_STATUS_NULL;
-	MovementStatus facingDirection = MS::MOVEMENT_STATUS_NULL;
+	MovementStatus movementStatus  = MS::MOVEMENT_STATUS_NOTHING;
+	MovementStatus lastMove = MS::MOVEMENT_STATUS_NOTHING;
 
-	//movement can be refined to work diagonally in an intended way, currently it is possible but it is a bug
 public:
+	void movementUpdate();
 
-	void moveBegin(const SDL_Event* const event);
-	void moveEnd();
-
-
-	MovementStatus getMovementStatus()const {
-		return movementStatus;
-	}
-	MovementStatus getFacingDirection()const {
-		return facingDirection;
-	}
-
+	MovementStatus getCurrentMove()const;
+	MovementStatus getLastMove()const;
 };
 
 class Camera {
@@ -62,46 +47,58 @@ public:
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
-struct AnimationData {
-	int frameBeginX = 0;
-	int frameBeginY = 0;
-	int frameEndX = 0;
-	int frameEndY = 0;
+enum class SpriteID {
+	none = 0,
+	player_sheet = 1,
+	world_map = 2,
 };
+enum class ClipID {
+	none         = 0,
+	walk_up      = 1,
+	walk_down    = 2,
+	walk_left    = 3,
+	walk_right   = 4,
+	idle_up      = 5,
+	idle_down    = 6,
+	idle_left    = 7,
+	idle_right   = 8,
+};
+struct AnimationClip {
+	int x = 0;
+	int y = 0;
+	int w = 0;
+	int h = 0;
+	int frameCount = 0;
+	int frameDelay = 0;
+	bool isLooping = false;
+};
+
 class Sprite {
 
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
+	SpriteID textureID = SpriteID::none;
+	std::map<ClipID, AnimationClip>* clips = nullptr;//not owner, and doesn't point to heap object
+
+	ClipID previousClip = ClipID::none;
+	int frameIndex = 0;
+	int clipTimer = 0;
 
 public:
 
-	Sprite(SDL_Texture* Texture) :texture(Texture) {
-		//defaults
-		source.w = texture->w;
-		source.h = texture->h;
+	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest, SpriteID id) :texture(Texture), source(*src), destination(*dest), textureID(id) {}
+	Sprite() = default;//later refine texturemanager code (if it's not a meme) and get rid of this constructor
 
-		destination.w = texture->w;
-		destination.h = texture->h;
-	}
-
-	void setNextFrame(const AnimationData animData) {
-
-	}
-
-	SDL_Texture* getTexture() {
-		return texture;
-	}
-	SDL_FRect* getSource() {
-		return &source;
-	}
-	SDL_FRect* getDestination() {
-		return &destination;
-	}
-
+	void play(const ClipID clipID);
+	void setClips(std::map<ClipID, AnimationClip>* clips);
+	const SpriteID getID()const;
+	bool isAnimated()const;
+	int clipsCount()const;
+	SDL_Texture* getTexture();
+	SDL_FRect* getSource();
+	SDL_FRect* getDestination();
 };
-
-
 
 class Player {
 
@@ -111,9 +108,7 @@ public:
 	Movement movement;
 	Camera camera;
 
-	static constexpr int speed = 5;
-
-	//animation
+	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
 
 	//frameLimiter
 	//NPCs->handle new/delete inbetween frames
