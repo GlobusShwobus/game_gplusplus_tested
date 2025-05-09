@@ -78,7 +78,7 @@ SDL_FRect Camera::toCameraSpace(const SDL_FRect* const entity)const {
 
 void Sprite::play(const ClipID clipID) {
 	//if this status, then nothing to do here
-	if (clipID == ClipID::none) return;
+	if (clipID == ClipID::none || !clips) return;
 
 	const auto& clipIt = clips->find(clipID);
 
