@@ -30,7 +30,7 @@
     <ClInclude Include="vec2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="BasicComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TESTS.h">

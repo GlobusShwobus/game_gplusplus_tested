@@ -9,15 +9,6 @@
 static constexpr int logicalRendererWidthInitial = 1280;
 static constexpr int logicalRendererHeightInitial = 720;
 
-
-//clean up
-//read player speed from config
-//create get position/texture/sheet position shortcut functions
-//generic entity manager system, this will hold all object type entities, including animatable misc objects like waterfalls, chimneys, but also importantly generic empty entities AKA invisible walls
-//test out collison
-//junk test out empty entities invisible walls
-
-
 int main() {
 
     
@@ -52,14 +43,7 @@ int main() {
 
     //initialize TextureManager
     TextureManager textureManager;
-    try {
-        textureManager.bootUpSprites(window.getRenderer(), metaConfig);
-        textureManager.bootUpAnimations(animationConfig);//think could delete animationConfig after this to save some space
-    }
-    catch (const std::exception& excpt) {
-        printf(excpt.what());
-        return -1;
-    }
+
 
     //TEST (later scene?) worldmap
     Sprite worldMap = textureManager.createSprite(SpriteID::world_map);

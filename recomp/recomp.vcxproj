@@ -147,7 +147,7 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="MyUtils.h" />
     <ClInclude Include="TESTS.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="BasicComponents.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Texture_Manager.h" />
     <ClInclude Include="vec2.h" />

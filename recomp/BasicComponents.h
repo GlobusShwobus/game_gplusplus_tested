@@ -63,7 +63,7 @@ enum class ClipID {
 	idle_left    = 7,
 	idle_right   = 8,
 };
-struct AnimationClip {
+struct Animation {
 	int x = 0;
 	int y = 0;
 	int w = 0;
@@ -79,7 +79,7 @@ class Sprite {
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
 
-	std::map<ClipID, AnimationClip>* clips = nullptr;//not owner, and doesn't point to heap object
+	//std::map<ClipID, AnimationClip>* clips = nullptr;//not owner, and doesn't point to heap object
 
 	ClipID previousClip = ClipID::none;
 	int frameIndex = 0;
@@ -91,23 +91,10 @@ public:
 	Sprite() = default;//later refine texturemanager code (if it's not a meme) and get rid of this constructor
 
 	void play(const ClipID clipID);
-	void setClips(std::map<ClipID, AnimationClip>* clips);
-	bool isAnimated()const;
+	//void setClips(std::map<ClipID, AnimationClip>* clips);
+	//bool isAnimated()const;
 
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
 	SDL_FRect* getDestination();
-};
-
-class Player {
-
-public:
-
-	Sprite sprite;
-	Movement movement;
-	Camera camera;
-
-	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
-
-	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
 };
