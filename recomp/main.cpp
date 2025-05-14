@@ -9,6 +9,15 @@
 static constexpr int logicalRendererWidthInitial = 1280;
 static constexpr int logicalRendererHeightInitial = 720;
 
+
+//clean up
+//read player speed from config
+//create get position/texture/sheet position shortcut functions
+//generic entity manager system, this will hold all object type entities, including animatable misc objects like waterfalls, chimneys, but also importantly generic empty entities AKA invisible walls
+//test out collison
+//junk test out empty entities invisible walls
+
+
 int main() {
 
     
@@ -95,13 +104,6 @@ int main() {
 
         MyUtils::Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
         MyUtils::Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
-
-
-        SDL_FRect debugSource = *player.sprite.getSource();
-        SDL_FRect debugDest = *player.sprite.getDestination();
-
-        printf("source: %f / %f\n", debugSource.x, debugSource.y);
-        printf("dest: %f / %f\n", debugDest.x, debugDest.y);
 
 
         window.updateEnd();

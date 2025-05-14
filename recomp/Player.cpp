@@ -124,17 +124,8 @@ void Sprite::play(const ClipID clipID) {
 void Sprite::setClips(std::map<ClipID, AnimationClip>* clips) {
 	this->clips = clips;
 }
-const SpriteID Sprite::getID()const {
-	return textureID;
-}
 bool Sprite::isAnimated()const {
 	return clips;
-}
-int Sprite::clipsCount()const {
-	if (clips) {
-		return clips->size();
-	}
-	return 0;
 }
 SDL_Texture* Sprite::getTexture() {
 	return texture;

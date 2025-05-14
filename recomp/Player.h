@@ -78,7 +78,7 @@ class Sprite {
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
-	SpriteID textureID = SpriteID::none;
+
 	std::map<ClipID, AnimationClip>* clips = nullptr;//not owner, and doesn't point to heap object
 
 	ClipID previousClip = ClipID::none;
@@ -87,14 +87,13 @@ class Sprite {
 
 public:
 
-	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest, SpriteID id) :texture(Texture), source(*src), destination(*dest), textureID(id) {}
+	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest) :texture(Texture), source(*src), destination(*dest) {}
 	Sprite() = default;//later refine texturemanager code (if it's not a meme) and get rid of this constructor
 
 	void play(const ClipID clipID);
 	void setClips(std::map<ClipID, AnimationClip>* clips);
-	const SpriteID getID()const;
 	bool isAnimated()const;
-	int clipsCount()const;
+
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
 	SDL_FRect* getDestination();
@@ -109,9 +108,6 @@ public:
 	Camera camera;
 
 	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
-
-	//frameLimiter
-	//NPCs->handle new/delete inbetween frames
 
 	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
 };

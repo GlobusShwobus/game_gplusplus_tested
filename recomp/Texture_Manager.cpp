@@ -31,7 +31,7 @@ void TextureManager::bootUpSprites(SDL_Renderer* renderer, const nlohmann::json*
 			throw std::logic_error("\nFailed to load texture at path named: " + texturePath);
 		}
 
-		Sprite sprite(texture, &source, &destination, textureID);
+		Sprite sprite(texture, &source, &destination);
 
 		sprites.emplace(textureID, sprite);
 	}
