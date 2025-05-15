@@ -149,7 +149,7 @@
     <ClInclude Include="TESTS.h" />
     <ClInclude Include="BasicComponents.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="ComponentManager.h" />
+    <ClInclude Include="EntityFactory.h" />
     <ClInclude Include="vec2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -159,7 +159,7 @@
     <ClCompile Include="BasicComponents.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="TESTS.cpp" />
-    <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="EntityFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="animationClips.json" />

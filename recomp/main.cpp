@@ -1,4 +1,4 @@
-#include "Texture_Manager.h"
+#include "EntityFactory.h"
 #include "RenderWindow.h"
 #include "Grid.h"
 #include "Player.h"
@@ -42,7 +42,16 @@ int main() {
 
 
     //initialize TextureManager
-    TextureManager textureManager;
+    EntityFactory textureManager;
+
+    try {
+        textureManager.bootUpSprites(window.getRenderer(), metaConfig);
+        textureManager.bootUpAnimations(animationConfig);
+    }
+    catch (const std::exception& e) {
+        printf("\nEntityManager BootUp failure: %s\n", e.what());
+        std::exit(EXIT_FAILURE);
+    }
 
 
     //TEST (later scene?) worldmap

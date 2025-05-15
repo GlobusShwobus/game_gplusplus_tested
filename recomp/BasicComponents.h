@@ -2,6 +2,7 @@
 
 #include "SDL3/SDL.h"
 #include <map>
+#include <vector>
 
 enum class MovementStatus {
 	MOVE_UP,
@@ -47,7 +48,7 @@ public:
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
-enum class ClipID {
+enum class ReelID {
 	none         = 0,
 	walk_up      = 1,
 	walk_down    = 2,
@@ -59,7 +60,8 @@ enum class ClipID {
 	idle_right   = 8,
 };
 
-struct Animation {
+struct FrameReelData {
+	ReelID id = ReelID::none;
 	int x = 0;
 	int y = 0;
 	int w = 0;
@@ -75,22 +77,47 @@ class Sprite {
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
 
-	ClipID previousClip = ClipID::none;
-	int frameIndex = 0;
-	int clipTimer = 0;
+	class Animation {
+
+		const std::vector<FrameReelData>* const reelData = nullptr;//not owner
+
+		ReelID previousReelID = ReelID::none;
+		int frameIndex = 0;
+		int clipTimer = 0;
+
+	public:
+		void play(const ReelID clipID);//LEAVE IT FOR NOW LIKE THIS, LATER FUG KNOWS
+	};
 
 public:
 
 	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest) :texture(Texture), source(*src), destination(*dest) {}
-	Sprite() = default;//later refine texturemanager code (if it's not a meme) and get rid of this constructor
-
-	void play(const ClipID clipID);
+	Sprite() = default;//REMEMBER TO CLEAN THIS UP WHEN DONE WITH ENTITY/COMPONENT ARCHITECTURE
 
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
 	SDL_FRect* getDestination();
 };
 
+enum class EntityID {
+	PLAYER = 1,
+	ENEMY_SPEAR1 = 2,
+	WORLD_MAP = 10001,
+};
+
+enum class EnemeyID {
+	ENEMY_SPEAR1
+};
+
+struct EnemyData {
+
+};
+
+
+//SET UP COMPONENT MANAGMENT FIRST, THEN ENTITIES AND GAMESCENE
+
+
+/*
 class Player {
 
 public:
@@ -103,3 +130,4 @@ public:
 
 	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
 };
+*/

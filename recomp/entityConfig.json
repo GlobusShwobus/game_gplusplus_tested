@@ -6,10 +6,24 @@
       "texture_source": [ 0, 0, 32, 32 ],
       "texture_destination": [ 0, 0, 32, 32 ]
     },
-    "movement_speed": 2.5
+    "movement_speed": 2.5,
+    "health_points": 100,
+    "attack_power": 25
+  },
+  "Enemy": {
+    "entity_id_type": 2,
+    "sprite": {
+      "texture_path": "../Textures/enemy1.png",
+      "texture_source": [ 0, 0, 32, 32 ],
+      "texture_destination": [ 0, 0, 32, 32 ]
+    },
+    "movement_speed": 5,
+    "health_points": 100,
+    "attack_power": 10,
+    "attack_interval": 10
   },
   "Worldmap": {
-    "entity_id_type": 2,
+    "entity_id_type": 10001,
     "sprite": {
       "texture_path": "../Textures/worldmap.png",
       "texture_source": [ 0, 0, 2560, 1440 ],
