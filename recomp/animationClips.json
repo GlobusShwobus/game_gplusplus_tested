@@ -1,6 +1,6 @@
 {
 	"player_sheet": {
-		"texture_id": 1,
+		"entity_id_type": 1,
 		"walk_up": {
 			"clip_id": 1,
 			"begin_x": 0,
@@ -83,6 +83,6 @@
 		}
 	},
 	"Worldmap": {
-		"texture_id": 2
+		"entity_id_type": 2
 	}
 }

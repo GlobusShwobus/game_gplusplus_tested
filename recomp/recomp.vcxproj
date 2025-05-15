@@ -149,20 +149,21 @@
     <ClInclude Include="TESTS.h" />
     <ClInclude Include="BasicComponents.h" />
     <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Texture_Manager.h" />
+    <ClInclude Include="ComponentManager.h" />
     <ClInclude Include="vec2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyUtils.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="BasicComponents.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="TESTS.cpp" />
-    <ClCompile Include="Texture_Manager.cpp" />
+    <ClCompile Include="ComponentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="animationClips.json" />
+    <Text Include="entityConfig.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

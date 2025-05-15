@@ -21,7 +21,7 @@ typedef MovementStatus MS;
 class Movement {
 
 	MovementStatus movementStatus  = MS::MOVEMENT_STATUS_NOTHING;
-	MovementStatus lastMove = MS::MOVEMENT_STATUS_NOTHING;
+	MovementStatus lastMove        = MS::MOVEMENT_STATUS_NOTHING;
 
 public:
 	void movementUpdate();
@@ -47,11 +47,6 @@ public:
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
-enum class SpriteID {
-	none = 0,
-	player_sheet = 1,
-	world_map = 2,
-};
 enum class ClipID {
 	none         = 0,
 	walk_up      = 1,
@@ -63,6 +58,7 @@ enum class ClipID {
 	idle_left    = 7,
 	idle_right   = 8,
 };
+
 struct Animation {
 	int x = 0;
 	int y = 0;
@@ -79,8 +75,6 @@ class Sprite {
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
 
-	//std::map<ClipID, AnimationClip>* clips = nullptr;//not owner, and doesn't point to heap object
-
 	ClipID previousClip = ClipID::none;
 	int frameIndex = 0;
 	int clipTimer = 0;
@@ -91,10 +85,21 @@ public:
 	Sprite() = default;//later refine texturemanager code (if it's not a meme) and get rid of this constructor
 
 	void play(const ClipID clipID);
-	//void setClips(std::map<ClipID, AnimationClip>* clips);
-	//bool isAnimated()const;
 
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
 	SDL_FRect* getDestination();
+};
+
+class Player {
+
+public:
+
+	Sprite sprite;
+	Movement movement;
+	Camera camera;
+
+	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
+
+	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
 };

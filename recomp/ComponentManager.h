@@ -10,32 +10,21 @@
 /*
 #######################################################################################################################
 
-* EntityManager stores all components
-* EntityManager stores entities
-* Entities are all base objects(or normal no virtual inheritence, will see)
-* EntityManager stores all entity types in independent containers
+* EntityFactory stores all building blocks requires to create entities
+* EntityFactory creates entities from blocks of data stored into it
+* EntityFactory handles owvership of components
+* Entities may store, but should never own, pointers to xyz
 * All data required to build entities is read at the start of the program from jsons and stored into memory
-* When in need to create an entity, do it so via enums and then use the building blocks to create whatever
+* 
+* Grid class to become GameScene class
+* GameScene class stores and handles ownership of entities (which are to be created by 'new' via EntityFactory)
 * 
 * Current issue: don't like how sprite component stored animation data, desire to store it independently, maybe in entities
-* Current issue: Grid.h is redundant but its functionality valueable, probably merge the tile system into EntityManager
 
 #######################################################################################################################
 */
-class Player {
 
-public:
-
-	Sprite sprite;
-	Movement movement;
-	Camera camera;
-
-	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
-
-	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
-};
-
-class EntityManager {
+class ComponentManager {
 
 	std::map<SpriteID, Sprite> spriteComponents;
 	std::map<ClipID, Animation> animationComponents;

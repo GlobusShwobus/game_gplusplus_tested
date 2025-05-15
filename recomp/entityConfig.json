@@ -1,0 +1,24 @@
+{
+  "Player": {
+    "entity_id_type": 1,
+    "sprite": {
+      "texture_path": "../Textures/player_sheet.png",
+      "texture_source": [ 0, 0, 32, 32 ],
+      "texture_destination": [ 0, 0, 32, 32 ]
+    },
+    "movement_speed": 2.5
+  },
+  "Worldmap": {
+    "entity_id_type": 2,
+    "sprite": {
+      "texture_path": "../Textures/worldmap.png",
+      "texture_source": [ 0, 0, 2560, 1440 ],
+      "texture_destination": [ 0, 0, 2560, 1440 ]
+    }
+  },
+  "Window": {
+    "width": 1400,
+    "height": 800,
+    "game_name": "pepega_game"
+  }
+}

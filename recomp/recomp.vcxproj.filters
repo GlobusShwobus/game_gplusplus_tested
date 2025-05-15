@@ -24,7 +24,7 @@
     <ClInclude Include="RenderWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Texture_Manager.h">
+    <ClInclude Include="ComponentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vec2.h">
@@ -50,10 +50,10 @@
     <ClCompile Include="RenderWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture_Manager.cpp">
+    <ClCompile Include="ComponentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="BasicComponents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TESTS.cpp">
@@ -65,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="animationClips.json">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="entityConfig.json">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
