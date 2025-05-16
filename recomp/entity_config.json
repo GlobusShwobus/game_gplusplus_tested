@@ -1,0 +1,26 @@
+{
+  "enemy_spear1": {
+    "entity_id_type": 2,
+    "sprite": {
+      "texture_path": "../Textures/enemy_spear1.png",
+      "texture_source": [ 0, 0, 32, 32 ],
+      "texture_destination": [ 0, 0, 32, 32 ]
+    },
+    "movement_speed": 5,
+    "health_points": 100,
+    "attack_power": 10,
+    "attack_interval": 10
+  },
+  "enemy_sword1": {
+    "entity_id_type": 3,
+    "sprite": {
+      "texture_path": "../Textures/enemy_sword1.png",
+      "texture_source": [ 0, 0, 32, 32 ],
+      "texture_destination": [ 0, 0, 32, 32 ]
+    },
+    "movement_speed": 10,
+    "health_points": 200,
+    "attack_power": 20,
+    "attack_interval": 5
+  }
+}

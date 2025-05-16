@@ -18,6 +18,12 @@
 * 
 * PLAYER IS SPECIAL CASE HANDELED SEPARATELY
 * 
+* window init unique json
+* animation data unique json
+* entities data unique json
+* player unique json (also contains animation information)
+* 
+* 
 * Grid class to become GameScene class
 * GameScene class stores and handles ownership of entities (which are to be created by 'new' via EntityFactory)
 * 
@@ -42,11 +48,12 @@ public:
 
 	//makes a copy
 	Sprite createSprite(const SpriteID spriteID);
-	~TextureManager();
+
+	~EntityFactory();
 
 public:
-	TextureManager(const TextureManager&) = delete;
-	TextureManager(TextureManager&&)noexcept = delete;
-	TextureManager& operator=(const TextureManager&) = delete;
+	EntityFactory(const EntityFactory&) = delete;
+	EntityFactory(EntityFactory&&)noexcept = delete;
+	EntityFactory& operator=(const EntityFactory&) = delete;
 };
 

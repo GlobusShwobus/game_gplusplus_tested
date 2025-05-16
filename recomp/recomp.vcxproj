@@ -162,8 +162,10 @@
     <ClCompile Include="EntityFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="animationClips.json" />
-    <Text Include="entityConfig.json" />
+    <Text Include="entity_config.json" />
+    <Text Include="player_config.json" />
+    <Text Include="stage_config.json" />
+    <Text Include="window_config.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

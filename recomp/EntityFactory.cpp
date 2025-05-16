@@ -1,6 +1,6 @@
-#include "Texture_Manager.h"
+#include "EntityFactory.h"
 
-void TextureManager::bootUpSprites(SDL_Renderer* renderer, const nlohmann::json* const data) {
+void EntityFactory::bootUpSprites(SDL_Renderer* renderer, const nlohmann::json* const data) {
 	if (!data) {//if null ptr, kill it
 		throw std::logic_error("\nJSON nullptr\n");
 	}
@@ -36,7 +36,7 @@ void TextureManager::bootUpSprites(SDL_Renderer* renderer, const nlohmann::json*
 		sprites.emplace(textureID, sprite);
 	}
 }
-void TextureManager::bootUpAnimations(const nlohmann::json* const data) {
+void EntityFactory::bootUpAnimations(const nlohmann::json* const data) {
 	if (!data) {
 		throw std::logic_error("\nJSON nullptr\n");
 	}
@@ -79,14 +79,15 @@ Sprite TextureManager::createSprite(const SpriteID spriteID) {
 
 	return sprite;
 }
-TextureManager::~TextureManager()
+EntityFactory::~EntityFactory()
 {
 	//sprites itself is not the owner of the pointer because many different objects can point to the same texture on the GPU
 	//if the entity holding a copy of a sprite, stops existing, then by default it's not the last reference anyway
 	//however if the manager stops existing, and this should only happen when the game is closed, that means we must clean up now
-	for (auto& [id, sprite] : sprites) {
+	for (auto& [id, sprite] : spriteComponents) {
 		SDL_DestroyTexture(sprite.getTexture());
 	}
-	sprites.clear();
-	animationData.clear();
+	spriteComponents.clear();
+	animationComponents.clear();
+	enemyData.clear();
 }

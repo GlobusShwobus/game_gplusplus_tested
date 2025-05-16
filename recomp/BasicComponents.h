@@ -48,46 +48,68 @@ public:
 	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 };
 
-enum class ReelID {
-	none         = 0,
-	walk_up      = 1,
-	walk_down    = 2,
-	walk_left    = 3,
-	walk_right   = 4,
-	idle_up      = 5,
-	idle_down    = 6,
-	idle_left    = 7,
-	idle_right   = 8,
-};
+//cool new stuff
+// TODO: !!!!!!!!!!!
+// INITALIZE ANIMATIONS SOMEWHERE
+typedef uint32_t AnimationID;
+constexpr AnimationID HASH(const char* str) {
+	uint32_t hashish = 2166136261u;
+	while (*str) {
+		hashish ^= *str++;
+		hashish *= 16777619u;
+	}
+	return hashish;
+}
 
-struct FrameReelData {
-	ReelID id = ReelID::none;
-	int x = 0;
-	int y = 0;
-	int w = 0;
-	int h = 0;
-	int frameCount = 0;
+struct AnimationReel {
+	AnimationID id = 0;
+	std::vector<SDL_FRect> frames;
 	int frameDelay = 0;
 	bool isLooping = false;
 };
+
+class AnimationController {
+	const std::vector<AnimationReel>* const clips = nullptr;//not owner
+	const AnimationReel* currentReel = nullptr;
+	int currentFrame = 0;
+	int frameTimer = 0;
+
+public:
+	AnimationController() = default;//TODO: must set clips for entities, not owner
+
+	void update(AnimationID id);//TODO: need to implement frame updating
+	const SDL_FRect getCurrentFrame()const;//TODO: creates a rectngle describing frame, acts as source for texture rendering
+};
+
+class NPCState {//TODO:only useful for entities that move, item types need another one
+public:
+	enum class State {
+		idle, walking
+	};
+	enum class Facing {
+		up, down, left, right
+	};
+private:
+	State currentState = State::idle;
+	Facing currentFacing = Facing::down;
+
+	void setState(State newState) {
+		currentState = newState;
+	}
+	void setFacing(Facing newFacing) {
+		currentFacing = newFacing;
+	}
+	void setPair(State newState, Facing newFacing) {
+		currentState = newState; currentFacing = newFacing;
+	}
+};
+
 
 class Sprite {
 
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
-
-	class Animation {
-
-		const std::vector<FrameReelData>* const reelData = nullptr;//not owner
-
-		ReelID previousReelID = ReelID::none;
-		int frameIndex = 0;
-		int clipTimer = 0;
-
-	public:
-		void play(const ReelID clipID);//LEAVE IT FOR NOW LIKE THIS, LATER FUG KNOWS
-	};
 
 public:
 
@@ -100,24 +122,27 @@ public:
 };
 
 enum class EntityID {
-	PLAYER = 1,
+	NONE = 0,
 	ENEMY_SPEAR1 = 2,
+	ENEMY_SWORD1 = 3,
 	WORLD_MAP = 10001,
 };
 
 enum class EnemeyID {
-	ENEMY_SPEAR1
+	ENEMY_SPEAR1,
+	ENEMY_SWORD1
 };
 
 struct EnemyData {
-
+	EntityID id = EntityID::NONE;
+	float movement_speed = 0.f;
+	float health_points = 0.f;
+	float attack_power = 0.f;
+	float attack_interval = 0.f;
 };
 
 
 //SET UP COMPONENT MANAGMENT FIRST, THEN ENTITIES AND GAMESCENE
-
-
-/*
 class Player {
 
 public:
@@ -129,5 +154,6 @@ public:
 	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
 
 	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
+
+
 };
-*/
