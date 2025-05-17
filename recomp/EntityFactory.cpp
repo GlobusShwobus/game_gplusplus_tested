@@ -65,20 +65,7 @@ void EntityFactory::bootUpAnimations(const nlohmann::json* const data) {
 		}
 	}
 }
-Sprite TextureManager::createSprite(const SpriteID spriteID) {
 
-	if (sprites.find(spriteID) == sprites.end()) {
-		throw std::runtime_error("\nSprite type entry not stored. likely config not updated\n");
-	}
-
-	Sprite sprite = sprites[spriteID];
-
-	if (animationData.find(spriteID) != animationData.end()) {
-		sprite.setClips(&animationData[spriteID]);
-	}
-
-	return sprite;
-}
 EntityFactory::~EntityFactory()
 {
 	//sprites itself is not the owner of the pointer because many different objects can point to the same texture on the GPU

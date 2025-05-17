@@ -49,10 +49,9 @@ public:
 };
 
 //cool new stuff
-// TODO: !!!!!!!!!!!
-// INITALIZE ANIMATIONS SOMEWHERE
-typedef uint32_t AnimationID;
-constexpr AnimationID HASH(const char* str) {
+typedef uint32_t HASH_ID_TYPE;
+
+constexpr HASH_ID_TYPE HASH(const char* str) {
 	uint32_t hashish = 2166136261u;
 	while (*str) {
 		hashish ^= *str++;
@@ -61,8 +60,38 @@ constexpr AnimationID HASH(const char* str) {
 	return hashish;
 }
 
+//####################################################################################################
+//--------------------   ANIMATION IDs   -------------------------------------------------------------
+//####################################################################################################
+typedef HASH_ID_TYPE AnimID;
+constexpr AnimID AnimID_WALK_UP = HASH("walk_up");
+constexpr AnimID AnimID_WALK_DOWN = HASH("walk_down");
+constexpr AnimID AnimID_WALK_LEFT = HASH("walk_left");
+constexpr AnimID AnimID_WALK_RIGHT = HASH("walk_right");
+constexpr AnimID AnimID_IDLE_UP = HASH("idle_up");
+constexpr AnimID AnimID_IDLE_DOWN = HASH("idle_down");
+constexpr AnimID AnimID_IDLE_LEFT = HASH("idle_left");
+constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
+
+typedef HASH_ID_TYPE EntityType;
+//####################################################################################################
+//--------------------   ENTITY TYPES   --------------------------------------------------------------
+//####################################################################################################
+
+constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
+
+//####################################################################################################
+//--------------------   ENTITY IDs   ----------------------------------------------------------------
+//####################################################################################################
+typedef HASH_ID_TYPE EntityID;
+typedef EntityID EnemyID;
+constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
+constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
+
+
+
 struct AnimationReel {
-	AnimationID id = 0;
+	AnimID id = 0;
 	std::vector<SDL_FRect> frames;
 	int frameDelay = 0;
 	bool isLooping = false;
@@ -77,7 +106,7 @@ class AnimationController {
 public:
 	AnimationController() = default;//TODO: must set clips for entities, not owner
 
-	void update(AnimationID id);//TODO: need to implement frame updating
+	void update(AnimID id);//TODO: need to implement frame updating
 	const SDL_FRect getCurrentFrame()const;//TODO: creates a rectngle describing frame, acts as source for texture rendering
 };
 
@@ -121,20 +150,8 @@ public:
 	SDL_FRect* getDestination();
 };
 
-enum class EntityID {
-	NONE = 0,
-	ENEMY_SPEAR1 = 2,
-	ENEMY_SWORD1 = 3,
-	WORLD_MAP = 10001,
-};
-
-enum class EnemeyID {
-	ENEMY_SPEAR1,
-	ENEMY_SWORD1
-};
-
 struct EnemyData {
-	EntityID id = EntityID::NONE;
+	EntityID id = 0;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float attack_power = 0.f;

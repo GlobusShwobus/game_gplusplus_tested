@@ -1,6 +1,7 @@
 {
   "enemy_spear1": {
-    "entity_id_type": 2,
+    "type": "enemy_type",
+    "entity_id": "enemy_spear1",
     "sprite": {
       "texture_path": "../Textures/enemy_spear1.png",
       "texture_source": [ 0, 0, 32, 32 ],
@@ -12,7 +13,8 @@
     "attack_interval": 10
   },
   "enemy_sword1": {
-    "entity_id_type": 3,
+    "type": "enemy_type",
+    "entity_id": "enemy_sword1",
     "sprite": {
       "texture_path": "../Textures/enemy_sword1.png",
       "texture_source": [ 0, 0, 32, 32 ],
