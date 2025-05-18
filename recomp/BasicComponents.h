@@ -31,23 +31,6 @@ public:
 	MovementStatus getLastMove()const;
 };
 
-class Camera {
-
-	SDL_FPoint center{ 0,0 };
-	int radiusWidth = 0;
-	int radiusHeight = 0;
-
-	//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
-public:
-
-	Camera(const int diameterWidth, const int diameterHeight) :radiusWidth(diameterWidth / 2), radiusHeight(diameterHeight / 2) {}
-
-	void setFocus(const SDL_FRect* const playerPos);
-	void setClamp(const SDL_FRect* const worldMap);
-	const SDL_FPoint getCenter()const;
-	SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
-};
-
 //cool new stuff
 typedef uint32_t HASH_ID_TYPE;
 
@@ -73,11 +56,10 @@ constexpr AnimID AnimID_IDLE_DOWN = HASH("idle_down");
 constexpr AnimID AnimID_IDLE_LEFT = HASH("idle_left");
 constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 
-typedef HASH_ID_TYPE EntityType;
 //####################################################################################################
 //--------------------   ENTITY TYPES   --------------------------------------------------------------
 //####################################################################################################
-
+typedef HASH_ID_TYPE EntityType;
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
 
 //####################################################################################################
@@ -92,22 +74,25 @@ constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
 
 struct AnimationReel {
 	AnimID id = 0;
-	std::vector<SDL_FRect> frames;
+	SDL_FRect initialFrame;
+	int frameCount = 0;
 	int frameDelay = 0;
 	bool isLooping = false;
 };
 
 class AnimationController {
 	const std::vector<AnimationReel>* const clips = nullptr;//not owner
-	const AnimationReel* currentReel = nullptr;
-	int currentFrame = 0;
+	const AnimationReel* currentReel = nullptr;//points to dinkelberg
+	int frameIndex = 0;
 	int frameTimer = 0;
 
 public:
 	AnimationController() = default;//TODO: must set clips for entities, not owner
 
-	void update(AnimID id);//TODO: need to implement frame updating
-	const SDL_FRect getCurrentFrame()const;//TODO: creates a rectngle describing frame, acts as source for texture rendering
+	void update(AnimID id);
+	void setNewReel(AnimID id);
+	//creates a rectngle describing frame, acts as source for texture rendering
+	const SDL_FRect getCurrentFrame()const;
 };
 
 class NPCState {//TODO:only useful for entities that move, item types need another one
@@ -166,11 +151,8 @@ public:
 
 	Sprite sprite;
 	Movement movement;
-	Camera camera;
 
 	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
 
-	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture), camera(cameraRadii.x, cameraRadii.y) {}
-
-
+	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture) {}
 };

@@ -6,9 +6,6 @@
 #include "MyUtils.h"
 
 
-static constexpr int logicalRendererWidthInitial = 1280;
-static constexpr int logicalRendererHeightInitial = 720;
-
 int main() {
 
     

@@ -1,71 +1,59 @@
 #include "EntityFactory.h"
 
-void EntityFactory::bootUpSprites(SDL_Renderer* renderer, const nlohmann::json* const data) {
-	if (!data) {//if null ptr, kill it
-		throw std::logic_error("\nJSON nullptr\n");
+void EntityFactory::bootUpEntityBuildingBlocks(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
+
+	if (!entityConfig) {//if null ptr, kill it
+		throw std::logic_error("\nentityConfig nullptr, cannot initalize components\n");
 	}
 
-	for (const auto& entry : *data) {
-		if (!entry.contains("sprite")) {//LATER SHOULD DECOUPLE OTHER DATA INTO ANOTHER JSON FOR CORRECTNESS. currently this json can contain other data
-			continue;
-		}
+	for (const auto& entry : *entityConfig) {
 
-		const auto& spriteData = entry["sprite"];
+		const std::string entityTypeKey = entry["type"];
+		const EntityType type = HASH(entityTypeKey.c_str());
+		const std::string entityIDKey = entry["entity_id"];
+		const EntityID id = HASH(entityIDKey.c_str());
 
-		//kill it if we miss sprite information, otherwise we will eventually crash somewhere anyway
-		if (!spriteData.contains("texture_id") || !spriteData.contains("texture_path") || !spriteData.contains("texture_source") || !spriteData.contains("texture_destination")) {
-			throw std::logic_error("\nSprite data missing data\n");
-		}
-		//init data
-		SpriteID textureID = static_cast<SpriteID>(spriteData["texture_id"]);
+		const nlohmann::json* const spriteData = &entry["sprite"];
 
-		SDL_FRect source{ spriteData["texture_source"][0], spriteData["texture_source"][1], spriteData["texture_source"][2], spriteData["texture_source"][3] };
-		SDL_FRect destination{ spriteData["texture_destination"][0], spriteData["texture_destination"][1], spriteData["texture_destination"][2], spriteData["texture_destination"][3] };
-
-		const std::string texturePath = spriteData["texture_path"];
-
-		SDL_Texture* texture = IMG_LoadTexture(renderer, texturePath.c_str());
-
-		//make sure the path actually existed, else kill it because we forgot to apply right name or at all
-		if (!texture) {
-			throw std::logic_error("\nFailed to load texture at path named: " + texturePath);
-		}
-
-		Sprite sprite(texture, &source, &destination);
-
-		sprites.emplace(textureID, sprite);
-	}
-}
-void EntityFactory::bootUpAnimations(const nlohmann::json* const data) {
-	if (!data) {
-		throw std::logic_error("\nJSON nullptr\n");
-	}
-
-	for (const auto& [name, obj]: data->items()) {
-		if (!obj.contains("texture_id")) {//the texture MUST be defined with the primary key in both animation JSON and metadata JSOn
-			throw std::logic_error("\nEntry without assigned ID (forgot to update?)\n");
-		}
-
-		SpriteID spriteID = static_cast<SpriteID>(obj["texture_id"]);
-		for (const auto& [key, val] : obj.items()) {//assumes these items exist, otherwise something should throw
-			if (key == "texture_id" || !val.is_object()) {
-				continue;
-			}
-			AnimationClip clip;
-			clip.x = val["begin_x"];
-			clip.y = val["begin_y"];
-			clip.w = val["width"];
-			clip.h = val["height"];
-			clip.frameCount = val["frame_count"];
-			clip.frameDelay = val["frame_delay"];
-			clip.isLooping = (bool)val["loops"];
-
-			ClipID clipID = static_cast<ClipID>(val["clip_id"]);
-			animationData[spriteID][clipID] = clip;
+		switch (type) {
+		case EntityType_ENEMY:
+			initEnemyData(&entry, id);
+			initSprite(spriteData, renderer, id);
+			break;
+			//others cases, like buildings, waterfalls, items idk
+		default: throw std::logic_error("\ntype not defined\n");
 		}
 	}
 }
+void EntityFactory::initEnemyData(const nlohmann::json* const enemyData, const EnemyID id) {
 
+	EnemyData entry;
+
+	entry.id = id;
+	entry.movement_speed = (*enemyData)["movement_speed"];
+	entry.health_points = (*enemyData)["health_points"];
+	entry.attack_power = (*enemyData)["attack_power"];
+	entry.attack_interval = (*enemyData)["attack_interval"];
+
+	this->enemyData.emplace(entry.id, entry);
+}
+
+void EntityFactory::initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id) {
+
+	const std::string texturePath = (*spriteData)["texture_path"];
+
+	auto& src = (*spriteData)["texture_source"];
+	auto& dest = (*spriteData)["texture_destination"];
+
+	SDL_FRect source{ src[0],src[1], src[2], src[3] };
+	SDL_FRect destination{ dest[0],dest[1], dest[2], dest[3] };
+
+	SDL_Texture* texture = IMG_LoadTexture(renderer, texturePath.c_str());
+
+	Sprite sprite(texture, &source, &destination);
+
+	spriteComponents.emplace(id, sprite);
+}
 EntityFactory::~EntityFactory()
 {
 	//sprites itself is not the owner of the pointer because many different objects can point to the same texture on the GPU
