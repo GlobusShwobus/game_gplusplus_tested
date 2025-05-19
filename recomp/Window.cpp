@@ -12,19 +12,9 @@ Window::Window(const nlohmann::json* const windowConfig) {
 
 	window = SDL_CreateWindow(title.c_str(), windowWidth, windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-	if (!window) {
-		printf("\nERROR:: failed to create SDL Window: %s\n", SDL_GetError());
-		std::exit(EXIT_FAILURE);
-	}
-
 	renderer = SDL_CreateRenderer(window, nullptr);
 
-	if (!renderer) {
-		printf("\nERROR:: failed to create SDL Renderer: %s\n", SDL_GetError());
-		std::exit(EXIT_FAILURE);
-	}
-
-	FPS = FPSTarget;
+	frameLimiter = new FrameLimiter(FPSTarget);
 	camera = new Camera(cameraWidth, cameraHeight);
 	SDL_SetRenderLogicalPresentation(renderer, cameraWidth*2, cameraHeight*2, SDL_LOGICAL_PRESENTATION_STRETCH);
 
@@ -36,18 +26,18 @@ Window::Window(const nlohmann::json* const windowConfig) {
 }
 void Window::updateBegin() {
 	SDL_RenderClear(renderer);
-	frameBegin = SDL_GetTicks();
+	frameLimiter->frameBufferBegin();
 }
 void Window::updateEnd() {
 	SDL_RenderPresent(renderer);
-
-	frameDuration = SDL_GetTicks() - frameBegin;
-	if (frameDelay > frameDuration) {
-		SDL_Delay(frameDelay - frameDuration);
-	}
+	frameLimiter->frameBufferEnd();
 }
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
+}
+void Window::drawSprite(Sprite* sprite)const {
+	SDL_FRect dest = camera->toCameraSpace(sprite->getDestination());
+	SDL_RenderTexture(renderer, sprite->getTexture(), sprite->getSource(), &dest);
 }
 
 void Window::Camera::setFocus(const SDL_FRect* const rect) {

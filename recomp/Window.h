@@ -2,16 +2,36 @@
 
 #include "SDL3/SDL.h"
 #include "json.hpp"
+#include "BasicComponents.h"
 
 class Window {
 
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
-	int FPS = 0;
-	const double frameDelay = 1000.0 / FPS;
-	Uint64 frameBegin = 0;
-	Uint64 frameDuration = 0;
+	class FrameLimiter {
+
+		int FPS = 0;
+		const double frameDelay = 1000.0 / FPS;
+		Uint64 frameBegin = 0;
+		Uint64 frameDuration = 0;
+
+	public:
+
+		FrameLimiter(int fps) :FPS(fps) {}
+		
+		void frameBufferBegin() {
+			frameBegin = SDL_GetTicks();
+		}
+		void frameBufferEnd() {
+			frameDuration = SDL_GetTicks() - frameBegin;
+			if (frameDelay > frameDuration) {
+				SDL_Delay(frameDelay - frameDuration);
+			}
+		}
+	};
+	FrameLimiter* frameLimiter = nullptr;
+
 
 	class Camera {
 
@@ -30,7 +50,7 @@ class Window {
 		const SDL_FPoint getCenter()const;
 		SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 	};
-	Camera* camera = nullptr;;
+	Camera* camera = nullptr;
 
 public:
 
@@ -39,12 +59,15 @@ public:
 	void updateBegin();
 	void updateEnd();
 
+	void drawSprite(Sprite* sprite)const;
+
 	SDL_Renderer* getRenderer();
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
 		delete camera;
+		delete frameLimiter;
 	}
 private:
 	Window(const Window&) = delete;

@@ -4,33 +4,6 @@
 #include <map>
 #include <vector>
 
-enum class MovementStatus {
-	MOVE_UP,
-	MOVE_DOWN,
-	MOVE_LEFT,
-	MOVE_RIGHT,
-
-	MOVE_UP_LEFT,
-	MOVE_UP_RIGHT,
-	MOVE_DOWN_LEFT,
-	MOVE_DOWN_RIGHT,
-	MOVEMENT_STATUS_NOTHING
-};
-typedef MovementStatus MS;
-//movement flags
-
-class Movement {
-
-	MovementStatus movementStatus  = MS::MOVEMENT_STATUS_NOTHING;
-	MovementStatus lastMove        = MS::MOVEMENT_STATUS_NOTHING;
-
-public:
-	void movementUpdate();
-
-	MovementStatus getCurrentMove()const;
-	MovementStatus getLastMove()const;
-};
-
 //cool new stuff
 typedef uint32_t HASH_ID_TYPE;
 
@@ -60,6 +33,7 @@ constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 //--------------------   ENTITY TYPES   --------------------------------------------------------------
 //####################################################################################################
 typedef HASH_ID_TYPE EntityType;
+constexpr EntityType EntityType_ENEMY = HASH("player_type");
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
 
 //####################################################################################################
@@ -103,21 +77,24 @@ public:
 	enum class Facing {
 		up, down, left, right
 	};
+
+	//this function will call different types of state update functions based on whatever entity ower type is
+	//mainly issue of player vs AI
+	void update();
+
+	State getState()const;
+	Facing getFacing()const;
+
+	NPCState(const EntityType type) :typeOfOwner(type) {}
 private:
 	State currentState = State::idle;
 	Facing currentFacing = Facing::down;
+	
+	EntityType typeOfOwner = 0;
 
-	void setState(State newState) {
-		currentState = newState;
-	}
-	void setFacing(Facing newFacing) {
-		currentFacing = newFacing;
-	}
-	void setPair(State newState, Facing newFacing) {
-		currentState = newState; currentFacing = newFacing;
-	}
+	//only really for player/or some AI script who knows
+	void setOnKeyboardInput();
 };
-
 
 class Sprite {
 
@@ -145,6 +122,25 @@ struct EnemyData {
 
 
 //SET UP COMPONENT MANAGMENT FIRST, THEN ENTITIES AND GAMESCENE
+
+class Player {
+
+
+	Sprite sprite;
+	NPCState state;
+
+	float movementSpeed = 0;
+	float healthPoints = 0;
+	float attackPower = 0;
+
+
+
+
+
+}
+
+
+
 class Player {
 
 public:

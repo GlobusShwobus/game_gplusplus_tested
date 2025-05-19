@@ -1,6 +1,6 @@
 {
 	"Player": {
-		"entity_id_type": 1,
+		"type": "player_type",
 		"movement_speed": 2.5,
 		"health_points": 100,
 		"attack_power": 25,

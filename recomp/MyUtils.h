@@ -7,7 +7,7 @@
 #include "json.hpp"
 #include "SDL3/SDL.h"
 #include "Grid.h"
-#include "Player.h"
+#include "BasicComponents.h"
 
 namespace MyUtils {
 
@@ -17,11 +17,4 @@ namespace MyUtils {
     nlohmann::json* initJSON(const char* path);
 
     ClipID getClipBasedOnMovement(const Movement movementData);
-
-    namespace Rendering {
-        //later sepparate logic for player rendering and world objects as that will enable ignoring rendering outside of camera area
-        //for now, don't have NPCs for that to set up
-        void renderBasic(SDL_Renderer* renderer, Sprite& sprite, const Camera& cam);
-
-    }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderWindow.h"
+#include "Window.h"
 #include "Grid.h"
 
 namespace TESTS {

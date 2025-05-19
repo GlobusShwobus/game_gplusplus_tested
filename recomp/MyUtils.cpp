@@ -75,6 +75,10 @@ namespace MyUtils {
 
 		return json;
 	}
+
+
+
+
 	ClipID getClipBasedOnMovement(const Movement movementData) {
 
 		MovementStatus moving = movementData.getCurrentMove();
@@ -107,13 +111,5 @@ namespace MyUtils {
 		}
 
 		return ClipID::none;
-	}
-
-	namespace Rendering {
-		void renderBasic(SDL_Renderer* renderer, Sprite& sprite, const Camera& cam) {
-			SDL_FRect dest = cam.toCameraSpace(sprite.getDestination());
-			SDL_RenderTexture(renderer, sprite.getTexture(), sprite.getSource(), &dest);
-		}
-
 	}
 }

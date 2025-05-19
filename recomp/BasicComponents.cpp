@@ -1,6 +1,12 @@
 #include "BasicComponents.h"
 
-void Movement::movementUpdate() {
+NPCState::State NPCState::getState()const {
+	return currentState;
+}
+NPCState::Facing NPCState::getFacing()const {
+	return currentFacing;
+}
+void NPCState::setOnKeyboardInput() {
 	const auto* keystate = SDL_GetKeyboardState(nullptr);
 
 	bool w = keystate[SDL_SCANCODE_W];
@@ -8,47 +14,21 @@ void Movement::movementUpdate() {
 	bool s = keystate[SDL_SCANCODE_S];
 	bool d = keystate[SDL_SCANCODE_D];
 
-	if (w && a) {
-		movementStatus = MS::MOVE_UP_LEFT;
-		lastMove = MS::MOVE_UP_LEFT;
+	if (w || a || s || d) {
+		currentState = State::walking;
 	}
-	else if (w && d) {
-		movementStatus = MS::MOVE_UP_RIGHT;
-		lastMove = MS::MOVE_UP_RIGHT;
+	if (w) {
+		currentFacing = Facing::up;
 	}
-	else if (s && a) {
-		movementStatus = MS::MOVE_DOWN_LEFT;
-		lastMove = MS::MOVE_DOWN_LEFT;
+	if (a) {
+		currentFacing = Facing::up;
 	}
-	else if (s && d) {
-		movementStatus = MS::MOVE_DOWN_RIGHT;
-		lastMove = MS::MOVE_DOWN_RIGHT;
+	if (s) {
+		currentFacing = Facing::up;
 	}
-	else if (w) {
-		movementStatus = MS::MOVE_UP;
-		lastMove = MS::MOVE_UP;
+	if (d) {
+		currentFacing = Facing::up;
 	}
-	else if (s) {
-		movementStatus = MS::MOVE_DOWN;
-		lastMove = MS::MOVE_DOWN;
-	}
-	else if (a) {
-		movementStatus = MS::MOVE_LEFT;
-		lastMove = MS::MOVE_LEFT;
-	}
-	else if (d) {
-		movementStatus = MS::MOVE_RIGHT;
-		lastMove = MS::MOVE_RIGHT;
-	}
-	else {
-		movementStatus = MS::MOVEMENT_STATUS_NOTHING;
-	}
-}
-MovementStatus Movement::getCurrentMove()const {
-	return movementStatus;
-}
-MovementStatus Movement::getLastMove()const {
-	return lastMove;
 }
 
 SDL_Texture* Sprite::getTexture() {

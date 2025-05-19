@@ -1,7 +1,6 @@
 #include "EntityFactory.h"
 
-void EntityFactory::bootUpEntityBuildingBlocks(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
-
+EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
 	if (!entityConfig) {//if null ptr, kill it
 		throw std::logic_error("\nentityConfig nullptr, cannot initalize components\n");
 	}

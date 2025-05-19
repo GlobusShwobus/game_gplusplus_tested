@@ -26,9 +26,7 @@
 * 
 * Grid class to become GameScene class
 * GameScene class stores and handles ownership of entities (which are to be created by 'new' via EntityFactory)
-* 
-* Current issue: don't like how sprite component stored animation data, desire to store it independently, maybe in entities
-
+*
 #######################################################################################################################
 */
 
@@ -44,14 +42,13 @@ class EntityFactory {
 
 public:
 
-	EntityFactory() {}
-
 	//animations where?
-	void bootUpEntityBuildingBlocks(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
+	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
 
 	//makes a copy
-	Sprite createSprite(const SpriteID spriteID);
+	//THIS IS WHERE I WOULD PUT MY ENTITY CREATION. IF I HAD ONE
+	//Sprite createSprite(const SpriteID spriteID);
 
 	~EntityFactory();
 
