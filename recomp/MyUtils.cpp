@@ -10,6 +10,62 @@ namespace MyUtils {
 		};
 		return corners;
 	}
+	std::pair<NPCState::State, NPCState::Facing> getWASDState() {
+		const auto* keystate = SDL_GetKeyboardState(nullptr);
+
+		bool w = keystate[SDL_SCANCODE_W];
+		bool a = keystate[SDL_SCANCODE_A];
+		bool s = keystate[SDL_SCANCODE_S];
+		bool d = keystate[SDL_SCANCODE_D];
+
+		NPCState::State state = NPCState::State::noChange;
+		NPCState::Facing facing = NPCState::Facing::noChange;
+
+		if (w || a || s || d) {
+			state = NPCState::State::walking;
+
+			if (w) {
+				facing = NPCState::Facing::up;
+			}
+			if (a) {
+				facing = NPCState::Facing::left;
+			}
+			if (s) {
+				facing = NPCState::Facing::down;
+			}
+			if (d) {
+				facing = NPCState::Facing::right;
+			}
+
+		}
+		return { state, facing };
+	}
+
+	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {
+
+		auto corners = getCorners(updatedLocation);
+
+		for (const auto& point : corners) {
+			if (!grid.isValidTile(point) || !grid.getTile(point).doesContain(TFLAG_WALKABLE)) {
+				return;
+			}
+		}
+		*previousPosition = updatedLocation;
+	}
+
+	nlohmann::json* initJSON(const char* path) {
+		//look into assurances that the path is a json so we catch exception early
+		std::ifstream in(path);
+		nlohmann::json* json = nullptr;
+		if (in.good()) {
+			json = new nlohmann::json();
+			in >> *json;
+		}
+		in.close();
+
+		return json;
+	}
+
 
 	SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const float speed) {
 		SDL_FRect newPos = *position;
@@ -50,32 +106,6 @@ namespace MyUtils {
 		}
 		return newPos;
 	}
-
-	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {
-
-		auto corners = getCorners(updatedLocation);
-
-		for (const auto& point : corners) {
-			if (!grid.isValidTile(point) || !grid.getTile(point).doesContain(TFLAG_WALKABLE)) {
-				return;
-			}
-		}
-		*previousPosition = updatedLocation;
-	}
-
-	nlohmann::json* initJSON(const char* path) {
-		//look into assurances that the path is a json so we catch exception early
-		std::ifstream in(path);
-		nlohmann::json* json = nullptr;
-		if (in.good()) {
-			json = new nlohmann::json();
-			in >> *json;
-		}
-		in.close();
-
-		return json;
-	}
-
 
 
 

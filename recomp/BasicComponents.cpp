@@ -6,28 +6,12 @@ NPCState::State NPCState::getState()const {
 NPCState::Facing NPCState::getFacing()const {
 	return currentFacing;
 }
-void NPCState::setOnKeyboardInput() {
-	const auto* keystate = SDL_GetKeyboardState(nullptr);
-
-	bool w = keystate[SDL_SCANCODE_W];
-	bool a = keystate[SDL_SCANCODE_A];
-	bool s = keystate[SDL_SCANCODE_S];
-	bool d = keystate[SDL_SCANCODE_D];
-
-	if (w || a || s || d) {
-		currentState = State::walking;
+void NPCState::setState(const std::pair<NPCState::State, NPCState::Facing>* const state) {
+	if (!(state->first == State::noChange)) {
+		currentState = state->first;
 	}
-	if (w) {
-		currentFacing = Facing::up;
-	}
-	if (a) {
-		currentFacing = Facing::up;
-	}
-	if (s) {
-		currentFacing = Facing::up;
-	}
-	if (d) {
-		currentFacing = Facing::up;
+	if (!(state->second == Facing::noChange)) {
+		currentFacing = state->second;
 	}
 }
 
@@ -40,8 +24,6 @@ SDL_FRect* Sprite::getSource() {
 SDL_FRect* Sprite::getDestination() {
 	return &destination;
 }
-
-
 
 void AnimationController::update(AnimID id) {
 	if (!currentReel->isLooping && frameIndex >= currentReel->frameCount) return;//not looping so nothing to update

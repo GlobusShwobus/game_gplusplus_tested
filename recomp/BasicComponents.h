@@ -41,9 +41,12 @@ constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
 //####################################################################################################
 typedef HASH_ID_TYPE EntityID;
 typedef EntityID EnemyID;
+typedef EntityID PlayerID;
+
 constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
 constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
 
+constexpr PlayerID EnemyID_SWORD1 = HASH("player_version1");
 
 
 struct AnimationReel {
@@ -61,7 +64,8 @@ class AnimationController {
 	int frameTimer = 0;
 
 public:
-	AnimationController() = default;//TODO: must set clips for entities, not owner
+	//reels originates from EntityFactory witch holds the data, it is always valid and should not be freed
+	AnimationController(const std::vector<AnimationReel>* const reels) :clips(reels), currentReel(&reels->front()) {}
 
 	void update(AnimID id);
 	void setNewReel(AnimID id);
@@ -72,28 +76,21 @@ public:
 class NPCState {//TODO:only useful for entities that move, item types need another one
 public:
 	enum class State {
-		idle, walking
+		noChange, idle, walking
 	};
 	enum class Facing {
-		up, down, left, right
+		noChange, up, down, left, right
 	};
 
-	//this function will call different types of state update functions based on whatever entity ower type is
-	//mainly issue of player vs AI
-	void update();
-
+	void setState(const std::pair<State, Facing>* const state);
 	State getState()const;
 	Facing getFacing()const;
 
-	NPCState(const EntityType type) :typeOfOwner(type) {}
+	NPCState() = default;
 private:
+
 	State currentState = State::idle;
 	Facing currentFacing = Facing::down;
-	
-	EntityType typeOfOwner = 0;
-
-	//only really for player/or some AI script who knows
-	void setOnKeyboardInput();
 };
 
 class Sprite {
@@ -120,35 +117,9 @@ struct EnemyData {
 	float attack_interval = 0.f;
 };
 
-
-//SET UP COMPONENT MANAGMENT FIRST, THEN ENTITIES AND GAMESCENE
-
-class Player {
-
-
-	Sprite sprite;
-	NPCState state;
-
-	float movementSpeed = 0;
-	float healthPoints = 0;
-	float attackPower = 0;
-
-
-
-
-
-}
-
-
-
-class Player {
-
-public:
-
-	Sprite sprite;
-	Movement movement;
-
-	static constexpr float speed = 2.5f;//uhm, speed*FPS is real speed so yeah. oops
-
-	Player(Sprite texture, SDL_FPoint cameraRadii) :sprite(texture) {}
+struct PlayerData {
+	PlayerID id = 0;
+	float movement_speed = 0.f;
+	float health_points = 0.f;
+	float attack_power = 0.f;
 };

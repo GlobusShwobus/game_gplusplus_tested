@@ -36,8 +36,12 @@ class EntityFactory {
 	std::map<EntityID, std::vector<AnimationReel>> animationComponents;
 
 	std::map<EnemyID, EnemyData> enemyData;
+	std::map<PlayerID, PlayerData> playerData;
 
 	void initEnemyData(const nlohmann::json* const enemyData, const EnemyID id);
+	void initPlayerData(const nlohmann::json* const enemyData) {
+		sdf
+	}
 	void initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id);
 
 public:
