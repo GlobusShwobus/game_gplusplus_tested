@@ -11,20 +11,17 @@ int main() {
     
     //configs
     nlohmann::json* entityConfig    = nullptr;
-    nlohmann::json* playerConfig    = nullptr;
     nlohmann::json* stageConfig     = nullptr;
     nlohmann::json* windowConfig    = nullptr;
 
     try {
         entityConfig = MyUtils::initJSON("entity_config.json");
-        playerConfig = MyUtils::initJSON("player_config.json");
         stageConfig = MyUtils::initJSON("stage_config.json");
         windowConfig = MyUtils::initJSON("window_config.json");
     }
     catch (const std::exception& excpt) {
         printf(excpt.what());
         delete entityConfig;
-        delete playerConfig;
         delete stageConfig;
         delete windowConfig;
         return -1;
@@ -95,7 +92,6 @@ int main() {
 
     //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
     delete entityConfig;
-    delete playerConfig;
     delete stageConfig;
     delete windowConfig;
 

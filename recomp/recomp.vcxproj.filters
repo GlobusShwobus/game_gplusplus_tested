@@ -67,9 +67,6 @@
     <Text Include="entity_config.json">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="player_config.json">
-      <Filter>Resource Files</Filter>
-    </Text>
     <Text Include="stage_config.json">
       <Filter>Resource Files</Filter>
     </Text>

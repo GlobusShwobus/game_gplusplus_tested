@@ -33,7 +33,7 @@ constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 //--------------------   ENTITY TYPES   --------------------------------------------------------------
 //####################################################################################################
 typedef HASH_ID_TYPE EntityType;
-constexpr EntityType EntityType_ENEMY = HASH("player_type");
+constexpr EntityType EntityType_PLAYER = HASH("player_type");
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
 
 //####################################################################################################
@@ -46,7 +46,7 @@ typedef EntityID PlayerID;
 constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
 constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
 
-constexpr PlayerID EnemyID_SWORD1 = HASH("player_version1");
+constexpr PlayerID PlayerID_Version1 = HASH("player_version1");
 
 
 struct AnimationReel {

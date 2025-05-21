@@ -14,17 +14,28 @@ EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Rende
 
 		const nlohmann::json* const spriteData = &entry["sprite"];
 
+		//entities may have different basic data, hence need for init table
 		switch (type) {
 		case EntityType_ENEMY:
-			initEnemyData(&entry, id);
-			initSprite(spriteData, renderer, id);
+			initEntityEnemy(&entry, id);
 			break;
+		case PlayerID_Version1:
+			initEntityPlayer(&entry, id);
 			//others cases, like buildings, waterfalls, items idk
 		default: throw std::logic_error("\ntype not defined\n");
 		}
+
+		//every entity sprite data is structured the same way
+		initSprite(spriteData, renderer, id);
+
+		//not every entity may be animatable, but the clip data is structured the same way
+		if (entry.contains("animations")) {
+			initAnimations(&entry, id);
+		}
+
 	}
 }
-void EntityFactory::initEnemyData(const nlohmann::json* const enemyData, const EnemyID id) {
+void EntityFactory::initEntityEnemy(const nlohmann::json* const enemyData, const EnemyID id) {
 
 	EnemyData entry;
 
@@ -35,6 +46,16 @@ void EntityFactory::initEnemyData(const nlohmann::json* const enemyData, const E
 	entry.attack_interval = (*enemyData)["attack_interval"];
 
 	this->enemyData.emplace(entry.id, entry);
+}
+void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, const EnemyID id) {
+	PlayerData entry;
+
+	entry.id = id;
+	entry.movement_speed = (*playerData)["movement_speed"];
+	entry.health_points = (*playerData)["health_points"];
+	entry.attack_power = (*playerData)["attack_power"];
+
+	this->playerData.emplace(entry.id, entry);
 }
 
 void EntityFactory::initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id) {
@@ -52,6 +73,28 @@ void EntityFactory::initSprite(const nlohmann::json* const spriteData, SDL_Rende
 	Sprite sprite(texture, &source, &destination);
 
 	spriteComponents.emplace(id, sprite);
+}
+void EntityFactory::initAnimations(const nlohmann::json* const animationData, const EnemyID id) {
+
+	std::vector<AnimationReel> reelCollection;//autismus maximus
+
+	for (const auto& data : *animationData) {
+
+		AnimationReel clip;
+		const std::string clipID = data["clip_id"];
+		clip.id = HASH(clipID.c_str());
+		clip.initialFrame.x = data["x"];
+		clip.initialFrame.y = data["y"];
+		clip.initialFrame.w = data["width"];
+		clip.initialFrame.h = data["height"];
+		clip.frameCount = data["frame_count"];
+		clip.frameDelay = data["frame_delay"];
+		clip.isLooping = data["loops"];
+
+		reelCollection.push_back(clip);
+	}
+
+	animationComponents.emplace(id, std::move(reelCollection));
 }
 EntityFactory::~EntityFactory()
 {

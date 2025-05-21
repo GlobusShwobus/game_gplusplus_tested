@@ -8,80 +8,88 @@
     "sprite": {
       "texture_path": "../Textures/player_sheet.png",
       "texture_source": [ 0, 0, 32, 32 ],
-      "texture_destination": [ 0, 0, 32, 32 ],
-      "animations": {
-        "walk_up": {
-          "x": 0,
-          "y": 0,
-          "width": 32,
-          "height": 32,
-          "frame_count": 8,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "walk_down": {
-          "x": 0,
-          "y": 32,
-          "width": 32,
-          "height": 32,
-          "frame_count": 8,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "walk_left": {
-          "x": 0,
-          "y": 64,
-          "width": 32,
-          "height": 32,
-          "frame_count": 8,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "walk_right": {
-          "x": 0,
-          "y": 96,
-          "width": 32,
-          "height": 32,
-          "frame_count": 8,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "idle_up": {
-          "x": 0,
-          "y": 128,
-          "width": 32,
-          "height": 32,
-          "frame_count": 2,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "idle_down": {
-          "x": 64,
-          "y": 128,
-          "width": 32,
-          "height": 32,
-          "frame_count": 2,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "idle_left": {
-          "x": 128,
-          "y": 128,
-          "width": 32,
-          "height": 32,
-          "frame_count": 2,
-          "frame_delay": 6,
-          "loops": true
-        },
-        "idle_right": {
-          "x": 192,
-          "y": 128,
-          "width": 32,
-          "height": 32,
-          "frame_count": 2,
-          "frame_delay": 6,
-          "loops": true
-        }
+      "texture_destination": [ 0, 0, 32, 32 ]
+    },
+    "animations": {
+      "walk_up": {
+        "clip_id": "walk_up",
+        "x": 0,
+        "y": 0,
+        "width": 32,
+        "height": 32,
+        "frame_count": 8,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "walk_down": {
+        "clip_id": "walk_down",
+        "x": 0,
+        "y": 32,
+        "width": 32,
+        "height": 32,
+        "frame_count": 8,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "walk_left": {
+        "clip_id": "walk_left",
+        "x": 0,
+        "y": 64,
+        "width": 32,
+        "height": 32,
+        "frame_count": 8,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "walk_right": {
+        "clip_id": "walk_right",
+        "x": 0,
+        "y": 96,
+        "width": 32,
+        "height": 32,
+        "frame_count": 8,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "idle_up": {
+        "clip_id": "idle_up",
+        "x": 0,
+        "y": 128,
+        "width": 32,
+        "height": 32,
+        "frame_count": 2,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "idle_down": {
+        "clip_id": "idle_down",
+        "x": 64,
+        "y": 128,
+        "width": 32,
+        "height": 32,
+        "frame_count": 2,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "idle_left": {
+        "clip_id": "idle_left",
+        "x": 128,
+        "y": 128,
+        "width": 32,
+        "height": 32,
+        "frame_count": 2,
+        "frame_delay": 6,
+        "loops": true
+      },
+      "idle_right": {
+        "clip_id": "idle_right",
+        "x": 192,
+        "y": 128,
+        "width": 32,
+        "height": 32,
+        "frame_count": 2,
+        "frame_delay": 6,
+        "loops": true
       }
     }
   },

@@ -38,11 +38,10 @@ class EntityFactory {
 	std::map<EnemyID, EnemyData> enemyData;
 	std::map<PlayerID, PlayerData> playerData;
 
-	void initEnemyData(const nlohmann::json* const enemyData, const EnemyID id);
-	void initPlayerData(const nlohmann::json* const enemyData) {
-		sdf
-	}
+	void initEntityEnemy(const nlohmann::json* const enemyData, const EnemyID id);
+	void initEntityPlayer(const nlohmann::json* const enemyData, const EnemyID id);
 	void initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id);
+	void initAnimations(const nlohmann::json* const animationData, const EnemyID id);
 
 public:
 

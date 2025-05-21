@@ -7,7 +7,6 @@ class Player {
 
 	Sprite sprite;
 	NPCState state;
-	std::vector<AnimationReel> reels;
 	AnimationController animControlls;
 	
 	float movementSpeed = 0;
