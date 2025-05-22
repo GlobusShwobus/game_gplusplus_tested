@@ -40,14 +40,14 @@ void Window::drawSprite(Sprite* sprite)const {
 	SDL_RenderTexture(renderer, sprite->getTexture(), sprite->getSource(), &dest);
 }
 
-void Window::Camera::setFocusCenter(const SDL_FRect* const rect) {
+void Window::Camera::setFocusPoint(const SDL_FRect* const rect) {
 	center.x = rect->x + (rect->w / 2);
 	center.y = rect->y + (rect->h / 2);
 }
 void Window::Camera::clampTo(const SDL_FRect* const rect) {
-	if (center.x - radiusWidth < rect->x) { center.x = radiusWidth; }//left edge
+	if (center.x - radiusWidth < rect->x)  { center.x = radiusWidth; }//left edge
 	if (center.y - radiusHeight < rect->y) { center.y = radiusHeight; }//top edge
-	if (center.x + radiusWidth > rect->w) { center.x = rect->w - radiusWidth; }//right edge
+	if (center.x + radiusWidth > rect->w)  { center.x = rect->w - radiusWidth; }//right edge
 	if (center.y + radiusHeight > rect->h) { center.y = rect->h - radiusHeight; }//bottom edge
 }
 SDL_FRect Window::Camera::toCameraSpace(const SDL_FRect* const entity)const {

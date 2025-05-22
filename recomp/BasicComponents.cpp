@@ -43,7 +43,7 @@ void AnimationController::update(AnimID id) {
 void AnimationController::setNewReel(AnimID id) {
 	bool exists = false;
 	for (const AnimationReel& each : *clips) {
-		if (each.id == id) {
+		if (each.id == id && currentReel->id != id) {//if it even exists and if it isn't the one already in use
 			currentReel = &each;//praying this sets address and not some other voodoo
 			frameIndex = 0;
 			exists = true;

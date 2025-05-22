@@ -10,7 +10,7 @@ namespace MyUtils {
 		};
 		return corners;
 	}
-	std::pair<NPCState::State, NPCState::Facing> getWASDState() {
+	void WASD_state(NPCState& state) {
 		const auto* keystate = SDL_GetKeyboardState(nullptr);
 
 		bool w = keystate[SDL_SCANCODE_W];
@@ -18,27 +18,26 @@ namespace MyUtils {
 		bool s = keystate[SDL_SCANCODE_S];
 		bool d = keystate[SDL_SCANCODE_D];
 
-		NPCState::State state = NPCState::State::noChange;
-		NPCState::Facing facing = NPCState::Facing::noChange;
 
 		if (w || a || s || d) {
-			state = NPCState::State::walking;
-
+			state.setState(NPCState::State::walking);
 			if (w) {
-				facing = NPCState::Facing::up;
+				state.setFacing(NPCState::Facing::up);
 			}
 			if (a) {
-				facing = NPCState::Facing::left;
+				state.setFacing(NPCState::Facing::left);
 			}
 			if (s) {
-				facing = NPCState::Facing::down;
+				state.setFacing(NPCState::Facing::down);
 			}
 			if (d) {
-				facing = NPCState::Facing::right;
+				state.setFacing(NPCState::Facing::right);
 			}
 
 		}
-		return { state, facing };
+		else {
+			state.setState(NPCState::State::walking);
+		}
 	}
 
 	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {

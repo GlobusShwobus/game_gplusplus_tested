@@ -46,7 +46,7 @@ class Window {
 		
 		void clampTo(const SDL_FRect* const rect);
 		SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
-		void setFocusCenter(const SDL_FRect* const rect);
+		void setFocusPoint(const SDL_FRect* const rect);
 	};
 	Camera* camera = nullptr;
 

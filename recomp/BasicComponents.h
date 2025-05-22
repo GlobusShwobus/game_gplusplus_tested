@@ -49,6 +49,13 @@ constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
 constexpr PlayerID PlayerID_Version1 = HASH("player_version1");
 
 
+
+
+
+
+
+
+
 struct AnimationReel {
 	AnimID id = 0;
 	SDL_FRect initialFrame;
@@ -76,19 +83,41 @@ public:
 class NPCState {//TODO:only useful for entities that move, item types need another one
 public:
 	enum class State {
-		noChange, idle, walking
+		idle, walking
 	};
 	enum class Facing {
-		noChange, up, down, left, right
+		up, down, left, right
 	};
+	//should be run each frame
 
-	void setState(const std::pair<State, Facing> const state);
-	State getState()const;
-	Facing getFacing()const;
+	void setState(const State state) {
+		if (state != currentState) {
+			currentState = state;
+			wasStateChange = true;
+		}
+		else {
+			wasStateChange = false;//fucking scuffed idk at this point
+		}
+	}
+	void setFacing(const Facing facing) {
+		if (facing != currentFacing) {
+			currentFacing = facing;
+			wasFaceChange = true;
+		}
+		else {
+			wasFaceChange = false;
+		}
+	}
 
-	NPCState() = default;
+	bool didStateChange()const {
+		return wasStateChange;
+	}
+	bool didFaceChange()const {
+		return wasFaceChange;
+	}
 private:
-
+	bool wasStateChange = false;
+	bool wasFaceChange = false;
 	State currentState = State::idle;
 	Facing currentFacing = Facing::down;
 };

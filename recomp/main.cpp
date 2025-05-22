@@ -64,23 +64,23 @@ int main() {
             if (event.type == SDL_EVENT_QUIT) {
                 gameRunning = false;
             }
-
-            //EVENTS
-            player.movement.movementUpdate();//reads event key press moves
-            //#################################################################################
         }
-
-        player->state.setState(MyUtils::getWASDState());
+        MyUtils::WASD_state(player->state);
 
         //MOVEMENT
+        
+        if (player->state.didStateChange()) {
+            put move logic here, dingus
+        }
+
         SDL_FRect* pos = player->getPosition();
         SDL_FRect newPos = MyUtils::getNewPosition(*pos, player->state, player->movementSpeed);
-        MyUtils::updatePosition(grid, newPos, pos);
+        MyUtils::updatePosition(grid, newPos, pos);//UNITE ALL FUNCTIONALITY INTO 1, GET POS, NEW POS, UPDATE POS, CAN MAKE IT LEANER
         //#################################################################################
 
         //CAMERA
-        window.getCamera()->setFocusCenter(player->getPosition());
-        SDL_FRect poopa{ 0,0,2560,1440 };
+        window.getCamera()->setFocusPoint(player->getPosition());
+        SDL_FRect poopa{ 0,0,2560,1440 };//GET RID OF THIS LATER WITH SCENE SET UP
         window.getCamera()->clampTo(&poopa);
         //#################################################################################
 
@@ -90,9 +90,7 @@ int main() {
         //#################################################################################
 
 
-
-        MyUtils::Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
-        MyUtils::Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
+        window.drawSprite(&player->sprite);
 
 
         window.updateEnd();

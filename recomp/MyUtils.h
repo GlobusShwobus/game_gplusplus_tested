@@ -12,7 +12,7 @@
 namespace MyUtils {
 
 	std::array<SDL_FPoint, 4> getCorners(const SDL_FRect& position);
-    std::pair<NPCState::State, NPCState::Facing> getWASDState();
+    void WASD_state(NPCState& state);
     nlohmann::json* initJSON(const char* path);
 
 	SDL_FRect getNewPosition(const SDL_FRect& position, const NPCState& state, const float speed);
