@@ -82,7 +82,7 @@ public:
 		noChange, up, down, left, right
 	};
 
-	void setState(const std::pair<State, Facing>* const state);
+	void setState(const std::pair<State, Facing> const state);
 	State getState()const;
 	Facing getFacing()const;
 
@@ -122,4 +122,31 @@ struct PlayerData {
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float attack_power = 0.f;
+};
+
+
+class Player {
+
+public:
+
+	Sprite sprite;
+	NPCState state;
+	AnimationController animControlls;
+
+	PlayerID id = 0;
+	float movementSpeed = 0;
+	float healthPoints = 0;
+	float attackPower = 0;
+
+	Player(const Sprite* const sprite, const std::vector<AnimationReel>* const reels, const PlayerData* const data):sprite(*sprite), animControlls(reels) {
+		id = data->id;
+		movementSpeed = data->movement_speed;
+		healthPoints = data->health_points;
+		attackPower = data->attack_power;
+	}
+
+	SDL_FRect* getPosition() {
+		return sprite.getDestination();
+	}
+
 };

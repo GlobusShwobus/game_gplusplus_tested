@@ -21,6 +21,7 @@ EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Rende
 			break;
 		case PlayerID_Version1:
 			initEntityPlayer(&entry, id);
+			break;
 			//others cases, like buildings, waterfalls, items idk
 		default: throw std::logic_error("\ntype not defined\n");
 		}

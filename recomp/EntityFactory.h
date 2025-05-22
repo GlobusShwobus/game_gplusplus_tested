@@ -48,6 +48,20 @@ public:
 	//animations where?
 	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
+	//caller is the owner
+	Player* createPlayer(const char* type) {
+		PlayerID id = HASH(type);
+
+		if (id != PlayerID_Version1) {
+			printf("\nillegal type ffor player init: %s\n", type);
+		}
+
+
+		Player* player = new Player(&spriteComponents[id], &animationComponents[id], &playerData[id]);
+
+		return player;
+	}
+
 
 	//makes a copy
 	//THIS IS WHERE I WOULD PUT MY ENTITY CREATION. IF I HAD ONE

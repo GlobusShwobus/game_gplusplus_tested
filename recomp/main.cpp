@@ -36,13 +36,20 @@ int main() {
     //initialize EntityFactory
     EntityFactory entityFactory(entityConfig, window.getRenderer());
 
-    //TEST (later scene?) worldmap
-    //Sprite worldMap = textureManager.createSprite(SpriteID::world_map);
+    //###################################################
+    // 
+    // Grid to become scene, which holds the map and any entities associated with it.
+    // 
+    // 
+    // Sprite worldMap = textureManager.createSprite(SpriteID::world_map);
+     Grid grid = Grid(2560, 1440);
+    // 
+    // 
+    //#####################################################################
 
-    //grid
-    Grid grid = Grid(worldMap.getTexture()->w, worldMap.getTexture()->h);
+
     //player
-    Player player = Player(textureManager.createSprite(SpriteID::player_sheet) , SDL_FPoint{ logicalRendererWidthInitial, logicalRendererHeightInitial });
+    Player* player = entityFactory.createPlayer("player_version1");
 
 
     bool gameRunning = true;
@@ -63,20 +70,26 @@ int main() {
             //#################################################################################
         }
 
+        player->state.setState(MyUtils::getWASDState());
+
         //MOVEMENT
-        SDL_FRect tPos = MyUtils::getNewPosition(player.sprite.getDestination(), player.movement.getCurrentMove(), player.speed);
-        MyUtils::updatePosition(grid, tPos, player.sprite.getDestination());
+        SDL_FRect* pos = player->getPosition();
+        SDL_FRect newPos = MyUtils::getNewPosition(*pos, player->state, player->movementSpeed);
+        MyUtils::updatePosition(grid, newPos, pos);
         //#################################################################################
 
         //CAMERA
-        player.camera.setFocus(player.sprite.getDestination());
-        player.camera.setClamp(worldMap.getSource());
+        window.getCamera()->setFocusCenter(player->getPosition());
+        SDL_FRect poopa{ 0,0,2560,1440 };
+        window.getCamera()->clampTo(&poopa);
         //#################################################################################
 
         //ANIMATION
         const ClipID clip = MyUtils::getClipBasedOnMovement(player.movement);
         player.sprite.play(clip);
         //#################################################################################
+
+
 
         MyUtils::Rendering::renderBasic(window.getRenderer(), worldMap, player.camera);
         MyUtils::Rendering::renderBasic(window.getRenderer(), player.sprite, player.camera);
@@ -94,6 +107,8 @@ int main() {
     delete entityConfig;
     delete stageConfig;
     delete windowConfig;
+
+    delete player;
 
     return 0;
 }

@@ -40,15 +40,13 @@ class Window {
 		int radiusHeight = 0;
 
 		//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
-	
-		void setClamp(const int windowW, const int windowH);
 	public:
 
 		Camera(const int diameterWidth, const int diameterHeight) :radiusWidth(diameterWidth / 2), radiusHeight(diameterHeight / 2) {}
-
-		void setFocus(const SDL_FRect* const playerPos);
-		const SDL_FPoint getCenter()const;
+		
+		void clampTo(const SDL_FRect* const rect);
 		SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
+		void setFocusCenter(const SDL_FRect* const rect);
 	};
 	Camera* camera = nullptr;
 
@@ -62,6 +60,9 @@ public:
 	void drawSprite(Sprite* sprite)const;
 
 	SDL_Renderer* getRenderer();
+	Camera* const getCamera() {
+		return camera;
+	}
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);

@@ -67,42 +67,20 @@ namespace MyUtils {
 	}
 
 
-	SDL_FRect getNewPosition(const SDL_FRect* const position, const MovementStatus movementStatus, const float speed) {
-		SDL_FRect newPos = *position;
+	SDL_FRect getNewPosition(const SDL_FRect& position, const NPCState& state, const float speed) {
+		SDL_FRect newPos = position;
 
-		const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
+		//const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
 
-		switch (movementStatus) {
-		case MovementStatus::MOVE_UP:
-			newPos.y -= speed;
-			break;
-		case MovementStatus::MOVE_DOWN:
-			newPos.y += speed;
-			break;
-		case MovementStatus::MOVE_LEFT:
-			newPos.x -= speed;
-			break;
-		case MovementStatus::MOVE_RIGHT:
-			newPos.x += speed;
-			break;
-		case MovementStatus::MOVE_UP_LEFT:
-			newPos.y -= diagonalSpeed;
-			newPos.x -= diagonalSpeed;
-			break;
-		case MovementStatus::MOVE_UP_RIGHT:
-			newPos.y -= diagonalSpeed;
-			newPos.x += diagonalSpeed;
-			break;
-		case MovementStatus::MOVE_DOWN_LEFT:
-			newPos.y += diagonalSpeed;
-			newPos.x -= diagonalSpeed;
-			break;
-		case MovementStatus::MOVE_DOWN_RIGHT:
-			newPos.y += diagonalSpeed;
-			newPos.x += diagonalSpeed;
-			break;
-		default:
-			break;
+		if(state.getState() == NPCState::State::walking) {
+			switch (state.getFacing()) {
+			case NPCState::Facing::up:    newPos.y -= speed; break;
+			case NPCState::Facing::down:  newPos.y += speed; break;
+			case NPCState::Facing::left:  newPos.x -= speed; break;
+			case NPCState::Facing::right: newPos.x += speed; break;
+			default://no change
+				break;
+			}
 		}
 		return newPos;
 	}

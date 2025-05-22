@@ -145,7 +145,6 @@
   <ItemGroup>
     <ClInclude Include="Grid.h" />
     <ClInclude Include="MyUtils.h" />
-    <ClInclude Include="Player.h" />
     <ClInclude Include="TESTS.h" />
     <ClInclude Include="BasicComponents.h" />
     <ClInclude Include="Window.h" />

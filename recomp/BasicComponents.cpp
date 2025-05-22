@@ -6,12 +6,12 @@ NPCState::State NPCState::getState()const {
 NPCState::Facing NPCState::getFacing()const {
 	return currentFacing;
 }
-void NPCState::setState(const std::pair<NPCState::State, NPCState::Facing>* const state) {
-	if (!(state->first == State::noChange)) {
-		currentState = state->first;
+void NPCState::setState(const std::pair<NPCState::State, NPCState::Facing> const state) {
+	if (!(state.first == State::noChange)) {
+		currentState = state.first;
 	}
-	if (!(state->second == Facing::noChange)) {
-		currentFacing = state->second;
+	if (!(state.second == Facing::noChange)) {
+		currentFacing = state.second;
 	}
 }
 
