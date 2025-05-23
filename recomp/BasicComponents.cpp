@@ -1,18 +1,36 @@
 #include "BasicComponents.h"
 
+void NPCState::setState(const State state) {
+	if (state != currentState) {
+		currentState = state;
+		wasStateChange = true;
+	}
+	else {
+		wasStateChange = false;//fucking scuffed idk at this point
+	}
+}
+void NPCState::setFacing(const Facing facing) {
+	if (facing != currentFacing) {
+		currentFacing = facing;
+		wasFaceChange = true;
+	}
+	else {
+		wasFaceChange = false;
+	}
+}
+
 NPCState::State NPCState::getState()const {
 	return currentState;
 }
 NPCState::Facing NPCState::getFacing()const {
 	return currentFacing;
 }
-void NPCState::setState(const std::pair<NPCState::State, NPCState::Facing> const state) {
-	if (!(state.first == State::noChange)) {
-		currentState = state.first;
-	}
-	if (!(state.second == Facing::noChange)) {
-		currentFacing = state.second;
-	}
+
+bool NPCState::didStateChangeThisFrame()const {
+	return wasStateChange;
+}
+bool NPCState::didFaceChangeThisFrame()const {
+	return wasFaceChange;
 }
 
 SDL_Texture* Sprite::getTexture() {
@@ -25,7 +43,7 @@ SDL_FRect* Sprite::getDestination() {
 	return &destination;
 }
 
-void AnimationController::update(AnimID id) {
+void AnimationController::update() {
 	if (!currentReel->isLooping && frameIndex >= currentReel->frameCount) return;//not looping so nothing to update
 	frameTimer++;
 

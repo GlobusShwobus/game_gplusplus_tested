@@ -68,25 +68,23 @@ int main() {
         MyUtils::WASD_state(player->state);
 
         //MOVEMENT
-        
-        if (player->state.didStateChange()) {
-            put move logic here, dingus
-        }
-
-        SDL_FRect* pos = player->getPosition();
-        SDL_FRect newPos = MyUtils::getNewPosition(*pos, player->state, player->movementSpeed);
-        MyUtils::updatePosition(grid, newPos, pos);//UNITE ALL FUNCTIONALITY INTO 1, GET POS, NEW POS, UPDATE POS, CAN MAKE IT LEANER
+        MyUtils::doMovement(grid, player->sprite.getDestination(), player->state, player->movementSpeed);
         //#################################################################################
 
         //CAMERA
-        window.getCamera()->setFocusPoint(player->getPosition());
+        window.getCamera()->setFocusPoint(player->sprite.getDestination());
         SDL_FRect poopa{ 0,0,2560,1440 };//GET RID OF THIS LATER WITH SCENE SET UP
         window.getCamera()->clampTo(&poopa);
         //#################################################################################
 
         //ANIMATION
-        const ClipID clip = MyUtils::getClipBasedOnMovement(player.movement);
-        player.sprite.play(clip);
+
+        if (player->state.didStateChangeThisFrame() || player->state.didFaceChangeThisFrame()) {
+            player->animControlls.setNewReel(MyUtils::getReelOnState(player->state));
+        }
+
+        player->animControlls.update();
+        *player->sprite.getSource() = player->animControlls.getCurrentFrame();//clean this up somehow? make MyUtils simply change values instead of RVO etc
         //#################################################################################
 
 

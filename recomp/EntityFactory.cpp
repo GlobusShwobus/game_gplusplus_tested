@@ -19,7 +19,7 @@ EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Rende
 		case EntityType_ENEMY:
 			initEntityEnemy(&entry, id);
 			break;
-		case PlayerID_Version1:
+		case EntityType_PLAYER:
 			initEntityPlayer(&entry, id);
 			break;
 			//others cases, like buildings, waterfalls, items idk
@@ -79,7 +79,7 @@ void EntityFactory::initAnimations(const nlohmann::json* const animationData, co
 
 	std::vector<AnimationReel> reelCollection;//autismus maximus
 
-	for (const auto& data : *animationData) {
+	for (const auto& data : (*animationData)["animations"]) {
 
 		AnimationReel clip;
 		const std::string clipID = data["clip_id"];
@@ -108,4 +108,18 @@ EntityFactory::~EntityFactory()
 	spriteComponents.clear();
 	animationComponents.clear();
 	enemyData.clear();
+}
+
+
+Player* EntityFactory::createPlayer(const char* type) {
+	PlayerID id = HASH(type);
+
+	if (id != PlayerID_Version1) {
+		printf("\nillegal type ffor player init: %s\n", type);
+	}
+
+
+	Player* player = new Player(&spriteComponents[id], &animationComponents[id], &playerData[id]);
+
+	return player;
 }

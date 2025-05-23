@@ -74,7 +74,7 @@ public:
 	//reels originates from EntityFactory witch holds the data, it is always valid and should not be freed
 	AnimationController(const std::vector<AnimationReel>* const reels) :clips(reels), currentReel(&reels->front()) {}
 
-	void update(AnimID id);
+	void update();
 	void setNewReel(AnimID id);
 	//creates a rectngle describing frame, acts as source for texture rendering
 	const SDL_FRect getCurrentFrame()const;
@@ -83,38 +83,21 @@ public:
 class NPCState {//TODO:only useful for entities that move, item types need another one
 public:
 	enum class State {
-		idle, walking
+		idle, moving
 	};
 	enum class Facing {
 		up, down, left, right
 	};
 	//should be run each frame
 
-	void setState(const State state) {
-		if (state != currentState) {
-			currentState = state;
-			wasStateChange = true;
-		}
-		else {
-			wasStateChange = false;//fucking scuffed idk at this point
-		}
-	}
-	void setFacing(const Facing facing) {
-		if (facing != currentFacing) {
-			currentFacing = facing;
-			wasFaceChange = true;
-		}
-		else {
-			wasFaceChange = false;
-		}
-	}
+	void setState(const State state);
+	void setFacing(const Facing facing);
 
-	bool didStateChange()const {
-		return wasStateChange;
-	}
-	bool didFaceChange()const {
-		return wasFaceChange;
-	}
+	State getState()const;
+	Facing getFacing()const;
+
+	bool didStateChangeThisFrame()const;
+	bool didFaceChangeThisFrame()const;
 private:
 	bool wasStateChange = false;
 	bool wasFaceChange = false;
@@ -173,9 +156,4 @@ public:
 		healthPoints = data->health_points;
 		attackPower = data->attack_power;
 	}
-
-	SDL_FRect* getPosition() {
-		return sprite.getDestination();
-	}
-
 };

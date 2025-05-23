@@ -15,12 +15,9 @@ namespace MyUtils {
     void WASD_state(NPCState& state);
     nlohmann::json* initJSON(const char* path);
 
-	SDL_FRect getNewPosition(const SDL_FRect& position, const NPCState& state, const float speed);
-	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition);
+	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing& facing, const float speed);
+	void doMovement(Grid& grid, SDL_FRect* const currentPosition, const NPCState& state, const float speed);
 
-	bool isSamePos(const SDL_FRect& first, const SDL_FRect& second) {
-		return first.x == second.x && first.y == second.y;
-	}
 
-    ClipID getClipBasedOnMovement(const Movement movementData);
+	AnimID getReelOnState(const NPCState& state);
 }

@@ -2,12 +2,14 @@
 
 Window::Window(const nlohmann::json* const windowConfig) {
 
-	const int windowWidth = (*windowConfig)["window_width"];
-	const int windowHeight = (*windowConfig)["window_height"];
-	const int cameraWidth = (*windowConfig)["camera_width"];
-	const int cameraHeight = (*windowConfig)["camera_height"];
-	const int FPSTarget = (*windowConfig)["FPS_target"];
-	const std::string title = (*windowConfig)["game_name"];
+	const auto& windowItem = (*windowConfig)["Window"];
+
+	const int windowWidth = windowItem["window_width"];
+	const int windowHeight = windowItem["window_height"];
+	const int cameraWidth = windowItem["camera_width"];
+	const int cameraHeight = windowItem["camera_height"];
+	const int FPSTarget = windowItem["FPS_target"];
+	const std::string title = windowItem["game_name"];
 
 
 	window = SDL_CreateWindow(title.c_str(), windowWidth, windowHeight, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);

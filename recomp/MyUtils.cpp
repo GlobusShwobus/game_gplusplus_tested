@@ -20,7 +20,7 @@ namespace MyUtils {
 
 
 		if (w || a || s || d) {
-			state.setState(NPCState::State::walking);
+			state.setState(NPCState::State::moving);
 			if (w) {
 				state.setFacing(NPCState::Facing::up);
 			}
@@ -36,20 +36,27 @@ namespace MyUtils {
 
 		}
 		else {
-			state.setState(NPCState::State::walking);
+			state.setState(NPCState::State::idle);
 		}
 	}
 
-	void updatePosition(Grid& grid, const SDL_FRect& updatedLocation, SDL_FRect* const previousPosition) {
+	void doMovement(Grid& grid, SDL_FRect* const currentPosition, const NPCState& state, const float speed) {
 
-		auto corners = getCorners(updatedLocation);
+		if (state.getState() == NPCState::State::idle) {
+			return;//no move so skip
+		}
 
-		for (const auto& point : corners) {
+		SDL_FRect newPos = getNewPosition(currentPosition, state.getFacing(), speed);
+
+
+		auto corners = getCorners(newPos);
+
+		for (const auto& point : corners) {//if there is any collision with something which shouldn't allow pass through, skip move
 			if (!grid.isValidTile(point) || !grid.getTile(point).doesContain(TFLAG_WALKABLE)) {
 				return;
 			}
 		}
-		*previousPosition = updatedLocation;
+		*currentPosition = newPos;
 	}
 
 	nlohmann::json* initJSON(const char* path) {
@@ -66,57 +73,44 @@ namespace MyUtils {
 	}
 
 
-	SDL_FRect getNewPosition(const SDL_FRect& position, const NPCState& state, const float speed) {
-		SDL_FRect newPos = position;
+	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing& facing, const float speed) {
+		SDL_FRect newPos = *current;
 
+		//no diagonals currently anymore
 		//const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
 
-		if(state.getState() == NPCState::State::walking) {
-			switch (state.getFacing()) {
-			case NPCState::Facing::up:    newPos.y -= speed; break;
-			case NPCState::Facing::down:  newPos.y += speed; break;
-			case NPCState::Facing::left:  newPos.x -= speed; break;
-			case NPCState::Facing::right: newPos.x += speed; break;
-			default://no change
-				break;
-			}
+		switch (facing) {
+		case NPCState::Facing::up:    newPos.y -= speed; break;
+		case NPCState::Facing::down:  newPos.y += speed; break;
+		case NPCState::Facing::left:  newPos.x -= speed; break;
+		case NPCState::Facing::right: newPos.x += speed; break;
+		default://no change
+			break;
 		}
 		return newPos;
 	}
+	AnimID getReelOnState(const NPCState& state) {
+		const auto st = state.getState();
+		const auto fc = state.getFacing();
 
+		AnimID id = 0;
 
-
-	ClipID getClipBasedOnMovement(const Movement movementData) {
-
-		MovementStatus moving = movementData.getCurrentMove();
-		MovementStatus ifIdle = movementData.getLastMove();
-
-		if (moving == MovementStatus::MOVE_UP) {
-			return ClipID::walk_up;
+		if (st == NPCState::State::moving) {
+			switch (fc) {
+			case NPCState::Facing::up:	  id = AnimID_WALK_UP; break;
+			case NPCState::Facing::down:  id = AnimID_WALK_DOWN; break;
+			case NPCState::Facing::left:  id = AnimID_WALK_LEFT; break;
+			case NPCState::Facing::right: id = AnimID_WALK_RIGHT; break;
+			}
 		}
-		else if (moving == MovementStatus::MOVE_DOWN) {
-			return ClipID::walk_down;
+		else if (st == NPCState::State::idle) {
+			switch (fc) {
+			case NPCState::Facing::up:	  id = AnimID_IDLE_UP; break;
+			case NPCState::Facing::down:  id = AnimID_IDLE_DOWN; break;
+			case NPCState::Facing::left:  id = AnimID_IDLE_LEFT; break;
+			case NPCState::Facing::right: id = AnimID_IDLE_RIGHT; break;
+			}
 		}
-		else if (moving == MovementStatus::MOVE_LEFT || moving == MovementStatus::MOVE_UP_LEFT || moving == MovementStatus::MOVE_DOWN_LEFT) {
-			return ClipID::walk_left;
-		}
-		else if (moving == MovementStatus::MOVE_RIGHT || moving == MovementStatus::MOVE_UP_RIGHT || moving == MovementStatus::MOVE_DOWN_RIGHT) {
-			return ClipID::walk_right;
-		}
-		//if none of the above is satisfied
-		if (ifIdle == MovementStatus::MOVE_UP) {
-			return ClipID::idle_up;
-		}
-		else if (ifIdle == MovementStatus::MOVE_DOWN) {
-			return ClipID::idle_down;
-		}
-		else if (ifIdle == MovementStatus::MOVE_LEFT || ifIdle == MovementStatus::MOVE_UP_LEFT || ifIdle == MovementStatus::MOVE_DOWN_LEFT) {
-			return ClipID::idle_left;
-		}
-		else if (ifIdle == MovementStatus::MOVE_RIGHT || ifIdle == MovementStatus::MOVE_UP_RIGHT || ifIdle == MovementStatus::MOVE_DOWN_RIGHT) {
-			return ClipID::idle_right;
-		}
-
-		return ClipID::none;
+		return id;
 	}
 }
