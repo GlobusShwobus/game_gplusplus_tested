@@ -78,9 +78,9 @@ int main() {
         //#################################################################################
 
         //ANIMATION
-
-        if (player->state.didStateChangeThisFrame() || player->state.didFaceChangeThisFrame()) {
+        if (player->state.didChangeOccur()) {
             player->animControlls.setNewReel(MyUtils::getReelOnState(player->state));
+            player->state.handeledChange();
         }
 
         player->animControlls.update();
@@ -90,14 +90,11 @@ int main() {
 
         window.drawSprite(&player->sprite);
 
-
         window.updateEnd();
     }
 
 
-    window.~Window();
     SDL_Quit();
-
 
     //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
     delete entityConfig;

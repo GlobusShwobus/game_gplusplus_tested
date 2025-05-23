@@ -96,11 +96,10 @@ public:
 	State getState()const;
 	Facing getFacing()const;
 
-	bool didStateChangeThisFrame()const;
-	bool didFaceChangeThisFrame()const;
+	bool didChangeOccur()const;
+	void handeledChange();
 private:
-	bool wasStateChange = false;
-	bool wasFaceChange = false;
+	bool wasChange = false;
 	State currentState = State::idle;
 	Facing currentFacing = Facing::down;
 };

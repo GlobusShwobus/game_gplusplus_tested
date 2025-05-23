@@ -24,13 +24,13 @@ namespace MyUtils {
 			if (w) {
 				state.setFacing(NPCState::Facing::up);
 			}
-			if (a) {
+			else if (a) {
 				state.setFacing(NPCState::Facing::left);
 			}
-			if (s) {
+			else if (s) {
 				state.setFacing(NPCState::Facing::down);
 			}
-			if (d) {
+			else if (d) {
 				state.setFacing(NPCState::Facing::right);
 			}
 

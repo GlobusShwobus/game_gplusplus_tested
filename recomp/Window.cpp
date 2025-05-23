@@ -16,9 +16,11 @@ Window::Window(const nlohmann::json* const windowConfig) {
 
 	renderer = SDL_CreateRenderer(window, nullptr);
 
-	frameLimiter = new FrameLimiter(FPSTarget);
-	camera = new Camera(cameraWidth, cameraHeight);
-	SDL_SetRenderLogicalPresentation(renderer, cameraWidth*2, cameraHeight*2, SDL_LOGICAL_PRESENTATION_STRETCH);
+	frameLimiter.init(FPSTarget);
+	camera.init(cameraWidth, cameraHeight);
+
+	//THIS IS NOT INTENDED BEHAVIOR, CAMERA SHOULD DETERMINE LOGICAL RENDERING NOT WINDOW SIZE, FIX LATER
+	SDL_SetRenderLogicalPresentation(renderer, windowWidth, windowHeight, SDL_LOGICAL_PRESENTATION_STRETCH);
 
 	//SDL_LOGICAL_PRESENTATION_DISABLED,     --> There is no logical size in effect 
 	//SDL_LOGICAL_PRESENTATION_STRETCH,      --> The rendered content is stretched to the output resolution 
@@ -28,17 +30,17 @@ Window::Window(const nlohmann::json* const windowConfig) {
 }
 void Window::updateBegin() {
 	SDL_RenderClear(renderer);
-	frameLimiter->frameBufferBegin();
+	frameLimiter.frameBufferBegin();
 }
 void Window::updateEnd() {
 	SDL_RenderPresent(renderer);
-	frameLimiter->frameBufferEnd();
+	frameLimiter.frameBufferEnd();
 }
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
 }
 void Window::drawSprite(Sprite* sprite)const {
-	SDL_FRect dest = camera->toCameraSpace(sprite->getDestination());
+	SDL_FRect dest = camera.toCameraSpace(sprite->getDestination());
 	SDL_RenderTexture(renderer, sprite->getTexture(), sprite->getSource(), &dest);
 }
 
@@ -63,4 +65,20 @@ SDL_FRect Window::Camera::toCameraSpace(const SDL_FRect* const entity)const {
 
 	return screenPos;
 }
-
+void Window::Camera::init(const int width, const int height) {
+	radiusWidth = width;
+	radiusHeight = height;
+}
+void Window::FrameLimiter::init(const int fps) {
+	FPS = fps;
+	frameDelay = 1000.0f / FPS;
+}
+void Window::FrameLimiter::frameBufferBegin() {
+	frameBegin = SDL_GetTicks();
+}
+void Window::FrameLimiter::frameBufferEnd() {
+	frameDuration = SDL_GetTicks() - frameBegin;
+	if (frameDelay > frameDuration) {
+		SDL_Delay(frameDelay - frameDuration);
+	}
+}

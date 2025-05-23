@@ -3,19 +3,13 @@
 void NPCState::setState(const State state) {
 	if (state != currentState) {
 		currentState = state;
-		wasStateChange = true;
-	}
-	else {
-		wasStateChange = false;//fucking scuffed idk at this point
+		wasChange = true;
 	}
 }
 void NPCState::setFacing(const Facing facing) {
 	if (facing != currentFacing) {
 		currentFacing = facing;
-		wasFaceChange = true;
-	}
-	else {
-		wasFaceChange = false;
+		wasChange = true;
 	}
 }
 
@@ -26,11 +20,11 @@ NPCState::Facing NPCState::getFacing()const {
 	return currentFacing;
 }
 
-bool NPCState::didStateChangeThisFrame()const {
-	return wasStateChange;
+bool NPCState::didChangeOccur()const {
+	return wasChange;
 }
-bool NPCState::didFaceChangeThisFrame()const {
-	return wasFaceChange;
+void NPCState::handeledChange() {
+	wasChange = false;
 }
 
 SDL_Texture* Sprite::getTexture() {
@@ -59,17 +53,11 @@ void AnimationController::update() {
 	}
 }
 void AnimationController::setNewReel(AnimID id) {
-	bool exists = false;
 	for (const AnimationReel& each : *clips) {
 		if (each.id == id && currentReel->id != id) {//if it even exists and if it isn't the one already in use
 			currentReel = &each;//praying this sets address and not some other voodoo
 			frameIndex = 0;
-			exists = true;
 		}
-	}
-
-	if (!exists) {
-		printf("\nEntered invalid animation for this entity: %d\n", id);
 	}
 }
 const SDL_FRect AnimationController::getCurrentFrame()const {

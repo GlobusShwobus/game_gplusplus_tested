@@ -12,25 +12,18 @@ class Window {
 	class FrameLimiter {
 
 		int FPS = 0;
-		const double frameDelay = 1000.0 / FPS;
+		double frameDelay = 0;
 		Uint64 frameBegin = 0;
 		Uint64 frameDuration = 0;
 
 	public:
+		FrameLimiter() = default;
 
-		FrameLimiter(int fps) :FPS(fps) {}
-		
-		void frameBufferBegin() {
-			frameBegin = SDL_GetTicks();
-		}
-		void frameBufferEnd() {
-			frameDuration = SDL_GetTicks() - frameBegin;
-			if (frameDelay > frameDuration) {
-				SDL_Delay(frameDelay - frameDuration);
-			}
-		}
+		void init(const int fps);
+		void frameBufferBegin();
+		void frameBufferEnd();
 	};
-	FrameLimiter* frameLimiter = nullptr;
+	FrameLimiter frameLimiter;
 
 
 	class Camera {
@@ -42,13 +35,12 @@ class Window {
 		//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
 	public:
 
-		Camera(const int diameterWidth, const int diameterHeight) :radiusWidth(diameterWidth / 2), radiusHeight(diameterHeight / 2) {}
-		
+		void init(const int width, const int height);
 		void clampTo(const SDL_FRect* const rect);
 		SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
 		void setFocusPoint(const SDL_FRect* const rect);
 	};
-	Camera* camera = nullptr;
+	Camera camera;
 
 public:
 
@@ -61,14 +53,12 @@ public:
 
 	SDL_Renderer* getRenderer();
 	Camera* const getCamera() {
-		return camera;
+		return &camera;
 	}
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
-		delete camera;
-		delete frameLimiter;
 	}
 private:
 	Window(const Window&) = delete;
