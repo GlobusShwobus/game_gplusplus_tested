@@ -108,6 +108,7 @@ EntityFactory::~EntityFactory()
 	spriteComponents.clear();
 	animationComponents.clear();
 	enemyData.clear();
+	playerData.clear();
 }
 
 

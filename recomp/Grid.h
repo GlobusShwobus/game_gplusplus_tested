@@ -6,12 +6,19 @@
 
 /*
 
-NOTE TO SELF!!!
-
-There is a missmatch between tile positions and real pixel positions, how SDL_FRect is floats so it's simple to just work with floats
-This means there is a truncation issue. Currently it works as intended by truncating floats to integers and accessing correct tiles since floats trunc in one direction
-
-But there is always an invisible asshole (potential) bug to keep in mind
+* Grid class to become the scene class
+* it is important to retain the functionality of the grid for more linear collision checking
+* it is important to retain the functionality of the grid for invisible walls (unwalkable terrain)
+* Scene class must read data for a scene from a config
+*	currently planned is holding the mapping data (coordinates which are walkable which not)
+*	could also hold information for scrips, but not that far currently
+* Scene class is also the owner of entities
+*	does not create entities
+*	contains and manages life cycle
+* upon scene change, it may be fine to clean up entities, but would be good to store data which remembers where what to spawn (again, a bit far a head)
+* 
+* Tile object to become a basic bool and nothing else which tells the tile is walkable or not
+* HARD PART, how tf does a tile/cell know what entities stand in there
 
 */
 

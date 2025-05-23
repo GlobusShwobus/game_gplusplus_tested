@@ -12,14 +12,12 @@ void NPCState::setFacing(const Facing facing) {
 		wasChange = true;
 	}
 }
-
 NPCState::State NPCState::getState()const {
 	return currentState;
 }
 NPCState::Facing NPCState::getFacing()const {
 	return currentFacing;
 }
-
 bool NPCState::didChangeOccur()const {
 	return wasChange;
 }

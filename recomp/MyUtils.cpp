@@ -73,7 +73,7 @@ namespace MyUtils {
 	}
 
 
-	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing& facing, const float speed) {
+	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing facing, const float speed) {
 		SDL_FRect newPos = *current;
 
 		//no diagonals currently anymore

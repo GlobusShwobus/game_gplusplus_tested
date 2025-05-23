@@ -113,7 +113,6 @@ class Sprite {
 public:
 
 	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest) :texture(Texture), source(*src), destination(*dest) {}
-	Sprite() = default;//REMEMBER TO CLEAN THIS UP WHEN DONE WITH ENTITY/COMPONENT ARCHITECTURE
 
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
