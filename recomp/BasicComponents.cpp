@@ -25,17 +25,8 @@ void NPCState::handeledChange() {
 	wasChange = false;
 }
 
-SDL_Texture* Sprite::getTexture() {
-	return texture;
-}
-SDL_FRect* Sprite::getSource() {
-	return &source;
-}
-SDL_FRect* Sprite::getDestination() {
-	return &destination;
-}
 
-void AnimationController::update() {
+void AnimationController::moveFrame() {
 	if (!currentReel->isLooping && frameIndex >= currentReel->frameCount) return;//not looping so nothing to update
 	frameTimer++;
 
@@ -58,14 +49,10 @@ void AnimationController::setNewReel(AnimID id) {
 		}
 	}
 }
-const SDL_FRect AnimationController::getCurrentFrame()const {
-
-	SDL_FRect frame{ 0,0,0,0 };
-
-	frame.x = currentReel->initialFrame.x + (currentReel->initialFrame.w * frameIndex);
-	frame.y = currentReel->initialFrame.y;
-	frame.w = currentReel->initialFrame.w;
-	frame.h = currentReel->initialFrame.h;
-	return frame;
+void AnimationController::applySourceFromFrame(SDL_FRect* const rect)const {
+	rect->x = currentReel->initialFrame.x + (currentReel->initialFrame.w * frameIndex);
+	rect->y = currentReel->initialFrame.y;
+	rect->w = currentReel->initialFrame.w;
+	rect->h = currentReel->initialFrame.h;
 }
 

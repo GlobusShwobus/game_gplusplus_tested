@@ -39,14 +39,17 @@ void Window::updateEnd() {
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
 }
-void Window::drawSprite(Sprite* sprite)const {
-	SDL_FRect dest = camera.toCameraSpace(sprite->getDestination());
-	SDL_RenderTexture(renderer, sprite->getTexture(), sprite->getSource(), &dest);
+void Window::drawTexture(TextureData* const sprite)const {
+	camera.applyDestinationFromCamera(&sprite->destination);
+	SDL_RenderTexture(renderer, sprite->texture, &sprite->source, &sprite->destination);
 }
 
-void Window::Camera::setFocusPoint(const SDL_FRect* const rect) {
-	center.x = rect->x + (rect->w / 2);
-	center.y = rect->y + (rect->h / 2);
+void Window::Camera::setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size) {
+	center.x = pos->x + (size->x / 2);
+	center.y = pos->y + (size->y / 2);
+
+	topLeft.x = center.x - radiusWidth;
+	topLeft.y = center.y - radiusHeight;
 }
 void Window::Camera::clampTo(const SDL_FRect* const rect) {
 	if (center.x - radiusWidth < rect->x)  { center.x = radiusWidth; }//left edge
@@ -54,17 +57,10 @@ void Window::Camera::clampTo(const SDL_FRect* const rect) {
 	if (center.x + radiusWidth > rect->w)  { center.x = rect->w - radiusWidth; }//right edge
 	if (center.y + radiusHeight > rect->h) { center.y = rect->h - radiusHeight; }//bottom edge
 }
-SDL_FRect Window::Camera::toCameraSpace(const SDL_FRect* const entity)const {
-	SDL_FRect screenPos{ 0,0,0,0 };
-
-	screenPos.x = entity->x - (center.x - radiusWidth);
-	screenPos.y = entity->y - (center.y - radiusHeight);
-
-	screenPos.w = entity->w;
-	screenPos.h = entity->h;
-
-	return screenPos;
-}
+void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
+	entity->x -= topLeft.x;
+	entity->y -= topLeft.y;
+};
 void Window::Camera::init(const int width, const int height) {
 	radiusWidth = width;
 	radiusHeight = height;

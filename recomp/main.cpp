@@ -7,19 +7,28 @@
 
 /*
 
-TODO::Grid to scene
-      retains grid functionality
-      stores the map and data describing what areas are walkable what not
-      stores entities
-      handles batch creation
-      handles batch clean up
-      (massive bonus points for batch behavior like movement/collision etc)
+TODO:: TRANSFORM COMPONENT:
+       currently sprite destination is used for pos checking, instead there should be dedicated transform
+       similarly to how sprites source information is derived from animation controller class, sprite destination will be derived from transform, meaning it should be applied at the very end before drawing
+       no need to store transform in the config- it can be desrived from sprite dest (so the opposite), but it must be constructed correctly in the constructor
 
-      saves data in a config where what is
+TODO:: COLLISIONS:
+       horizontal overlap == if top of rect A is higher than bottom of rect B, and top of rect B is higher than bottom of rect A;  [y1<y2+h2  &&  y2<y1+h1] ==> less than sign because we start top left
+       vertical overlap == if left of rect A is to the left of the right side of rect B, and if the left side of rect B is to the left of the right side of rect A; [x1<x2+w2  &&  x2<x1+w1]
+       if overlap both horizontally AND vertically == collision
+       store data for how much was collided (x, y), probably need -+ to know from which direction
 
-      may need to store additional event type information for scrips but not necessarily scripts themselves
+TODO:: Grid to scene
+       retains grid functionality
+       stores the map and data describing what areas are walkable what not
+       stores entities
+       handles batch creation
+       handles batch clean up
+       (massive bonus points for batch behavior like movement/collision etc)
+       saves data in a config where what is
+       may need to store additional event type information for scrips but not necessarily scripts themselves
 
-
+TODO:: window frame counter and camera require a better constructor not init function, looks fugly
 TODO:: warp json objects so they get a more secure/automatic clean up when they're not desired any longer
 TODO:: decide wtf to do with the player, should it or should it not be at least in some shortcut way be tied to scenes?
 
@@ -91,7 +100,7 @@ int main() {
         //#################################################################################
 
         //CAMERA
-        window.getCamera()->setFocusPoint(player->sprite.getDestination());
+        window.getCamera()->setFocusPoint(player->transform.getCurrentPos(), player->transform.getSize());
         SDL_FRect poopa{ 0,0,2560,1440 };//GET RID OF THIS LATER WITH SCENE SET UP
         window.getCamera()->clampTo(&poopa);
         //#################################################################################
@@ -102,12 +111,12 @@ int main() {
             player->state.handeledChange();
         }
 
-        player->animControlls.update();
-        *player->sprite.getSource() = player->animControlls.getCurrentFrame();//clean this up somehow? make MyUtils simply change values instead of RVO etc
+        player->animControlls.moveFrame();
+        player->animControlls.applySourceFromFrame(&player->texture.source);
         //#################################################################################
 
 
-        window.drawSprite(&player->sprite);
+        window.drawTexture(&player->texture);
 
         window.updateEnd();
     }

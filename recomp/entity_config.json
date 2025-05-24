@@ -5,6 +5,12 @@
     "movement_speed": 2.5,
     "health_points": 100,
     "attack_power": 25,
+    "transform": {
+      "x": 100,
+      "y": 100,
+      "w": 32,
+      "h": 32
+    },
     "sprite": {
       "texture_path": "../Textures/player_sheet.png",
       "texture_source": [ 0, 0, 32, 32 ],

@@ -28,7 +28,8 @@ class Window {
 
 	class Camera {
 
-		SDL_FPoint center{ 0,0 };
+		SDL_Point center{ 0,0 };
+		SDL_Point topLeft{ 0,0 };
 		int radiusWidth = 0;
 		int radiusHeight = 0;
 
@@ -37,8 +38,8 @@ class Window {
 
 		void init(const int width, const int height);
 		void clampTo(const SDL_FRect* const rect);
-		SDL_FRect toCameraSpace(const SDL_FRect* const entity)const;
-		void setFocusPoint(const SDL_FRect* const rect);
+		void applyDestinationFromCamera(SDL_FRect* const entity)const;
+		void setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size);
 	};
 	Camera camera;
 
@@ -49,7 +50,7 @@ public:
 	void updateBegin();
 	void updateEnd();
 
-	void drawSprite(Sprite* sprite)const;
+	void drawTexture(TextureData* const sprite)const;
 
 	SDL_Renderer* getRenderer();
 	Camera* const getCamera() {

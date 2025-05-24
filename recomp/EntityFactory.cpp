@@ -45,7 +45,6 @@ void EntityFactory::initEntityEnemy(const nlohmann::json* const enemyData, const
 	entry.health_points = (*enemyData)["health_points"];
 	entry.attack_power = (*enemyData)["attack_power"];
 	entry.attack_interval = (*enemyData)["attack_interval"];
-
 	this->enemyData.emplace(entry.id, entry);
 }
 void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, const EnemyID id) {
@@ -55,6 +54,10 @@ void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, con
 	entry.movement_speed = (*playerData)["movement_speed"];
 	entry.health_points = (*playerData)["health_points"];
 	entry.attack_power = (*playerData)["attack_power"];
+
+	const auto& transform = (*playerData)["transform"];
+
+	entry.transform = Transform(transform["x"], transform["y"], transform["w"], transform["h"]);
 
 	this->playerData.emplace(entry.id, entry);
 }
@@ -71,9 +74,9 @@ void EntityFactory::initSprite(const nlohmann::json* const spriteData, SDL_Rende
 
 	SDL_Texture* texture = IMG_LoadTexture(renderer, texturePath.c_str());
 
-	Sprite sprite(texture, &source, &destination);
+	TextureData sprite(texture, &source, &destination);
 
-	spriteComponents.emplace(id, sprite);
+	textureComponents.emplace(id, sprite);
 }
 void EntityFactory::initAnimations(const nlohmann::json* const animationData, const EnemyID id) {
 
@@ -102,10 +105,10 @@ EntityFactory::~EntityFactory()
 	//sprites itself is not the owner of the pointer because many different objects can point to the same texture on the GPU
 	//if the entity holding a copy of a sprite, stops existing, then by default it's not the last reference anyway
 	//however if the manager stops existing, and this should only happen when the game is closed, that means we must clean up now
-	for (auto& [id, sprite] : spriteComponents) {
-		SDL_DestroyTexture(sprite.getTexture());
+	for (auto& [id, sprite] : textureComponents) {
+		SDL_DestroyTexture(sprite.texture);
 	}
-	spriteComponents.clear();
+	textureComponents.clear();
 	animationComponents.clear();
 	enemyData.clear();
 	playerData.clear();
@@ -120,7 +123,7 @@ Player* EntityFactory::createPlayer(const char* type) {
 	}
 
 
-	Player* player = new Player(&spriteComponents[id], &animationComponents[id], &playerData[id]);
+	Player* player = new Player(&textureComponents[id], &animationComponents[id], &playerData[id]);
 
 	return player;
 }

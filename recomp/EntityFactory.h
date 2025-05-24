@@ -9,7 +9,7 @@
 
 class EntityFactory {
 
-	std::map<EntityID, Sprite> spriteComponents;
+	std::map<EntityID, TextureData> textureComponents;
 	std::map<EntityID, std::vector<AnimationReel>> animationComponents;
 
 	std::map<EnemyID, EnemyData> enemyData;
