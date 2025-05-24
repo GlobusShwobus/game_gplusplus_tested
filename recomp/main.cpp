@@ -5,6 +5,25 @@
 
 #include "MyUtils.h"
 
+/*
+
+TODO::Grid to scene
+      retains grid functionality
+      stores the map and data describing what areas are walkable what not
+      stores entities
+      handles batch creation
+      handles batch clean up
+      (massive bonus points for batch behavior like movement/collision etc)
+
+      saves data in a config where what is
+
+      may need to store additional event type information for scrips but not necessarily scripts themselves
+
+
+TODO:: warp json objects so they get a more secure/automatic clean up when they're not desired any longer
+TODO:: decide wtf to do with the player, should it or should it not be at least in some shortcut way be tied to scenes?
+
+*/
 
 int main() {
 

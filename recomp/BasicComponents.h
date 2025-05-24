@@ -113,6 +113,7 @@ class Sprite {
 public:
 
 	Sprite(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest) :texture(Texture), source(*src), destination(*dest) {}
+	Sprite() = default;//Entity factory map does not like without default constructor, need to do something about it
 
 	SDL_Texture* getTexture();
 	SDL_FRect* getSource();
