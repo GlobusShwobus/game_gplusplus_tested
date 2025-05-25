@@ -22,16 +22,16 @@ namespace MyUtils {
 		if (w || a || s || d) {
 			state.setState(NPCState::State::moving);
 			if (w) {
-				state.setFacing(NPCState::Facing::up);
+				state.setDirection(NPCState::Direction::up);
 			}
 			else if (a) {
-				state.setFacing(NPCState::Facing::left);
+				state.setDirection(NPCState::Direction::left);
 			}
 			else if (s) {
-				state.setFacing(NPCState::Facing::down);
+				state.setDirection(NPCState::Direction::down);
 			}
 			else if (d) {
-				state.setFacing(NPCState::Facing::right);
+				state.setDirection(NPCState::Direction::right);
 			}
 
 		}
@@ -39,26 +39,6 @@ namespace MyUtils {
 			state.setState(NPCState::State::idle);
 		}
 	}
-
-	void doMovement(Grid& grid, SDL_FRect* const currentPosition, const NPCState& state, const float speed) {
-
-		if (state.getState() == NPCState::State::idle) {
-			return;//no move so skip
-		}
-
-		SDL_FRect newPos = getNewPosition(currentPosition, state.getFacing(), speed);
-
-
-		auto corners = getCorners(newPos);
-
-		for (const auto& point : corners) {//if there is any collision with something which shouldn't allow pass through, skip move
-			if (!grid.isValidTile(point) || !grid.getTile(point).doesContain(TFLAG_WALKABLE)) {
-				return;
-			}
-		}
-		*currentPosition = newPos;
-	}
-
 	nlohmann::json* initJSON(const char* path) {
 		//look into assurances that the path is a json so we catch exception early
 		std::ifstream in(path);
@@ -71,46 +51,39 @@ namespace MyUtils {
 
 		return json;
 	}
-
-
-	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing facing, const float speed) {
-		SDL_FRect newPos = *current;
-
-		//no diagonals currently anymore
-		//const float diagonalSpeed = speed * 0.7071f;// if diagonal speed is faster by sqrt2, then adjust by 1/sqrt2=0.7071
-
-		switch (facing) {
-		case NPCState::Facing::up:    newPos.y -= speed; break;
-		case NPCState::Facing::down:  newPos.y += speed; break;
-		case NPCState::Facing::left:  newPos.x -= speed; break;
-		case NPCState::Facing::right: newPos.x += speed; break;
-		default://no change
-			break;
-		}
-		return newPos;
-	}
 	AnimID getReelOnState(const NPCState& state) {
 		const auto st = state.getState();
-		const auto fc = state.getFacing();
+		const auto fc = state.getDirection();
 
 		AnimID id = 0;
 
 		if (st == NPCState::State::moving) {
 			switch (fc) {
-			case NPCState::Facing::up:	  id = AnimID_WALK_UP; break;
-			case NPCState::Facing::down:  id = AnimID_WALK_DOWN; break;
-			case NPCState::Facing::left:  id = AnimID_WALK_LEFT; break;
-			case NPCState::Facing::right: id = AnimID_WALK_RIGHT; break;
+			case NPCState::Direction::up:	  id = AnimID_WALK_UP; break;
+			case NPCState::Direction::down:  id = AnimID_WALK_DOWN; break;
+			case NPCState::Direction::left:  id = AnimID_WALK_LEFT; break;
+			case NPCState::Direction::right: id = AnimID_WALK_RIGHT; break;
 			}
 		}
 		else if (st == NPCState::State::idle) {
 			switch (fc) {
-			case NPCState::Facing::up:	  id = AnimID_IDLE_UP; break;
-			case NPCState::Facing::down:  id = AnimID_IDLE_DOWN; break;
-			case NPCState::Facing::left:  id = AnimID_IDLE_LEFT; break;
-			case NPCState::Facing::right: id = AnimID_IDLE_RIGHT; break;
+			case NPCState::Direction::up:	  id = AnimID_IDLE_UP; break;
+			case NPCState::Direction::down:  id = AnimID_IDLE_DOWN; break;
+			case NPCState::Direction::left:  id = AnimID_IDLE_LEFT; break;
+			case NPCState::Direction::right: id = AnimID_IDLE_RIGHT; break;
 			}
 		}
 		return id;
 	}
+	void moveScriptBasic(Transform& transform, NPCState& state, const float moveSpeed) {
+		if (state.getState() == NPCState::State::idle) {
+			return;
+		}
+
+		transform.setVelocity(state.getDirection(), moveSpeed);
+		transform.updatePosition();
+		transform.resetVelocity();
+
+	}
+
 }

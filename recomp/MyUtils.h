@@ -15,8 +15,8 @@ namespace MyUtils {
     void WASD_state(NPCState& state);
     nlohmann::json* initJSON(const char* path);
 
-	SDL_FRect getNewPosition(const SDL_FRect* const current, const NPCState::Facing facing, const float speed);
-	void doMovement(Grid& grid, SDL_FRect* const currentPosition, const NPCState& state, const float speed);
+	//eventually integrate fully into transform OR make more options with transform funcs that a script handles
+	void moveScriptBasic(Transform& transform, NPCState& state, const float moveSpeed);
 
 
 	AnimID getReelOnState(const NPCState& state);

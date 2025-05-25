@@ -95,23 +95,23 @@ public:
 	enum class State {
 		idle, moving
 	};
-	enum class Facing {
+	enum class Direction {
 		up, down, left, right
 	};
 	//should be run each frame
 
 	void setState(const State state);
-	void setFacing(const Facing facing);
+	void setDirection(const Direction facing);
 
 	State getState()const;
-	Facing getFacing()const;
+	Direction getDirection()const;
 
 	bool didChangeOccur()const;
 	void handeledChange();
 private:
 	bool wasChange = false;
 	State currentState = State::idle;
-	Facing currentFacing = Facing::down;
+	Direction currentDirection = Direction::down;
 };
 
 class Transform {
@@ -137,12 +137,65 @@ public:
 	
 	}
 
-	const SDL_Point* const getCurrentPos() {
+	const SDL_Point* const getPosition() {
 		return &position;
 	}
 	const SDL_Point* const getSize() {
 		return &size;
 	}
+
+	void updatePosition() {
+		previousPosition = position;
+
+		position.x += velocity.x;
+		position.y += velocity.y;
+	}
+	//maybe temp, will see
+	void clampPosition(int x, int y, int w, int h) {
+		if (position.x < x) {
+			position.x = x;
+		}
+		if (position.y < y) {
+			position.y = y;
+		}
+		if (position.x + size.x > w) {
+			position.x = w - size.x;
+		}
+		if (position.y + size.y > h) {
+			position.y = h - size.y;
+		}
+	}
+	void setVelocity(NPCState::Direction dir, const float moveSpeed) {
+		switch (dir) {
+		case NPCState::Direction::up:    velocity.y = moveSpeed; break;
+		case NPCState::Direction::down:  velocity.y = moveSpeed; break;
+		case NPCState::Direction::left:  velocity.x = moveSpeed; break;
+		case NPCState::Direction::right: velocity.x = moveSpeed; break;
+		default://no change but other dirs should not exist (maybe diagonals later)
+			break;
+		}
+	}
+	void incrementVelocity(NPCState::Direction dir, const float moveSpeed) {
+		switch (dir) {
+		case NPCState::Direction::up:    velocity.y -= moveSpeed; break;
+		case NPCState::Direction::down:  velocity.y += moveSpeed; break;
+		case NPCState::Direction::left:  velocity.x -= moveSpeed; break;
+		case NPCState::Direction::right: velocity.x += moveSpeed; break;
+		default://no change but other dirs should not exist (maybe diagonals later)
+			break;
+		}
+	}
+	void resetVelocity() {
+		velocity.x = 0;
+		velocity.y = 0;
+	}
+	void applyDestinationTexture(SDL_FRect* const dest)const {
+		dest->x = position.x;
+		dest->y = position.y;
+		dest->w = size.x;
+		dest->h = size.y;
+	}
+
 
 };
 
@@ -186,7 +239,7 @@ public:
 		attackPower = data->attack_power;
 
 
-		const SDL_Point* const pos = transform.getCurrentPos();
+		const SDL_Point* const pos = transform.getPosition();
 		const SDL_Point* const size = transform.getSize();
 
 		SDL_FRect dest{ pos->x, pos->y, size->x, size->y };//currently the texutre/frame size is same as collision box size, but now we can mix and match

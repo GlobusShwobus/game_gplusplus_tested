@@ -6,17 +6,17 @@ void NPCState::setState(const State state) {
 		wasChange = true;
 	}
 }
-void NPCState::setFacing(const Facing facing) {
-	if (facing != currentFacing) {
-		currentFacing = facing;
+void NPCState::setDirection(const Direction facing) {
+	if (facing != currentDirection) {
+		currentDirection = facing;
 		wasChange = true;
 	}
 }
 NPCState::State NPCState::getState()const {
 	return currentState;
 }
-NPCState::Facing NPCState::getFacing()const {
-	return currentFacing;
+NPCState::Direction NPCState::getDirection()const {
+	return currentDirection;
 }
 bool NPCState::didChangeOccur()const {
 	return wasChange;
