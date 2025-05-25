@@ -5,6 +5,7 @@
 #include <vector>
 
 //cool new stuff
+
 typedef uint32_t HASH_ID_TYPE;
 
 constexpr HASH_ID_TYPE HASH(const char* str) {
@@ -35,7 +36,7 @@ constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 typedef HASH_ID_TYPE EntityType;
 constexpr EntityType EntityType_PLAYER = HASH("player_type");
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
-bool isValidEntityType(const EntityType type) {
+constexpr bool isValidEntityType(const EntityType type) {
 	return type == EntityType_PLAYER || type == EntityType_ENEMY;
 }
 
@@ -48,14 +49,15 @@ typedef EntityID PlayerID;
 
 constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
 constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
-bool isValidEnemyType(const EnemyID type) {
+constexpr bool isValidEnemyType(const EnemyID type) {
 	return type == EnemyID_SPEAR1 || type == EnemyID_SWORD1;
 }
 
 constexpr PlayerID PlayerID_Version1 = HASH("player_version1");
-bool isValidPlayerType(const PlayerID type) {
+constexpr bool isValidPlayerType(const PlayerID type) {
 	return type == PlayerID_Version1;
 }
+
 
 
 
