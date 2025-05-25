@@ -11,13 +11,13 @@ class Window {
 
 	class FrameLimiter {
 
-		static constexpr Uint32 ms_in_second = 1000000;
+		static constexpr Uint32 ms_in_second = 1000;
 
 		Uint32 FPS = 0;
 		Uint32 maximumFrameDuration = 0;
 
-		Uint32 frameX = 0;
-		Uint32 frameY = 0;
+		Uint32 frameStart = 0;
+		Uint32 frameEnd = 0;
 
 		bool isDelayActivated = false;
 		Uint32 delayDuration = 0;
@@ -27,10 +27,15 @@ class Window {
 		FrameLimiter() = default;
 		FrameLimiter(const int fps) :FPS(fps), maximumFrameDuration(ms_in_second / FPS) {}
 
-		void update() {
-			frameY = frameX;
-			frameX = SDL_GetTicks();
-			Uint32 duration = frameX - frameY;
+		void beginFrame() {
+			frameStart = SDL_GetTicks();
+		}
+		void endFrame() {
+			frameEnd = SDL_GetTicks();
+			Uint32 duration = frameEnd - frameStart;
+
+			isDelayActivated = false;
+			delayDuration = 0;
 
 			if (duration < maximumFrameDuration) {
 				delayDuration = maximumFrameDuration - duration;
@@ -38,16 +43,12 @@ class Window {
 			}
 		}
 
-		bool isDelay()const {
+		bool shouldDelay()const {
 			return isDelayActivated;
 		}
 		Uint32 getDelayDuration()const {
 			return delayDuration;
 		}
-
-
-		void frameBufferBegin();
-		void frameBufferEnd();
 	};
 	FrameLimiter frameLimiter;
 
@@ -80,9 +81,13 @@ public:
 	void drawTexture(TextureData* const sprite)const;
 
 	SDL_Renderer* getRenderer();
-	Camera* const getCamera() {
-		return &camera;
+	Camera& getCamera() {
+		return camera;
 	}
+	FrameLimiter& getFrameBoy() {
+		return frameLimiter;
+	}
+
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);

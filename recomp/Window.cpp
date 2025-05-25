@@ -30,11 +30,9 @@ Window::Window(const nlohmann::json* const windowConfig) {
 }
 void Window::updateBegin() {
 	SDL_RenderClear(renderer);
-	frameLimiter.frameBufferBegin();
 }
 void Window::updateEnd() {
 	SDL_RenderPresent(renderer);
-	frameLimiter.frameBufferEnd();
 }
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
@@ -62,13 +60,4 @@ void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
 	entity->x -= topLeft.x;
 	entity->y -= topLeft.y;
 };
-void Window::FrameLimiter::frameBufferBegin() {
-	frameBegin = SDL_GetTicks();
-}
-void Window::FrameLimiter::frameBufferEnd() {
-	frameDuration = SDL_GetTicks() - frameBegin;
-	if (frameDelay > frameDuration) {
 
-		SDL_Delay(frameDelay - frameDuration);
-	}
-}

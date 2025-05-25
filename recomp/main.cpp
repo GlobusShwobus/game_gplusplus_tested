@@ -92,8 +92,11 @@ int main() {
     SDL_Event event;
 
     while (gameRunning) {
+        auto& frameCounter = window.getFrameBoy();
+        auto& camera = window.getCamera();
 
         window.updateBegin();
+        frameCounter.beginFrame();
 
 
         while (SDL_PollEvent(&event)) {
@@ -110,9 +113,9 @@ int main() {
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        window.getCamera()->setFocusPoint(player->transform.getPosition(), player->transform.getSize());
-        window.getCamera()->clampTo(0, 0, 2560, 1440);//currently map does not exist
-        window.getCamera()->setTopLeft();
+        camera.setFocusPoint(player->transform.getPosition(), player->transform.getSize());
+        camera.clampTo(0, 0, 2560, 1440);//currently map does not exist
+        camera.setTopLeft();
         //#################################################################################
 
         //ANIMATION
@@ -131,7 +134,25 @@ int main() {
         window.drawTexture(&player->texture);
         window.updateEnd();
     
-        printf("pos x: %d   pos y: %d\n", player->transform.getPosition()->x, player->transform.getPosition()->y);
+        //DO SHIT HERE LIKE CALLING "new" and "delete"
+        frameCounter.endFrame();
+
+        if (frameCounter.shouldDelay()) {
+
+            Uint32 delayTime = frameCounter.getDelayDuration();
+            Uint32 startDelay = SDL_GetTicks();
+
+            //DO SHIT HERE
+
+            //#################################################################################
+
+            Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
+
+            if (remaining > 0) {
+                SDL_Delay(remaining);
+            }
+        }
+        //#################################################################################
     }
 
 
