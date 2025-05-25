@@ -18,8 +18,8 @@ class Window {
 
 	public:
 		FrameLimiter() = default;
+		FrameLimiter(const int fps) :FPS(fps), frameDelay(1000.0f / FPS) {}
 
-		void init(const int fps);
 		void frameBufferBegin();
 		void frameBufferEnd();
 	};
@@ -35,11 +35,12 @@ class Window {
 
 		//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
 	public:
-
-		void init(const int width, const int height);
-		void clampTo(const SDL_FRect* const rect);
+		Camera() = default;
+		Camera(const int w, const int h):radiusWidth(w),radiusHeight(h) {}
+		void clampTo(int x, int y, int w, int h);//duplicate function, kind of
 		void applyDestinationFromCamera(SDL_FRect* const entity)const;
 		void setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size);
+		void setTopLeft();
 	};
 	Camera camera;
 

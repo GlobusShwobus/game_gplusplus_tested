@@ -121,7 +121,7 @@ class Transform {
 	SDL_Point previousPosition{ 0,0 };
 	SDL_Point size{ 0,0 };
 	SDL_Point halfSize{ 0,0 };
-	SDL_FPoint velocity{ 0.f,0.f };
+	SDL_Point velocity{ 0,0 };
 
 public:
 	Transform() = default;
@@ -165,22 +165,12 @@ public:
 			position.y = h - size.y;
 		}
 	}
-	void setVelocity(NPCState::Direction dir, const float moveSpeed) {
-		switch (dir) {
-		case NPCState::Direction::up:    velocity.y = moveSpeed; break;
-		case NPCState::Direction::down:  velocity.y = moveSpeed; break;
-		case NPCState::Direction::left:  velocity.x = moveSpeed; break;
-		case NPCState::Direction::right: velocity.x = moveSpeed; break;
-		default://no change but other dirs should not exist (maybe diagonals later)
-			break;
-		}
-	}
 	void incrementVelocity(NPCState::Direction dir, const float moveSpeed) {
 		switch (dir) {
-		case NPCState::Direction::up:    velocity.y -= moveSpeed; break;
-		case NPCState::Direction::down:  velocity.y += moveSpeed; break;
-		case NPCState::Direction::left:  velocity.x -= moveSpeed; break;
-		case NPCState::Direction::right: velocity.x += moveSpeed; break;
+		case NPCState::Direction::up:    velocity.y -= (int)moveSpeed; break;
+		case NPCState::Direction::down:  velocity.y += (int)moveSpeed; break;
+		case NPCState::Direction::left:  velocity.x -= (int)moveSpeed; break;
+		case NPCState::Direction::right: velocity.x += (int)moveSpeed; break;
 		default://no change but other dirs should not exist (maybe diagonals later)
 			break;
 		}
@@ -190,10 +180,10 @@ public:
 		velocity.y = 0;
 	}
 	void applyDestinationTexture(SDL_FRect* const dest)const {
-		dest->x = position.x;
-		dest->y = position.y;
-		dest->w = size.x;
-		dest->h = size.y;
+		dest->x = (float)position.x;
+		dest->y = (float)position.y;
+		dest->w = (float)size.x;
+		dest->h = (float)size.y;
 	}
 
 
@@ -242,7 +232,7 @@ public:
 		const SDL_Point* const pos = transform.getPosition();
 		const SDL_Point* const size = transform.getSize();
 
-		SDL_FRect dest{ pos->x, pos->y, size->x, size->y };//currently the texutre/frame size is same as collision box size, but now we can mix and match
+		SDL_FRect dest{ (float)pos->x, (float)pos->y, (float)size->x, (float)size->y };//currently the texutre/frame size is same as collision box size, but now we can mix and match
 
 		this->texture.destination = dest;
 	}

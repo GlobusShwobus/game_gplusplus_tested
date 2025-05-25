@@ -109,9 +109,10 @@ int main() {
         //#################################################################################
 
         //CAMERA
+        //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
         window.getCamera()->setFocusPoint(player->transform.getPosition(), player->transform.getSize());
-        SDL_FRect poopa{ 0,0,2560,1440 };//GET RID OF THIS LATER WITH SCENE SET UP
-        window.getCamera()->clampTo(&poopa);
+        window.getCamera()->clampTo(0, 0, 2560, 1440);
+        window.getCamera()->setTopLeft();
         //#################################################################################
 
         //ANIMATION

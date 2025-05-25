@@ -16,8 +16,8 @@ Window::Window(const nlohmann::json* const windowConfig) {
 
 	renderer = SDL_CreateRenderer(window, nullptr);
 
-	frameLimiter.init(FPSTarget);
-	camera.init(cameraWidth, cameraHeight);
+	frameLimiter = FrameLimiter(FPSTarget);
+	camera = Camera(cameraWidth, cameraHeight);
 
 	//THIS IS NOT INTENDED BEHAVIOR, CAMERA SHOULD DETERMINE LOGICAL RENDERING NOT WINDOW SIZE, FIX LATER
 	SDL_SetRenderLogicalPresentation(renderer, windowWidth, windowHeight, SDL_LOGICAL_PRESENTATION_STRETCH);
@@ -47,28 +47,21 @@ void Window::drawTexture(TextureData* const sprite)const {
 void Window::Camera::setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size) {
 	center.x = pos->x + (size->x / 2);
 	center.y = pos->y + (size->y / 2);
-
+}
+void Window::Camera::setTopLeft() {
 	topLeft.x = center.x - radiusWidth;
 	topLeft.y = center.y - radiusHeight;
 }
-void Window::Camera::clampTo(const SDL_FRect* const rect) {
-	if (center.x - radiusWidth < rect->x)  { center.x = radiusWidth; }//left edge
-	if (center.y - radiusHeight < rect->y) { center.y = radiusHeight; }//top edge
-	if (center.x + radiusWidth > rect->w)  { center.x = rect->w - radiusWidth; }//right edge
-	if (center.y + radiusHeight > rect->h) { center.y = rect->h - radiusHeight; }//bottom edge
+void Window::Camera::clampTo(int x, int y, int w, int h) {
+	if (center.x - radiusWidth < x)  { center.x = radiusWidth; }//left edge
+	if (center.y - radiusHeight < y) { center.y = radiusHeight; }//top edge
+	if (center.x + radiusWidth > w)  { center.x = w - radiusWidth; }//right edge
+	if (center.y + radiusHeight > h) { center.y = h - radiusHeight; }//bottom edge
 }
 void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
 	entity->x -= topLeft.x;
 	entity->y -= topLeft.y;
 };
-void Window::Camera::init(const int width, const int height) {
-	radiusWidth = width;
-	radiusHeight = height;
-}
-void Window::FrameLimiter::init(const int fps) {
-	FPS = fps;
-	frameDelay = 1000.0f / FPS;
-}
 void Window::FrameLimiter::frameBufferBegin() {
 	frameBegin = SDL_GetTicks();
 }

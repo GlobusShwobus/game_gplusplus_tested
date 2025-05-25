@@ -59,7 +59,7 @@ namespace MyUtils {
 
 		if (st == NPCState::State::moving) {
 			switch (fc) {
-			case NPCState::Direction::up:	  id = AnimID_WALK_UP; break;
+			case NPCState::Direction::up:	 id = AnimID_WALK_UP; break;
 			case NPCState::Direction::down:  id = AnimID_WALK_DOWN; break;
 			case NPCState::Direction::left:  id = AnimID_WALK_LEFT; break;
 			case NPCState::Direction::right: id = AnimID_WALK_RIGHT; break;
@@ -67,7 +67,7 @@ namespace MyUtils {
 		}
 		else if (st == NPCState::State::idle) {
 			switch (fc) {
-			case NPCState::Direction::up:	  id = AnimID_IDLE_UP; break;
+			case NPCState::Direction::up:	 id = AnimID_IDLE_UP; break;
 			case NPCState::Direction::down:  id = AnimID_IDLE_DOWN; break;
 			case NPCState::Direction::left:  id = AnimID_IDLE_LEFT; break;
 			case NPCState::Direction::right: id = AnimID_IDLE_RIGHT; break;
@@ -80,7 +80,7 @@ namespace MyUtils {
 			return;
 		}
 
-		transform.setVelocity(state.getDirection(), moveSpeed);
+		transform.incrementVelocity(state.getDirection(), moveSpeed);
 		transform.updatePosition();
 		transform.resetVelocity();
 
