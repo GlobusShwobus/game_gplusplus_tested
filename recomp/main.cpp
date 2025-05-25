@@ -24,7 +24,12 @@ TODO:: TEST: set up some random npc spawning and make them move randomly and bas
        values to determine how much and were to push back, 
        DESIRED RESULTS:: 
        for the transform to be able to handle collision and outcomes, that's it, the test code will be junk
-
+TODO:: CLEAN UP!!! 
+       variable names
+       behavior encapsulation
+       at least try to be const correct
+       if possible some optimization
+       of note:: entities are in kind of a free for all with all vars being public and names are all over the place
 
 TODO:: Grid to scene
        retains grid functionality

@@ -35,6 +35,9 @@ constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 typedef HASH_ID_TYPE EntityType;
 constexpr EntityType EntityType_PLAYER = HASH("player_type");
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
+bool isValidEntityType(const EntityType type) {
+	return type == EntityType_PLAYER || type == EntityType_ENEMY;
+}
 
 //####################################################################################################
 //--------------------   ENTITY IDs   ----------------------------------------------------------------
@@ -45,9 +48,14 @@ typedef EntityID PlayerID;
 
 constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
 constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
+bool isValidEnemyType(const EnemyID type) {
+	return type == EnemyID_SPEAR1 || type == EnemyID_SWORD1;
+}
 
 constexpr PlayerID PlayerID_Version1 = HASH("player_version1");
-
+bool isValidPlayerType(const PlayerID type) {
+	return type == PlayerID_Version1;
+}
 
 
 
@@ -194,8 +202,7 @@ struct EnemyData {
 	EntityID id = 0;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
-	float attack_power = 0.f;
-	float attack_interval = 0.f;
+	float mass = 0.f;
 };
 
 struct PlayerData {
@@ -203,7 +210,7 @@ struct PlayerData {
 	Transform transform;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
-	float attack_power = 0.f;
+	float mass = 0.f;
 };
 
 
@@ -219,21 +226,36 @@ public:
 	PlayerID id = 0;
 	float movementSpeed = 0;
 	float healthPoints = 0;
-	float attackPower = 0;
+	float mass = 0;
 
 	Player(const TextureData* const sprite, const std::vector<AnimationReel>* const reels, const PlayerData* const data):texture(*sprite), animControlls(reels) {
 		id = data->id;
 		transform = data->transform;
 		movementSpeed = data->movement_speed;
 		healthPoints = data->health_points;
-		attackPower = data->attack_power;
+		mass = data->mass;
+	}
+};
 
+class EnemyBasic {
+public:
+	TextureData texture;
+	NPCState state;
+	Transform transform;
 
-		const SDL_Point* const pos = transform.getPosition();
-		const SDL_Point* const size = transform.getSize();
+	EnemyID id = 0;
+	float movement_speed = 0.f;
+	float health_points = 0.f;
+	float mass = 0.f;
 
-		SDL_FRect dest{ (float)pos->x, (float)pos->y, (float)size->x, (float)size->y };//currently the texutre/frame size is same as collision box size, but now we can mix and match
+	EnemyBasic(const TextureData* const sprite, const EnemyData* const data) {
+		texture.texture = sprite->texture;
+		texture.source = sprite->source;
+		texture.destination = sprite->destination;
 
-		this->texture.destination = dest;
+		id = data->id;
+		movement_speed = data->movement_speed;
+		health_points = data->health_points;
+		mass = data->mass;
 	}
 };

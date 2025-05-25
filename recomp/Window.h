@@ -27,28 +27,11 @@ class Window {
 		FrameLimiter() = default;
 		FrameLimiter(const int fps) :FPS(fps), maximumFrameDuration(ms_in_second / FPS) {}
 
-		void beginFrame() {
-			frameStart = SDL_GetTicks();
-		}
-		void endFrame() {
-			frameEnd = SDL_GetTicks();
-			Uint32 duration = frameEnd - frameStart;
+		void beginFrame();
+		void endFrame();
 
-			isDelayActivated = false;
-			delayDuration = 0;
-
-			if (duration < maximumFrameDuration) {
-				delayDuration = maximumFrameDuration - duration;
-				isDelayActivated = true;
-			}
-		}
-
-		bool shouldDelay()const {
-			return isDelayActivated;
-		}
-		Uint32 getDelayDuration()const {
-			return delayDuration;
-		}
+		bool shouldDelay()const;
+		Uint32 getDelayDuration()const;
 	};
 	FrameLimiter frameLimiter;
 

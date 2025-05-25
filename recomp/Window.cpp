@@ -60,4 +60,25 @@ void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
 	entity->x -= topLeft.x;
 	entity->y -= topLeft.y;
 };
+void Window::FrameLimiter::beginFrame() {
+	frameStart = SDL_GetTicks();
+}
+void Window::FrameLimiter::endFrame() {
+	frameEnd = SDL_GetTicks();
+	Uint32 duration = frameEnd - frameStart;
+
+	isDelayActivated = false;
+	delayDuration = 0;
+
+	if (duration < maximumFrameDuration) {
+		delayDuration = maximumFrameDuration - duration;
+		isDelayActivated = true;
+	}
+}
+bool Window::FrameLimiter::shouldDelay()const {
+	return isDelayActivated;
+}
+Uint32 Window::FrameLimiter::getDelayDuration()const {
+	return delayDuration;
+}
 

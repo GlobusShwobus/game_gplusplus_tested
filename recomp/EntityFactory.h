@@ -22,11 +22,21 @@ class EntityFactory {
 
 public:
 
-	//animations where?
 	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
 	//caller is the owner
 	Player* createPlayer(const char* type);
+	//caller is the owner
+	EnemyBasic* createEnemy(const char* type) {
+		EnemyID id = HASH(type);
+
+		if (!isValidEnemyType(id)) {
+			throw "soggy pants develpoment error";
+		}
+
+		EnemyBasic* enemybasic = new EnemyBasic(&textureComponents[id], &enemyData[id]);
+		return enemybasic;
+	}
 
 
 	~EntityFactory();

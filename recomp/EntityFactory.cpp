@@ -15,6 +15,11 @@ EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Rende
 		const nlohmann::json* const spriteData = &entry["sprite"];
 
 		//entities may have different basic data, hence need for init table
+
+		if (!isValidEntityType(type)) {
+			throw "soggy pants develpoment error";
+		}
+
 		switch (type) {
 		case EntityType_ENEMY:
 			initEntityEnemy(&entry, id);
@@ -43,8 +48,7 @@ void EntityFactory::initEntityEnemy(const nlohmann::json* const enemyData, const
 	entry.id = id;
 	entry.movement_speed = (*enemyData)["movement_speed"];
 	entry.health_points = (*enemyData)["health_points"];
-	entry.attack_power = (*enemyData)["attack_power"];
-	entry.attack_interval = (*enemyData)["attack_interval"];
+	entry.mass = (*enemyData)["mass"];
 	this->enemyData.emplace(entry.id, entry);
 }
 void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, const EnemyID id) {
@@ -53,7 +57,7 @@ void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, con
 	entry.id = id;
 	entry.movement_speed = (*playerData)["movement_speed"];
 	entry.health_points = (*playerData)["health_points"];
-	entry.attack_power = (*playerData)["attack_power"];
+	entry.mass = (*playerData)["mass"];
 
 	const auto& transform = (*playerData)["transform"];
 
@@ -118,12 +122,21 @@ EntityFactory::~EntityFactory()
 Player* EntityFactory::createPlayer(const char* type) {
 	PlayerID id = HASH(type);
 
-	if (id != PlayerID_Version1) {
-		printf("\nillegal type ffor player init: %s\n", type);
+	if (!isValidPlayerType(id)) {
+		throw "soggy pants develpoment error";
 	}
-
 
 	Player* player = new Player(&textureComponents[id], &animationComponents[id], &playerData[id]);
 
 	return player;
+}
+EnemyBasic* EntityFactory::createEnemy(const char* type) {
+	EnemyID id = HASH(type);
+
+	if (!isValidEnemyType(id)) {
+		throw "soggy pants develpoment error";
+	}
+
+	EnemyBasic* enemybasic = new EnemyBasic(&textureComponents[id], &enemyData[id]);
+	return enemybasic;
 }
