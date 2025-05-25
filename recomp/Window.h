@@ -11,14 +11,40 @@ class Window {
 
 	class FrameLimiter {
 
-		int FPS = 0;
-		double frameDelay = 0;
-		Uint64 frameBegin = 0;
-		Uint64 frameDuration = 0;
+		static constexpr Uint32 ms_in_second = 1000000;
 
+		Uint32 FPS = 0;
+		Uint32 maximumFrameDuration = 0;
+
+		Uint32 frameX = 0;
+		Uint32 frameY = 0;
+
+		bool isDelayActivated = false;
+		Uint32 delayDuration = 0;
 	public:
+
+
 		FrameLimiter() = default;
-		FrameLimiter(const int fps) :FPS(fps), frameDelay(1000.0f / FPS) {}
+		FrameLimiter(const int fps) :FPS(fps), maximumFrameDuration(ms_in_second / FPS) {}
+
+		void update() {
+			frameY = frameX;
+			frameX = SDL_GetTicks();
+			Uint32 duration = frameX - frameY;
+
+			if (duration < maximumFrameDuration) {
+				delayDuration = maximumFrameDuration - duration;
+				isDelayActivated = true;
+			}
+		}
+
+		bool isDelay()const {
+			return isDelayActivated;
+		}
+		Uint32 getDelayDuration()const {
+			return delayDuration;
+		}
+
 
 		void frameBufferBegin();
 		void frameBufferEnd();

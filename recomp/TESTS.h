@@ -8,4 +8,9 @@ namespace TESTS {
 
     void SetNoWalkingZone(Grid& grid);
     void TestNoWalkingZone(SDL_Renderer* renderer);
+
+
+    class ENTITY_MANAGER_TEST {
+
+    };
 }

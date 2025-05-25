@@ -68,6 +68,7 @@ void Window::FrameLimiter::frameBufferBegin() {
 void Window::FrameLimiter::frameBufferEnd() {
 	frameDuration = SDL_GetTicks() - frameBegin;
 	if (frameDelay > frameDuration) {
+
 		SDL_Delay(frameDelay - frameDuration);
 	}
 }

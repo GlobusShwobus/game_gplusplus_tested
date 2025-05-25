@@ -105,13 +105,13 @@ int main() {
 
         //MOVEMENT
         MyUtils::moveScriptBasic(player->transform, player->state, player->movementSpeed);
-        player->transform.clampPosition(0,0,2560,1440);
+        player->transform.clampPosition(0,0,2560,1440);//currently map does not exist
         //#################################################################################
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
         window.getCamera()->setFocusPoint(player->transform.getPosition(), player->transform.getSize());
-        window.getCamera()->clampTo(0, 0, 2560, 1440);
+        window.getCamera()->clampTo(0, 0, 2560, 1440);//currently map does not exist
         window.getCamera()->setTopLeft();
         //#################################################################################
 
@@ -122,9 +122,10 @@ int main() {
         }
 
         player->animControlls.moveFrame();
-        player->animControlls.applySourceFromFrame(&player->texture.source);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS
-        player->transform.applyDestinationTexture(&player->texture.destination);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM
         //#################################################################################
+
+        player->animControlls.applySourceFromFrame(&player->texture.source);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS OR UTILITY
+        player->transform.applyDestinationTexture(&player->texture.destination);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
 
 
         window.drawTexture(&player->texture);
