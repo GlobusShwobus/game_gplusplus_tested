@@ -97,12 +97,8 @@ int main() {
     SDL_Event event;
 
     while (gameRunning) {
-        auto& frameCounter = window.getFrameBoy();
-        auto& camera = window.getCamera();
 
         window.updateBegin();
-        frameCounter.beginFrame();
-
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
@@ -118,9 +114,7 @@ int main() {
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        camera.setFocusPoint(player->transform.getPosition(), player->transform.getSize());
-        camera.clampTo(0, 0, 2560, 1440);//currently map does not exist
-        camera.setTopLeft();
+        window.updateCamera(player->transform.getPosition(), player->transform.getSize(), { 0,0,2560,1440 });
         //#################################################################################
 
         //ANIMATION
@@ -140,11 +134,10 @@ int main() {
         window.updateEnd();
     
         //DO SHIT HERE LIKE CALLING "new" and "delete"
-        frameCounter.endFrame();
 
-        if (frameCounter.shouldDelay()) {
+        if (window.shouldDelay()) {
 
-            Uint32 delayTime = frameCounter.getDelayDuration();
+            Uint32 delayTime = window.getDelayDuration();
             Uint32 startDelay = SDL_GetTicks();
 
             //DO SHIT HERE

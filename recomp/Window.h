@@ -9,48 +9,33 @@ class Window {
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
-	class FrameLimiter {
+	struct FrameLimiter {
 
 		static constexpr Uint32 ms_in_second = 1000;
 
-		Uint32 FPS = 0;
 		Uint32 maximumFrameDuration = 0;
-
 		Uint32 frameStart = 0;
 		Uint32 frameEnd = 0;
-
 		bool isDelayActivated = false;
 		Uint32 delayDuration = 0;
-	public:
-
-
-		FrameLimiter() = default;
-		FrameLimiter(const int fps) :FPS(fps), maximumFrameDuration(ms_in_second / FPS) {}
 
 		void beginFrame();
 		void endFrame();
-
-		bool shouldDelay()const;
-		Uint32 getDelayDuration()const;
 	};
 	FrameLimiter frameLimiter;
 
 
-	class Camera {
+	struct Camera {
 
-		SDL_Point center{ 0,0 };
 		SDL_Point topLeft{ 0,0 };
-		int radiusWidth = 0;
-		int radiusHeight = 0;
+
+		int width = 0;
+		int height = 0;
+		int halfWidth = 0;
+		int halfHeight = 0;
 
 		//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
-	public:
-		Camera() = default;
-		Camera(const int w, const int h):radiusWidth(w),radiusHeight(h) {}
-		void clampTo(int x, int y, int w, int h);//duplicate function, kind of
 		void applyDestinationFromCamera(SDL_FRect* const entity)const;
-		void setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size);
-		void setTopLeft();
 	};
 	Camera camera;
 
@@ -64,11 +49,26 @@ public:
 	void drawTexture(TextureData* const sprite)const;
 
 	SDL_Renderer* getRenderer();
-	Camera& getCamera() {
-		return camera;
-	}
-	FrameLimiter& getFrameBoy() {
-		return frameLimiter;
+	bool shouldDelay()const;
+	Uint32 getDelayDuration()const;
+	void updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp) {
+
+		camera.topLeft.x = (target->x + (targetSize->x / 2)) - camera.halfWidth;
+		camera.topLeft.y = (target->y + (targetSize->y / 2)) - camera.halfHeight;
+
+
+		if (camera.topLeft.x < clamp.x) {
+			camera.topLeft.x = clamp.x;
+		}
+		if (camera.topLeft.y < clamp.y) {
+			camera.topLeft.y = clamp.y;
+		}
+		if (camera.topLeft.x + camera.width > clamp.w) {
+			camera.topLeft.x = clamp.w - camera.width;
+		}
+		if (camera.topLeft.y + camera.height > clamp.h) {
+			camera.topLeft.y = clamp.h - camera.height;
+		}
 	}
 
 

@@ -16,8 +16,12 @@ Window::Window(const nlohmann::json* const windowConfig) {
 
 	renderer = SDL_CreateRenderer(window, nullptr);
 
-	frameLimiter = FrameLimiter(FPSTarget);
-	camera = Camera(cameraWidth, cameraHeight);
+	frameLimiter.maximumFrameDuration = frameLimiter.ms_in_second / FPSTarget;
+
+	camera.width = cameraWidth;
+	camera.height = cameraHeight;
+	camera.halfWidth = cameraWidth / 2;
+	camera.halfHeight = cameraHeight / 2;
 
 	//THIS IS NOT INTENDED BEHAVIOR, CAMERA SHOULD DETERMINE LOGICAL RENDERING NOT WINDOW SIZE, FIX LATER
 	SDL_SetRenderLogicalPresentation(renderer, windowWidth, windowHeight, SDL_LOGICAL_PRESENTATION_STRETCH);
@@ -30,9 +34,11 @@ Window::Window(const nlohmann::json* const windowConfig) {
 }
 void Window::updateBegin() {
 	SDL_RenderClear(renderer);
+	frameLimiter.beginFrame();
 }
 void Window::updateEnd() {
 	SDL_RenderPresent(renderer);
+	frameLimiter.endFrame();
 }
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
@@ -40,21 +46,6 @@ SDL_Renderer* Window::getRenderer() {
 void Window::drawTexture(TextureData* const sprite)const {
 	camera.applyDestinationFromCamera(&sprite->destination);
 	SDL_RenderTexture(renderer, sprite->texture, &sprite->source, &sprite->destination);
-}
-
-void Window::Camera::setFocusPoint(const SDL_Point* const pos, const SDL_Point* const size) {
-	center.x = pos->x + (size->x / 2);
-	center.y = pos->y + (size->y / 2);
-}
-void Window::Camera::setTopLeft() {
-	topLeft.x = center.x - radiusWidth;
-	topLeft.y = center.y - radiusHeight;
-}
-void Window::Camera::clampTo(int x, int y, int w, int h) {
-	if (center.x - radiusWidth < x)  { center.x = radiusWidth; }//left edge
-	if (center.y - radiusHeight < y) { center.y = radiusHeight; }//top edge
-	if (center.x + radiusWidth > w)  { center.x = w - radiusWidth; }//right edge
-	if (center.y + radiusHeight > h) { center.y = h - radiusHeight; }//bottom edge
 }
 void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
 	entity->x -= topLeft.x;
@@ -75,10 +66,10 @@ void Window::FrameLimiter::endFrame() {
 		isDelayActivated = true;
 	}
 }
-bool Window::FrameLimiter::shouldDelay()const {
-	return isDelayActivated;
+bool Window::shouldDelay()const {
+	return frameLimiter.isDelayActivated;
 }
-Uint32 Window::FrameLimiter::getDelayDuration()const {
-	return delayDuration;
+Uint32 Window::getDelayDuration()const {
+	return frameLimiter.delayDuration;
 }
 
