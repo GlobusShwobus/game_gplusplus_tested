@@ -7,108 +7,136 @@ EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Rende
 
 	for (const auto& entry : *entityConfig) {
 
-		const std::string entityTypeKey = entry["type"];
-		const EntityType type = HASH(entityTypeKey.c_str());
-		const std::string entityIDKey = entry["entity_id"];
-		const EntityID id = HASH(entityIDKey.c_str());
-
-		const nlohmann::json* const spriteData = &entry["sprite"];
-
-		//entities may have different basic data, hence need for init table
-
-		if (!isValidEntityType(type)) {
-			throw "soggy pants develpoment error";
+		if (!entry.contains("type") || !entry.contains("entity_id")) {
+			printf("entity missing type or id\n");
+			continue;
 		}
 
-		switch (type) {
+		const EntityType entityType = HASH(entry["type"].get<std::string>().c_str());
+		const EntityGeneric entityID = HASH(entry["entity_id"].get<std::string>().c_str());
+
+		if (!definedEntityType(entityType)) {
+			printf("entity type not defined : <%s> <%d>\n", entry["type"].get<std::string>().c_str(), entityType);
+			continue;
+		}
+
+		switch (entityType) {
 		case EntityType_ENEMY:
-			initEntityEnemy(&entry, id);
+			initEntityData(enemyData, entry, entityID);
 			break;
 		case EntityType_PLAYER:
-			initEntityPlayer(&entry, id);
+			initEntityData(playerData, entry, entityID);
 			break;
-			//others cases, like buildings, waterfalls, items idk
-		default: throw std::logic_error("\ntype not defined\n");
+			//others cases, like buildings, waterfalls, items GOES HERE
+		default:
+			printf("unknown type: <%s> <%d>", entry["type"].get<std::string>().c_str(), entityType);
+			continue;
 		}
 
-		//every entity sprite data is structured the same way
-		initSprite(spriteData, renderer, id);
-
+		//not every entity may have a sprite, maybe idk
+		if (entry.contains("sprite")) {
+			initTexture(entry["sprite"], renderer, entityID);
+		}
 		//not every entity may be animatable, but the clip data is structured the same way
 		if (entry.contains("animations")) {
-			initAnimations(&entry, id);
+			initAnimations(entry["animations"], entityID);
 		}
-
 	}
 }
-void EntityFactory::initEntityEnemy(const nlohmann::json* const enemyData, const EnemyID id) {
+void EntityFactory::initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, const EntityGeneric entityID) {
 
-	EnemyData entry;
+	EntityData entry;
 
-	entry.id = id;
-	entry.movement_speed = (*enemyData)["movement_speed"];
-	entry.health_points = (*enemyData)["health_points"];
-	entry.mass = (*enemyData)["mass"];
-	this->enemyData.emplace(entry.id, entry);
-}
-void EntityFactory::initEntityPlayer(const nlohmann::json* const playerData, const EnemyID id) {
-	PlayerData entry;
+	entry.id = entityID;
+	entry.movement_speed = entityData.value("movement_speed", 0.f);
+	entry.health_points = entityData.value("health_points", 1.f);
+	entry.mass = entityData.value("mass", 0.f);
 
-	entry.id = id;
-	entry.movement_speed = (*playerData)["movement_speed"];
-	entry.health_points = (*playerData)["health_points"];
-	entry.mass = (*playerData)["mass"];
-
-	const auto& transform = (*playerData)["transform"];
-
-	entry.transform = Transform(transform["x"], transform["y"], transform["w"], transform["h"]);
-
-	this->playerData.emplace(entry.id, entry);
+	if (entityData.contains("transform")) {
+		auto& transform = entityData["transform"];
+		entry.transform = Transform(transform["x"], transform["y"], transform["w"], transform["h"]);
+	}
+	container.emplace(entityID, std::move(entry));
 }
 
-void EntityFactory::initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id) {
+void EntityFactory::initTexture(const nlohmann::json& textureData, SDL_Renderer* renderer, const EntityGeneric entityID) {
 
-	const std::string texturePath = (*spriteData)["texture_path"];
+	if (!textureData.contains("texture_path") || !textureData.contains("texture_source") || !textureData.contains("texture_destination")) {
+		printf("texture lacks all required data: <%d>", entityID);
+		return;
+	}
 
-	auto& src = (*spriteData)["texture_source"];
-	auto& dest = (*spriteData)["texture_destination"];
-
-	SDL_FRect source{ src[0],src[1], src[2], src[3] };
-	SDL_FRect destination{ dest[0],dest[1], dest[2], dest[3] };
+	const std::string texturePath = textureData["texture_path"];
+	auto& sourceData = textureData["texture_source"];
+	auto& destData = textureData["texture_destination"];
 
 	SDL_Texture* texture = IMG_LoadTexture(renderer, texturePath.c_str());
 
-	TextureData sprite(texture, &source, &destination);
+	if (!texture) {
+		printf("texture path invalid or texture at path not found: <%s>", texturePath.c_str());
+		return;
+	}
 
-	textureComponents.emplace(id, sprite);
+	TextureData tData;
+	tData.texture = texture;
+	tData.source = { sourceData[0],sourceData[1], sourceData[2], sourceData[3] };
+	tData.destination = { destData[0],destData[1], destData[2], destData[3] };
+
+	textureComponents.emplace(entityID, std::move(tData));
 }
-void EntityFactory::initAnimations(const nlohmann::json* const animationData, const EnemyID id) {
+void EntityFactory::initAnimations(const nlohmann::json& animationData, const EntityGeneric entityID) {
 
 	std::vector<AnimationReel> reelCollection;//autismus maximus
 
-	for (const auto& data : (*animationData)["animations"]) {
+	for (const auto& data : animationData) {
 
 		AnimationReel clip;
-		const std::string clipID = data["clip_id"];
-		clip.id = HASH(clipID.c_str());
-		clip.initialFrame.x = data["x"];
-		clip.initialFrame.y = data["y"];
-		clip.initialFrame.w = data["width"];
-		clip.initialFrame.h = data["height"];
-		clip.frameCount = data["frame_count"];
-		clip.frameDelay = data["frame_delay"];
-		clip.isLooping = data["loops"];
-
-		reelCollection.push_back(clip);
+		
+		if (!data.contains("clip_id")) {
+			printf("data missing clip_id: <%d>", entityID);
+			continue;
+		}
+		clip.id = HASH(data["clip_id"].get<std::string>().c_str());
+		clip.initialFrame.x = data.value("x", 0.f);
+		clip.initialFrame.y = data.value("y", 0.f);
+		clip.initialFrame.w = data.value("width", 32.f);//need a better way for max width/height
+		clip.initialFrame.h = data.value("height", 32.f);//need a better way for max width/height
+		clip.frameCount = data.value("frame_count", 1);
+		clip.frameDelay = data.value("frame_delay", 10000);
+		clip.isLooping = data.value("loops", false);
+		reelCollection.push_back(std::move(clip));
 	}
 
-	animationComponents.emplace(id, std::move(reelCollection));
+	animationComponents.emplace(entityID, std::move(reelCollection));
 }
+
+Player* EntityFactory::createPlayer(const char* type) {
+	PlayerID id = HASH(type);
+	Player* player = nullptr;
+
+	if (textureComponents.contains(id) && animationComponents.contains(id) && playerData.contains(id)) {
+		player = new Player(textureComponents[id], animationComponents[id], playerData[id]);
+	}
+	else {
+		printf("something wrong in player data initialization: missing data\n");
+	}
+	return player;
+}
+EnemyBasic* EntityFactory::createEnemy(const char* type) {
+	EnemyID id = HASH(type);
+	EnemyBasic* enemybasic = nullptr;
+	
+	if (textureComponents.contains(id) && enemyData.contains(id)) {
+		enemybasic = new EnemyBasic(textureComponents[id], enemyData[id]);
+	}
+	else {
+		printf("something wrong in enemyBasic data initialization: missing data\n");
+	}
+	return enemybasic;
+}
+
 EntityFactory::~EntityFactory()
 {
-	//sprites itself is not the owner of the pointer because many different objects can point to the same texture on the GPU
-	//if the entity holding a copy of a sprite, stops existing, then by default it's not the last reference anyway
-	//however if the manager stops existing, and this should only happen when the game is closed, that means we must clean up now
 	for (auto& [id, sprite] : textureComponents) {
 		SDL_DestroyTexture(sprite.texture);
 	}
@@ -116,27 +144,4 @@ EntityFactory::~EntityFactory()
 	animationComponents.clear();
 	enemyData.clear();
 	playerData.clear();
-}
-
-
-Player* EntityFactory::createPlayer(const char* type) {
-	PlayerID id = HASH(type);
-
-	if (!isValidPlayerType(id)) {
-		throw "soggy pants develpoment error";
-	}
-
-	Player* player = new Player(&textureComponents[id], &animationComponents[id], &playerData[id]);
-
-	return player;
-}
-EnemyBasic* EntityFactory::createEnemy(const char* type) {
-	EnemyID id = HASH(type);
-
-	if (!isValidEnemyType(id)) {
-		throw "soggy pants develpoment error";
-	}
-
-	EnemyBasic* enemybasic = new EnemyBasic(&textureComponents[id], &enemyData[id]);
-	return enemybasic;
 }

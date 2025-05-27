@@ -105,6 +105,12 @@
     "movement_speed": 5,
     "health_points": 100,
     "mass": 10,
+    "transform": {
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
     "sprite": {
       "texture_path": "../Textures/enemy_spear1.png",
       "texture_source": [ 0, 0, 32, 32 ],
@@ -117,6 +123,12 @@
     "movement_speed": 10,
     "health_points": 200,
     "mass": 20,
+    "transform": {
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
     "sprite": {
       "texture_path": "../Textures/enemy_sword1.png",
       "texture_source": [ 0, 0, 32, 32 ],

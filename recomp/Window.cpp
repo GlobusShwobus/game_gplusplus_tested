@@ -56,7 +56,7 @@ void Window::FrameLimiter::beginFrame() {
 }
 void Window::FrameLimiter::endFrame() {
 	frameEnd = SDL_GetTicks();
-	Uint32 duration = frameEnd - frameStart;
+	Uint64 duration = frameEnd - frameStart;
 
 	isDelayActivated = false;
 	delayDuration = 0;
@@ -69,7 +69,26 @@ void Window::FrameLimiter::endFrame() {
 bool Window::shouldDelay()const {
 	return frameLimiter.isDelayActivated;
 }
-Uint32 Window::getDelayDuration()const {
+Uint64 Window::getDelayDuration()const {
 	return frameLimiter.delayDuration;
+}
+void Window::updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp) {
+
+	camera.topLeft.x = (target->x + (targetSize->x / 2)) - camera.halfWidth;
+	camera.topLeft.y = (target->y + (targetSize->y / 2)) - camera.halfHeight;
+
+
+	if (camera.topLeft.x < clamp.x) {
+		camera.topLeft.x = clamp.x;
+	}
+	if (camera.topLeft.y < clamp.y) {
+		camera.topLeft.y = clamp.y;
+	}
+	if (camera.topLeft.x + camera.width > clamp.w) {
+		camera.topLeft.x = clamp.w - camera.width;
+	}
+	if (camera.topLeft.y + camera.height > clamp.h) {
+		camera.topLeft.y = clamp.h - camera.height;
+	}
 }
 

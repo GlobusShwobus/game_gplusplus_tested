@@ -9,26 +9,24 @@
 
 class EntityFactory {
 
-	std::map<EntityID, TextureData> textureComponents;
-	std::map<EntityID, std::vector<AnimationReel>> animationComponents;
+	std::map<EntityGeneric, TextureData> textureComponents;//owner of the textures returned by IMG_LoadTexture and cleaned up at factory destructor
+	std::map<EntityGeneric, std::vector<AnimationReel>> animationComponents;
 
-	std::map<EnemyID, EnemyData> enemyData;
-	std::map<PlayerID, PlayerData> playerData;
+	std::map<EnemyID, EntityData> enemyData;
+	std::map<PlayerID, EntityData> playerData;
 
-	void initEntityEnemy(const nlohmann::json* const enemyData, const EnemyID id);
-	void initEntityPlayer(const nlohmann::json* const enemyData, const EnemyID id);
-	void initSprite(const nlohmann::json* const spriteData, SDL_Renderer* renderer, const EntityID id);
-	void initAnimations(const nlohmann::json* const animationData, const EnemyID id);
+	void initTexture(const nlohmann::json& textureData, SDL_Renderer* renderer, const EntityGeneric entityID);
+	void initAnimations(const nlohmann::json& animationData, const EntityGeneric entityID);
 
+	void initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, const EntityGeneric entityID);
 public:
 
 	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
-	//caller is the owner
+	//caller is the owner, can return nullptr
 	Player* createPlayer(const char* type);
-	//caller is the owner
+	//caller is the owner, can return nullptr
 	EnemyBasic* createEnemy(const char* type);
-
 
 	~EntityFactory();
 public:

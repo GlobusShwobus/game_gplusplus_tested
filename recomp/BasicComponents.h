@@ -34,35 +34,16 @@ constexpr AnimID AnimID_IDLE_RIGHT = HASH("idle_right");
 //--------------------   ENTITY TYPES   --------------------------------------------------------------
 //####################################################################################################
 typedef HASH_ID_TYPE EntityType;
+typedef HASH_ID_TYPE EntityGeneric;
+typedef EntityGeneric EnemyID;
+typedef EntityGeneric PlayerID;
+
 constexpr EntityType EntityType_PLAYER = HASH("player_type");
 constexpr EntityType EntityType_ENEMY = HASH("enemy_type");
-constexpr bool isValidEntityType(const EntityType type) {
-	return type == EntityType_PLAYER || type == EntityType_ENEMY;
+
+constexpr bool definedEntityType(const EntityType hashedType) {
+	return hashedType == EntityType_PLAYER || hashedType == EntityType_ENEMY;
 }
-
-//####################################################################################################
-//--------------------   ENTITY IDs   ----------------------------------------------------------------
-//####################################################################################################
-typedef HASH_ID_TYPE EntityID;
-typedef EntityID EnemyID;
-typedef EntityID PlayerID;
-
-constexpr EnemyID EnemyID_SPEAR1 = HASH("enemy_spear1");
-constexpr EnemyID EnemyID_SWORD1 = HASH("enemy_sword1");
-constexpr bool isValidEnemyType(const EnemyID type) {
-	return type == EnemyID_SPEAR1 || type == EnemyID_SWORD1;
-}
-
-constexpr PlayerID PlayerID_Version1 = HASH("player_version1");
-constexpr bool isValidPlayerType(const PlayerID type) {
-	return type == PlayerID_Version1;
-}
-
-
-
-
-
-
 
 
 
@@ -75,13 +56,9 @@ struct AnimationReel {
 };
 
 struct TextureData {
-
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect source = { 0,0,0,0 };
 	SDL_FRect destination = { 0,0,0,0 };
-
-	TextureData(SDL_Texture* Texture, SDL_FRect* src, SDL_FRect* dest) :texture(Texture), source(*src), destination(*dest) {}
-	TextureData() = default;//Entity factory map does not like without default constructor, need to do something about it
 };
 
 class AnimationController {
@@ -199,22 +176,13 @@ public:
 
 };
 
-
-struct EnemyData {
-	EntityID id = 0;
-	float movement_speed = 0.f;
-	float health_points = 0.f;
-	float mass = 0.f;
-};
-
-struct PlayerData {
-	PlayerID id = 0;
+struct EntityData {
+	EntityGeneric id = 0;
 	Transform transform;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float mass = 0.f;
 };
-
 
 class Player {
 
@@ -230,12 +198,12 @@ public:
 	float healthPoints = 0;
 	float mass = 0;
 
-	Player(const TextureData* const sprite, const std::vector<AnimationReel>* const reels, const PlayerData* const data):texture(*sprite), animControlls(reels) {
-		id = data->id;
-		transform = data->transform;
-		movementSpeed = data->movement_speed;
-		healthPoints = data->health_points;
-		mass = data->mass;
+	Player(const TextureData& texture, const std::vector<AnimationReel>& reels, const EntityData& data):texture(texture), animControlls(&reels) {
+		id = data.id;
+		transform = data.transform;
+		movementSpeed = data.movement_speed;
+		healthPoints = data.health_points;
+		mass = data.mass;
 	}
 };
 
@@ -250,14 +218,11 @@ public:
 	float health_points = 0.f;
 	float mass = 0.f;
 
-	EnemyBasic(const TextureData* const sprite, const EnemyData* const data) {
-		texture.texture = sprite->texture;
-		texture.source = sprite->source;
-		texture.destination = sprite->destination;
-
-		id = data->id;
-		movement_speed = data->movement_speed;
-		health_points = data->health_points;
-		mass = data->mass;
+	EnemyBasic(const TextureData& texture, const EntityData& data):texture(texture) {
+		id = data.id;
+		transform = data.transform;
+		movement_speed = data.movement_speed;
+		health_points = data.health_points;
+		mass = data.mass;
 	}
 };

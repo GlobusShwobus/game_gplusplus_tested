@@ -91,6 +91,10 @@ int main() {
 
     //player
     Player* player = entityFactory.createPlayer("player_version1");
+    if (!player) {
+        printf("player nullptr GG WP\n");
+        return -1;
+    }
 
 
     bool gameRunning = true;
@@ -137,8 +141,8 @@ int main() {
 
         if (window.shouldDelay()) {
 
-            Uint32 delayTime = window.getDelayDuration();
-            Uint32 startDelay = SDL_GetTicks();
+            Uint64 delayTime = window.getDelayDuration();
+            Uint64 startDelay = SDL_GetTicks();
 
             //DO SHIT HERE
 
