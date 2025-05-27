@@ -77,6 +77,103 @@ public:
 	void applySourceFromFrame(SDL_FRect* const rect)const;
 };
 
+struct SpriteReel {
+	int beginX = 0;
+	int beginY = 0;
+	int frameCount = 0;
+	bool loops = false;
+};
+
+class Sprite {
+	SDL_Texture* texture = nullptr;//not owner, shallow default coopy is OK
+	SDL_FRect source = { 0,0,0,0 };
+	SDL_FRect destination = { 0,0,0,0 };
+
+	class Animation {
+		friend class Sprite;
+		std::map<AnimID, SpriteReel> animationReelData;
+		SpriteReel* currentReel = nullptr;//not owner, shallow default coopy is OK, points to the first element 
+		int frameDelayDuration = 6;
+		int frameCurrentIndex = 0;
+		int frameTimer = 0;
+	public:
+		Animation(const std::map<AnimID, SpriteReel>& data) :animationReelData(data) {
+			if (!animationReelData.empty()) {
+				currentReel = &animationReelData.begin()->second;
+			}
+		}
+		void moveFrame() {
+			if (!currentReel->loops && frameCurrentIndex >= currentReel->frameCount) return;//not looping so nothing to update
+			frameTimer++;
+
+			//if we haven't reached the treshhold to update frame, leave
+			if (frameTimer < frameDelayDuration)return;
+
+			//entered next frame
+			frameTimer = 0;
+			frameCurrentIndex++;
+			//reset it if it is looping type and reached the end
+			if (currentReel->loops && frameCurrentIndex >= currentReel->frameCount) {
+				frameCurrentIndex = 0;
+			}
+		}
+		void setNewAnimation(const char* animation) {
+			AnimID id = HASH(animation);
+
+			if (!animationReelData.contains(id)) {
+				printf("invalid animation request: <%s>", animation);
+				return;
+			}
+
+			currentReel = &animationReelData[id];
+			frameCurrentIndex = 0;
+		}
+	};
+
+	Animation* animation = nullptr;//OWNER, DATA MANAGED INTERNALLY, RULE OF 5
+
+
+public:
+
+	bool isAnimatable() {
+		return animation != nullptr;
+	}
+
+	~Sprite() {
+		delete animation;
+		animation = nullptr;
+	}
+	Sprite(const Sprite& copy):texture(copy.texture), source(copy.source), destination(copy.destination), animation(copy.animation ? new Animation(*copy.animation):nullptr) {}
+	
+	Sprite operator=(const Sprite& copyAss) {
+		if (this != &copyAss) {
+			texture = copyAss.texture;
+			source = copyAss.source;
+			destination = copyAss.destination;
+
+			delete animation;
+			animation = copyAss.animation ? new Animation(*copyAss.animation) : nullptr;
+		}
+		return *this;
+	}
+	Sprite(Sprite&& move)noexcept:texture(move.texture), source(move.source), destination(move.destination), animation(move.animation) {
+		move.animation = nullptr;
+	}
+	Sprite operator=(Sprite&& moveAss)noexcept {
+		if (this != &moveAss) {
+			texture = moveAss.texture;
+			source = std::move(moveAss.source);
+			destination = std::move(moveAss.destination);
+
+			delete animation;
+			animation = moveAss.animation;
+			moveAss.animation = nullptr;
+		}
+		return *this;
+	}
+};
+
+
 class NPCState {//TODO:only useful for entities that move, item types need another one
 public:
 	enum class State {
