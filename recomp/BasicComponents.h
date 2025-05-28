@@ -45,36 +45,36 @@ constexpr bool definedEntityType(const EntityType hashedType) {
 	return hashedType == EntityType_PLAYER || hashedType == EntityType_ENEMY;
 }
 
-
-
 struct AnimationReel {
-	AnimID id = 0;
-	SDL_FRect initialFrame;
+	int beginX = 0;
+	int beginY = 0;
 	int frameCount = 0;
-	int frameDelay = 0;
 	bool isLooping = false;
 };
 
-struct TextureData {
-	SDL_Texture* texture = nullptr;//not owner
-	SDL_FRect source = { 0,0,0,0 };
-	SDL_FRect destination = { 0,0,0,0 };
-};
-
 class AnimationController {
-	const std::vector<AnimationReel>* const clips = nullptr;//not owner
-	const AnimationReel* currentReel = nullptr;//points to dinkelberg
+	static constexpr int frameDelay = 6;
+	
+	const std::map<AnimID, AnimationReel>* clips = nullptr;//not owner, points to real data
+	AnimID currentID = 0;
+	const AnimationReel* currentReel = nullptr;//points to clips, which is also not owner
+	
 	int frameIndex = 0;
 	int frameTimer = 0;
 
 public:
-	//reels originates from EntityFactory witch holds the data, it is always valid and should not be freed
-	AnimationController(const std::vector<AnimationReel>* const reels) :clips(reels), currentReel(&reels->front()) {}
+	//reels originates from EntityFactory witch holds the data, it is always valid, should not be freed, AND DO NOT FUCK WITH FACTORY MEMORY, otherwise GGWP
+	AnimationController(const std::map<AnimID, AnimationReel>& reels) :clips(&reels) {
+		if (!reels.empty()) {
+			currentID = reels.begin()->first;
+			currentReel = &reels.begin()->second;
+		}
+	}
 
 	void moveFrame();
 	void setNewReel(AnimID id);
 	//creates a rectngle describing frame, acts as source for texture rendering
-	void applySourceFromFrame(SDL_FRect* const rect)const;
+	void applySourceFromFrame(SDL_FRect& rect)const;
 };
 
 class NPCState {//TODO:only useful for entities that move, item types need another one
@@ -182,15 +182,20 @@ struct EntityData {
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float mass = 0.f;
+	float frameWidth = 0;
+	float frameHeight = 0;
 };
 
 class Player {
 
 public:
-
-	TextureData texture;
-	NPCState state;
+	SDL_Texture* texture = nullptr;//not owner
+	SDL_FRect textureSrc{ 0,0,0,0 };
+	SDL_FRect textureDest{ 0,0,0,0 };
 	AnimationController animControlls;
+
+	NPCState state;
+
 	Transform transform;
 
 	PlayerID id = 0;
@@ -198,8 +203,11 @@ public:
 	float healthPoints = 0;
 	float mass = 0;
 
-	Player(const TextureData& texture, const std::vector<AnimationReel>& reels, const EntityData& data):texture(texture), animControlls(&reels) {
+	Player(SDL_Texture* texture, const std::map<AnimID, AnimationReel>& animationData, const EntityData& data):texture(texture), animControlls(animationData) {
 		id = data.id;
+		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
+		textureDest = { 0,0,data.frameWidth, data.frameHeight };
+
 		transform = data.transform;
 		movementSpeed = data.movement_speed;
 		healthPoints = data.health_points;
@@ -209,7 +217,10 @@ public:
 
 class EnemyBasic {
 public:
-	TextureData texture;
+	SDL_Texture* texture = nullptr;//not owner
+	SDL_FRect textureSrc{ 0,0,0,0 };
+	SDL_FRect textureDest{ 0,0,0,0 };
+
 	NPCState state;
 	Transform transform;
 
@@ -218,8 +229,11 @@ public:
 	float health_points = 0.f;
 	float mass = 0.f;
 
-	EnemyBasic(const TextureData& texture, const EntityData& data):texture(texture) {
+	EnemyBasic(SDL_Texture* texture, const EntityData& data):texture(texture) {
 		id = data.id;
+		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
+		textureDest = { 0,0,data.frameWidth, data.frameHeight };
+
 		transform = data.transform;
 		movement_speed = data.movement_speed;
 		health_points = data.health_points;

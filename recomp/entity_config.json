@@ -11,90 +11,64 @@
       "w": 32,
       "h": 32
     },
-    "sprite": {
-      "texture_path": "../Textures/player_sheet.png",
-      "texture_source": [ 0, 0, 32, 32 ],
-      "texture_destination": [ 0, 0, 32, 32 ]
-    },
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "texturePath": "../Textures/player_sheet.png",
     "animations": {
       "walk_up": {
         "clip_id": "walk_up",
-        "x": 0,
-        "y": 0,
-        "width": 32,
-        "height": 32,
+        "beginX": 0,
+        "beginY": 0,
         "frame_count": 8,
-        "frame_delay": 6,
         "loops": true
       },
       "walk_down": {
         "clip_id": "walk_down",
-        "x": 0,
-        "y": 32,
-        "width": 32,
-        "height": 32,
-        "frame_count": 8,
-        "frame_delay": 6,
+        "beginX": 0,
+        "beginY": 32,
+        "frameCount": 8,
         "loops": true
       },
       "walk_left": {
         "clip_id": "walk_left",
-        "x": 0,
-        "y": 64,
-        "width": 32,
-        "height": 32,
-        "frame_count": 8,
-        "frame_delay": 6,
+        "beginX": 0,
+        "beginY": 64,
+        "frameCount": 8,
         "loops": true
       },
       "walk_right": {
         "clip_id": "walk_right",
-        "x": 0,
-        "y": 96,
-        "width": 32,
-        "height": 32,
-        "frame_count": 8,
-        "frame_delay": 6,
+        "beginX": 0,
+        "beginY": 96,
+        "frameCount": 8,
         "loops": true
       },
       "idle_up": {
         "clip_id": "idle_up",
-        "x": 0,
-        "y": 128,
-        "width": 32,
-        "height": 32,
-        "frame_count": 2,
-        "frame_delay": 6,
+        "beginX": 0,
+        "beginY": 128,
+        "frameCount": 2,
         "loops": true
       },
       "idle_down": {
         "clip_id": "idle_down",
-        "x": 64,
-        "y": 128,
-        "width": 32,
-        "height": 32,
-        "frame_count": 2,
-        "frame_delay": 6,
+        "beginX": 64,
+        "beginY": 128,
+        "frameCount": 2,
         "loops": true
       },
       "idle_left": {
         "clip_id": "idle_left",
-        "x": 128,
-        "y": 128,
-        "width": 32,
-        "height": 32,
-        "frame_count": 2,
-        "frame_delay": 6,
+        "beginX": 128,
+        "beginY": 128,
+        "frameCount": 2,
         "loops": true
       },
       "idle_right": {
         "clip_id": "idle_right",
-        "x": 192,
-        "y": 128,
-        "width": 32,
-        "height": 32,
-        "frame_count": 2,
-        "frame_delay": 6,
+        "beginX": 192,
+        "beginY": 128,
+        "frameCount": 2,
         "loops": true
       }
     }
@@ -111,11 +85,9 @@
       "w": 32,
       "h": 32
     },
-    "sprite": {
-      "texture_path": "../Textures/enemy_spear1.png",
-      "texture_source": [ 0, 0, 32, 32 ],
-      "texture_destination": [ 0, 0, 32, 32 ]
-    }
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "texturePath": "../Textures/enemy_spear1.png"
   },
   "enemy_sword1": {
     "type": "enemy_type",
@@ -129,10 +101,8 @@
       "w": 32,
       "h": 32
     },
-    "sprite": {
-      "texture_path": "../Textures/enemy_sword1.png",
-      "texture_source": [ 0, 0, 32, 32 ],
-      "texture_destination": [ 0, 0, 32, 32 ]
-    }
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "texturePath": "../Textures/enemy_sword1.png"
   }
 }

@@ -31,7 +31,7 @@ void AnimationController::moveFrame() {
 	frameTimer++;
 
 	//if we haven't reached the treshhold to update frame, leave
-	if (frameTimer < currentReel->frameDelay)return;
+	if (frameTimer < frameDelay)return;
 
 	//entered next frame
 	frameTimer = 0;
@@ -42,17 +42,14 @@ void AnimationController::moveFrame() {
 	}
 }
 void AnimationController::setNewReel(AnimID id) {
-	for (const AnimationReel& each : *clips) {
-		if (each.id == id && currentReel->id != id) {//if it even exists and if it isn't the one already in use
-			currentReel = &each;//praying this sets address and not some other voodoo
-			frameIndex = 0;
-		}
+	if (clips && clips->contains(id) && currentID != id) {
+		currentID = id;
+		currentReel = &clips->at(id);
+		frameIndex = 0;
 	}
 }
-void AnimationController::applySourceFromFrame(SDL_FRect* const rect)const {
-	rect->x = currentReel->initialFrame.x + (currentReel->initialFrame.w * frameIndex);
-	rect->y = currentReel->initialFrame.y;
-	rect->w = currentReel->initialFrame.w;
-	rect->h = currentReel->initialFrame.h;
+void AnimationController::applySourceFromFrame(SDL_FRect& rect)const {
+	rect.x = currentReel->beginX + (rect.w * frameIndex);
+	rect.y = currentReel->beginY;
 }
 

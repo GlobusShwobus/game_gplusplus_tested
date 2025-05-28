@@ -9,16 +9,15 @@
 
 class EntityFactory {
 
-	std::map<EntityGeneric, TextureData> textureComponents;//owner of the textures returned by IMG_LoadTexture and cleaned up at factory destructor
-	std::map<EntityGeneric, std::vector<AnimationReel>> animationComponents;
+	std::map<EntityGeneric, SDL_Texture*> textureComponents;//owner of the textures returned by IMG_LoadTexture and cleaned up at factory destructor
+	std::map<EntityGeneric, std::map<AnimID, AnimationReel>> animationComponents;
 
 	std::map<EnemyID, EntityData> enemyData;
 	std::map<PlayerID, EntityData> playerData;
 
-	void initTexture(const nlohmann::json& textureData, SDL_Renderer* renderer, const EntityGeneric entityID);
 	void initAnimations(const nlohmann::json& animationData, const EntityGeneric entityID);
+	void initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, SDL_Renderer* renderer);
 
-	void initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, const EntityGeneric entityID);
 public:
 
 	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);

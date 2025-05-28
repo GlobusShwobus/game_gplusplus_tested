@@ -130,8 +130,8 @@ int main() {
         player->animControlls.moveFrame();
         //#################################################################################
 
-        player->animControlls.applySourceFromFrame(&player->texture.source);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS OR UTILITY
-        player->transform.applyDestinationTexture(&player->texture.destination);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
+        player->animControlls.applySourceFromFrame(player->textureSrc);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS OR UTILITY
+        player->transform.applyDestinationTexture(&player->texture.destina);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
 
 
         window.drawTexture(&player->texture);
