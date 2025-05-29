@@ -93,7 +93,9 @@ int main() {
 
 
     //player
-    Player* player = entityFactory.createPlayer("player_version1");
+    //WRAP THIS SHIT UP
+    PlayerID id = HASH("player_version1");
+    Player* player = entityFactory.createPlayer(id);
     if (!player) {
         printf("player nullptr GG WP\n");
         return -1;

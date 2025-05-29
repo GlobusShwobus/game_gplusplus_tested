@@ -32,6 +32,7 @@ bool EntityFactory::initFactory(const nlohmann::json* const entityConfig, SDL_Re
 			continue;
 		}
 	}
+	return true;
 }
 void EntityFactory::initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, SDL_Renderer* renderer) {
 
