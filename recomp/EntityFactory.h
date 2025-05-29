@@ -7,6 +7,9 @@
 #include "json.hpp"
 #include "BasicComponents.h"
 
+/*
+* Data initalized by the factory should NEVER be cleaned up during runtime as entities will depend on the basic components
+*/
 class EntityFactory {
 
 	std::map<EntityGeneric, SDL_Texture*> textureComponents;//owner of the textures returned by IMG_LoadTexture and cleaned up at factory destructor
@@ -25,9 +28,9 @@ public:
 	bool initFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
 	//caller is the owner, can return nullptr
-	Player* createPlayer(const char* type);
+	Player* createPlayer(const PlayerID id)const;
 	//caller is the owner, can return nullptr
-	EnemyBasic* createEnemy(const char* type);
+	EnemyBasic* createEnemy(const EnemyID id)const;
 
 	~EntityFactory();
 public:

@@ -73,7 +73,7 @@ public:
 
 	void moveFrame();
 	void setNewReel(AnimID id);
-	//creates a rectngle describing frame, acts as source for texture rendering
+	//applies source coordinates for the texture
 	void applySourceFromFrame(SDL_FRect& rect)const;
 };
 
@@ -85,8 +85,6 @@ public:
 	enum class Direction {
 		up, down, left, right
 	};
-	//should be run each frame
-
 	void setState(const State state);
 	void setDirection(const Direction facing);
 
@@ -180,8 +178,8 @@ struct EntityData {
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float mass = 0.f;
-	float frameWidth = 0;
-	float frameHeight = 0;
+	float frameWidth = 0.f;
+	float frameHeight = 0.f;
 };
 
 class Player {
@@ -227,6 +225,8 @@ public:
 	float health_points = 0.f;
 	float mass = 0.f;
 
+	bool isActivated = false;
+
 	EnemyBasic(SDL_Texture* texture, const EntityData& data):texture(texture) {
 		id = data.id;
 		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
@@ -236,5 +236,7 @@ public:
 		movement_speed = data.movement_speed;
 		health_points = data.health_points;
 		mass = data.mass;
+		
+		isActivated = true;
 	}
 };
