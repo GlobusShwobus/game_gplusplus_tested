@@ -4,6 +4,7 @@
 
 
 #include "MyUtils.h"
+#include "TESTS.h"
 
 /*
 
@@ -101,7 +102,12 @@ int main() {
         return -1;
     }
 
+    //TEST CODE
+    TESTS::RandomNumberGenerator rng;
+    TESTS::ENTITY_MANAGER_TEST poop;
+    //###################################################
 
+    
     bool gameRunning = true;
     SDL_Event event;
 
@@ -140,17 +146,41 @@ int main() {
 
 
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
-        window.updateEnd();
-    
-        //DO SHIT HERE LIKE CALLING "new" and "delete"
 
+        //pooptest
+        for (auto& each : poop.getEnemies()) {
+            each->transform.applyDestinationTexture(each->textureDest);
+            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);
+        }
+        //#####
+
+        window.updateEnd();
+
+        //TESTCODE FOR CREATING ENTITIES
+        const auto* meme = SDL_GetKeyboardState(nullptr);
+        bool k = meme[SDL_SCANCODE_K];
+        bool l = meme[SDL_SCANCODE_L];
+        bool m = meme[SDL_SCANCODE_M];
+        if (k) {
+            TESTS::ASK_10_ENEMIES(poop);
+        }
+        if (l) {
+            TESTS::GIVE_RANDOM_POSITIONS_TO_ENEMIES(poop, rng);
+        }
+        if (m) {
+            TESTS::CLEAR_ALL_ENTITIES(poop);
+        }
+        //#########################
+   
+        //DO SHIT HERE LIKE CALLING "new" and "delete"
         if (window.shouldDelay()) {
 
             Uint64 delayTime = window.getDelayDuration();
             Uint64 startDelay = SDL_GetTicks();
 
             //DO SHIT HERE
-
+            poop.update(entityFactory, 1);
+            poop.removeEnemy();
             //#################################################################################
 
             Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);

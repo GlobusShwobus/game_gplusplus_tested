@@ -79,11 +79,23 @@ namespace MyUtils {
 		if (state.getState() == NPCState::State::idle) {
 			return;
 		}
-
-		transform.incrementVelocity(state.getDirection(), moveSpeed);
-		transform.updatePosition();
+		SDL_Point newVel = velocityOnDir(state.getDirection(), moveSpeed);
+		transform.setVelocity(newVel);
+		transform.setPosFromCurrentVel();
 		transform.resetVelocity();
+	}
+	SDL_Point velocityOnDir(NPCState::Direction dir, const float moveSpeed) {
+		SDL_Point vel{ 0,0 };
 
+		switch (dir) {
+		case NPCState::Direction::up:    vel.y -= (int)moveSpeed; break;
+		case NPCState::Direction::down:  vel.y += (int)moveSpeed; break;
+		case NPCState::Direction::left:  vel.x -= (int)moveSpeed; break;
+		case NPCState::Direction::right: vel.x += (int)moveSpeed; break;
+		default://no change but other dirs should not exist (maybe diagonals later)
+			break;
+		}
+		return vel;
 	}
 
 }

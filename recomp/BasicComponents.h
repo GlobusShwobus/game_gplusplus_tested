@@ -129,11 +129,17 @@ public:
 		return &size;
 	}
 
-	void updatePosition() {
+	void setPosFromCurrentVel() {
 		previousPosition = position;
 
 		position.x += velocity.x;
 		position.y += velocity.y;
+	}
+	void setPosStaight(int x, int y) {
+		previousPosition = position;
+
+		position.x = x;
+		position.y = y;
 	}
 	//maybe temp, will see
 	void clampPosition(int x, int y, int w, int h) {
@@ -150,15 +156,8 @@ public:
 			position.y = h - size.y;
 		}
 	}
-	void incrementVelocity(NPCState::Direction dir, const float moveSpeed) {
-		switch (dir) {
-		case NPCState::Direction::up:    velocity.y -= (int)moveSpeed; break;
-		case NPCState::Direction::down:  velocity.y += (int)moveSpeed; break;
-		case NPCState::Direction::left:  velocity.x -= (int)moveSpeed; break;
-		case NPCState::Direction::right: velocity.x += (int)moveSpeed; break;
-		default://no change but other dirs should not exist (maybe diagonals later)
-			break;
-		}
+	void setVelocity(const SDL_Point& newVelocity) {
+		velocity = newVelocity;
 	}
 	void resetVelocity() {
 		velocity.x = 0;

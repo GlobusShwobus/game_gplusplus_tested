@@ -16,6 +16,7 @@ namespace MyUtils {
     nlohmann::json* initJSON(const char* path);
 
 	//eventually integrate fully into transform OR make more options with transform funcs that a script handles
+	SDL_Point velocityOnDir(NPCState::Direction dir, const float moveSpeed);
 	void moveScriptBasic(Transform& transform, NPCState& state, const float moveSpeed);
 
 

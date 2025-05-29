@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Grid.h"
 #include "EntityFactory.h"
+#include <random>
 
 namespace TESTS {
 
@@ -10,6 +11,15 @@ namespace TESTS {
     void SetNoWalkingZone(Grid& grid);
     void TestNoWalkingZone(SDL_Renderer* renderer);
 
+    class RandomNumberGenerator {//actually neat, need to put in components?
+        std::random_device rd;
+        std::unique_ptr<std::mt19937> rng;
+    public:
+        RandomNumberGenerator() :rng(std::make_unique<std::mt19937>(rd())) {}
+        int getRand(int min, int max) {
+            return std::uniform_int_distribution<int>(min, max)(*rng);
+        }
+    };
 
     class ENTITY_MANAGER_TEST {
 
@@ -74,6 +84,18 @@ namespace TESTS {
 
             }
             requestAddition.clear();
+            
+            printf("entities: %d\n", enemies.size());
+            printf("requests: %d\n", requestAddition.size());
+        }
+
+        const std::vector<EnemyBasic*>& getEnemies()const {
+            return enemies;
         }
     };
+
+    void ASK_10_ENEMIES(ENTITY_MANAGER_TEST& entman);
+    void GIVE_RANDOM_POSITIONS_TO_ENEMIES(ENTITY_MANAGER_TEST& entman, RandomNumberGenerator& lolw);
+    void CLEAR_ALL_ENTITIES(ENTITY_MANAGER_TEST& entman);
+
 }
