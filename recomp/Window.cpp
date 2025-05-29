@@ -43,9 +43,9 @@ void Window::updateEnd() {
 SDL_Renderer* Window::getRenderer() {
 	return renderer;
 }
-void Window::drawTexture(TextureData* const sprite)const {
-	camera.applyDestinationFromCamera(&sprite->destination);
-	SDL_RenderTexture(renderer, sprite->texture, &sprite->source, &sprite->destination);
+void Window::drawTexture(SDL_Texture* texture, SDL_FRect* src, SDL_FRect* dest)const {
+	camera.applyDestinationFromCamera(dest);
+	SDL_RenderTexture(renderer, texture, src, dest);
 }
 void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
 	entity->x -= topLeft.x;

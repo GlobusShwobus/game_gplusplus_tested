@@ -20,7 +20,9 @@ class EntityFactory {
 
 public:
 
-	EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
+	EntityFactory() = default;
+
+	bool initFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
 
 	//caller is the owner, can return nullptr
 	Player* createPlayer(const char* type);
@@ -32,5 +34,6 @@ public:
 	EntityFactory(const EntityFactory&) = delete;
 	EntityFactory(EntityFactory&&)noexcept = delete;
 	EntityFactory& operator=(const EntityFactory&) = delete;
+	EntityFactory& operator=(EntityFactory&&)noexcept = delete;
 };
 

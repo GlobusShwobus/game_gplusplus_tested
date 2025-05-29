@@ -1,8 +1,9 @@
 #include "EntityFactory.h"
 
-EntityFactory::EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
+bool EntityFactory::initFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
 	if (!entityConfig) {//if null ptr, kill it
-		throw std::logic_error("\nentityConfig nullptr, cannot initalize components\n");
+		printf("\nentityConfig nullptr, cannot initalize components\n");
+		return false;
 	}
 
 	for (const auto& entry : *entityConfig) {
@@ -73,8 +74,8 @@ void EntityFactory::initAnimations(const nlohmann::json& animationData, const En
 		}
 		AnimID id = HASH(data["clip_id"].get<std::string>().c_str());
 
-		clip.beginX = data.value("beginX", 0.f);
-		clip.beginY = data.value("beginY", 0.f);
+		clip.beginX = data.value("beginX", 0);
+		clip.beginY = data.value("beginY", 0);
 		clip.frameCount = data.value("frameCount", 1);
 		clip.isLooping = data.value("loops", false);
 

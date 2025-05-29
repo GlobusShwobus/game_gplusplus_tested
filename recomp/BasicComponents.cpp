@@ -42,7 +42,7 @@ void AnimationController::moveFrame() {
 	}
 }
 void AnimationController::setNewReel(AnimID id) {
-	if (clips && clips->contains(id) && currentID != id) {
+	if (clips->contains(id) && currentID != id) {
 		currentID = id;
 		currentReel = &clips->at(id);
 		frameIndex = 0;

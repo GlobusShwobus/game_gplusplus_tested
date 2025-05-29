@@ -166,11 +166,9 @@ public:
 		velocity.x = 0;
 		velocity.y = 0;
 	}
-	void applyDestinationTexture(SDL_FRect* const dest)const {
-		dest->x = (float)position.x;
-		dest->y = (float)position.y;
-		dest->w = (float)size.x;
-		dest->h = (float)size.y;
+	void applyDestinationTexture(SDL_FRect& dest)const {
+		dest.x = (float)position.x;
+		dest.y = (float)position.y;
 	}
 
 

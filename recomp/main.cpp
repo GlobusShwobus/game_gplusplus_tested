@@ -75,7 +75,10 @@ int main() {
     Window window(windowConfig);
 
     //initialize EntityFactory
-    EntityFactory entityFactory(entityConfig, window.getRenderer());
+    EntityFactory entityFactory;
+    if (!entityFactory.initFactory(entityConfig, window.getRenderer())) {
+        return -1;
+    }
 
     //###################################################
     // 
@@ -131,10 +134,10 @@ int main() {
         //#################################################################################
 
         player->animControlls.applySourceFromFrame(player->textureSrc);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS OR UTILITY
-        player->transform.applyDestinationTexture(&player->texture.destina);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
+        player->transform.applyDestinationTexture(player->textureDest);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
 
 
-        window.drawTexture(&player->texture);
+        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
         window.updateEnd();
     
         //DO SHIT HERE LIKE CALLING "new" and "delete"

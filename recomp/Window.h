@@ -45,7 +45,7 @@ public:
 	void updateBegin();
 	void updateEnd();
 
-	void drawTexture(TextureData* const sprite)const;
+	void drawTexture(SDL_Texture* texture, SDL_FRect* src, SDL_FRect* dest)const;
 
 	SDL_Renderer* getRenderer();
 	bool shouldDelay()const;
