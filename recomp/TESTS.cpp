@@ -1,9 +1,24 @@
 #include "TESTS.h"
 
 namespace TESTS {
-    void ASK_10_ENEMIES(ENTITY_MANAGER_TEST& entman) {
+    void ASK_10_SPEARBOIS(ENTITY_MANAGER_TEST& entman) {
         for (int i = 0; i < 10; i++) {
             entman.addEnemy("enemy_spear1");
+        }
+    }
+    void ASK_10_SWORDBOIS(ENTITY_MANAGER_TEST& entman) {
+        for (int i = 0; i < 10; i++) {
+            entman.addEnemy("enemy_sword1");
+        }
+    }
+    void GIVE_RANDOM_VELOCITIES_TO_ENEMIES(ENTITY_MANAGER_TEST& entman, RandomNumberGenerator& lolw) {
+        const auto& enemies = entman.getEnemies();
+
+        for (auto& each : enemies) {
+            int x = lolw.getRand(0, 10);
+            int y = lolw.getRand(0, 10);
+
+            each->physics.setVelocity(x, y);
         }
     }
 
@@ -20,7 +35,7 @@ namespace TESTS {
     }
     void CLEAR_ALL_ENTITIES(ENTITY_MANAGER_TEST& entman) {
         for (auto& lol : entman.getEnemies()) {
-            lol->isActivated = false;
+            lol->state.deactivate();
         }
     }
     void SetNoWalkingZone(Grid& grid) {

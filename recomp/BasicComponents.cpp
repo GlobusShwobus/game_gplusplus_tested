@@ -1,29 +1,41 @@
 #include "BasicComponents.h"
 
-void NPCState::setState(const State state) {
-	if (state != currentState) {
-		currentState = state;
-		wasChange = true;
+void EntityState::deactivate() {
+	isActive = false;
+}
+bool EntityState::isActivated()const {
+	return isActive;
+}
+void EntityState::changeAction(EntityAction action) {
+	if (this->action != action) {
+		this->action = action;
 	}
 }
-void NPCState::setDirection(const Direction facing) {
-	if (facing != currentDirection) {
-		currentDirection = facing;
-		wasChange = true;
+void EntityState::changeDirection(EntityDirection direction) {
+	if (this->direction != direction) {
+		this->direction = direction;
+		eventFlags |= EntityEvents::directionChange;
 	}
 }
-NPCState::State NPCState::getState()const {
-	return currentState;
+void EntityState::setEvent(const EntityEvents events) {
+	eventFlags |= events;
 }
-NPCState::Direction NPCState::getDirection()const {
-	return currentDirection;
+void EntityState::flushEvents() {
+	eventFlags = 0;
 }
-bool NPCState::didChangeOccur()const {
-	return wasChange;
+int EntityState::getEvents()const {
+	return eventFlags;
 }
-void NPCState::handeledChange() {
-	wasChange = false;
+bool EntityState::containsEvent(EntityEvents event)const {
+	return eventFlags & event;
 }
+EntityDirection EntityState::getDirection()const {
+	return direction;
+}
+EntityAction EntityState::getAction()const {
+	return action;
+}
+
 
 
 void AnimationController::moveFrame() {

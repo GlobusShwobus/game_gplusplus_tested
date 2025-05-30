@@ -10,7 +10,7 @@ namespace MyUtils {
 		};
 		return corners;
 	}
-	void WASD_state(NPCState& state) {
+	void WASD_state(EntityState& state) {
 		const auto* keystate = SDL_GetKeyboardState(nullptr);
 
 		bool w = keystate[SDL_SCANCODE_W];
@@ -20,23 +20,23 @@ namespace MyUtils {
 
 
 		if (w || a || s || d) {
-			state.setState(NPCState::State::moving);
+			state.changeAction(EntityAction::moving);
 			if (w) {
-				state.setDirection(NPCState::Direction::up);
+				state.changeDirection(EntityDirection::up);
 			}
 			else if (a) {
-				state.setDirection(NPCState::Direction::left);
+				state.changeDirection(EntityDirection::left);
 			}
 			else if (s) {
-				state.setDirection(NPCState::Direction::down);
+				state.changeDirection(EntityDirection::down);
 			}
 			else if (d) {
-				state.setDirection(NPCState::Direction::right);
+				state.changeDirection(EntityDirection::right);
 			}
 
 		}
 		else {
-			state.setState(NPCState::State::idle);
+			state.changeAction(EntityAction::idle);
 		}
 	}
 	nlohmann::json* initJSON(const char* path) {
@@ -51,51 +51,44 @@ namespace MyUtils {
 
 		return json;
 	}
-	AnimID getReelOnState(const NPCState& state) {
-		const auto st = state.getState();
-		const auto fc = state.getDirection();
-
+	AnimID getReelOnState(EntityAction action, EntityDirection direction) {
 		AnimID id = 0;
 
-		if (st == NPCState::State::moving) {
-			switch (fc) {
-			case NPCState::Direction::up:	 id = AnimID_WALK_UP; break;
-			case NPCState::Direction::down:  id = AnimID_WALK_DOWN; break;
-			case NPCState::Direction::left:  id = AnimID_WALK_LEFT; break;
-			case NPCState::Direction::right: id = AnimID_WALK_RIGHT; break;
+		if (action == EntityAction::moving) {
+			switch (direction) {
+			case EntityDirection::up:	 id = AnimID_WALK_UP; break;
+			case EntityDirection::down:  id = AnimID_WALK_DOWN; break;
+			case EntityDirection::left:  id = AnimID_WALK_LEFT; break;
+			case EntityDirection::right: id = AnimID_WALK_RIGHT; break;
 			}
 		}
-		else if (st == NPCState::State::idle) {
-			switch (fc) {
-			case NPCState::Direction::up:	 id = AnimID_IDLE_UP; break;
-			case NPCState::Direction::down:  id = AnimID_IDLE_DOWN; break;
-			case NPCState::Direction::left:  id = AnimID_IDLE_LEFT; break;
-			case NPCState::Direction::right: id = AnimID_IDLE_RIGHT; break;
+		else if (action == EntityAction::idle) {
+			switch (direction) {
+			case EntityDirection::up:	 id = AnimID_IDLE_UP; break;
+			case EntityDirection::down:  id = AnimID_IDLE_DOWN; break;
+			case EntityDirection::left:  id = AnimID_IDLE_LEFT; break;
+			case EntityDirection::right: id = AnimID_IDLE_RIGHT; break;
 			}
 		}
 		return id;
 	}
-	void moveScriptBasic(Transform& transform, NPCState& state, const float moveSpeed) {
-		if (state.getState() == NPCState::State::idle) {
+	void moveScriptBasic(Transform& transform, const EntityState& state, const float moveSpeed) {
+		if (state.getAction() == EntityAction::idle) {
 			return;
 		}
-		SDL_Point newVel = velocityOnDir(state.getDirection(), moveSpeed);
-		transform.setVelocity(newVel);
-		transform.setPosFromCurrentVel();
-		transform.resetVelocity();
-	}
-	SDL_Point velocityOnDir(NPCState::Direction dir, const float moveSpeed) {
-		SDL_Point vel{ 0,0 };
 
-		switch (dir) {
-		case NPCState::Direction::up:    vel.y -= (int)moveSpeed; break;
-		case NPCState::Direction::down:  vel.y += (int)moveSpeed; break;
-		case NPCState::Direction::left:  vel.x -= (int)moveSpeed; break;
-		case NPCState::Direction::right: vel.x += (int)moveSpeed; break;
+		SDL_Point adjustPos{ 0,0 };
+		switch (state.getDirection()) {
+		case EntityDirection::up:    adjustPos.y -= (int)moveSpeed; break;
+		case EntityDirection::down:  adjustPos.y += (int)moveSpeed; break;
+		case EntityDirection::left:  adjustPos.x -= (int)moveSpeed; break;
+		case EntityDirection::right: adjustPos.x += (int)moveSpeed; break;
 		default://no change but other dirs should not exist (maybe diagonals later)
 			break;
 		}
-		return vel;
+
+		transform.addToCurrentPosition(adjustPos);
 	}
+
 
 }

@@ -36,7 +36,7 @@ namespace TESTS {
             
             enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
                 [](EnemyBasic* enemy) {
-                    if (!enemy->isActivated) {
+                    if (!enemy->state.isActivated()) {
                         delete enemy;
                         return true;
                     }
@@ -94,8 +94,10 @@ namespace TESTS {
         }
     };
 
-    void ASK_10_ENEMIES(ENTITY_MANAGER_TEST& entman);
+    void ASK_10_SPEARBOIS(ENTITY_MANAGER_TEST& entman);
+    void ASK_10_SWORDBOIS(ENTITY_MANAGER_TEST& entman);
     void GIVE_RANDOM_POSITIONS_TO_ENEMIES(ENTITY_MANAGER_TEST& entman, RandomNumberGenerator& lolw);
+    void GIVE_RANDOM_VELOCITIES_TO_ENEMIES(ENTITY_MANAGER_TEST& entman, RandomNumberGenerator& lolw);
     void CLEAR_ALL_ENTITIES(ENTITY_MANAGER_TEST& entman);
 
 }

@@ -77,26 +77,36 @@ public:
 	void applySourceFromFrame(SDL_FRect& rect)const;
 };
 
-class NPCState {//TODO:only useful for entities that move, item types need another one
+enum class EntityAction {
+	idle, moving, jumping, attacking, dashing
+};
+enum class EntityDirection {
+	left, right, up, down
+};
+enum EntityEvents {
+	directionChange = 1 << 0,
+	collsion_immovable = 1 << 1,
+	collision_light = 1 << 2,
+	collision_medium = 1 << 3,
+	collision_hard = 1 << 4,
+};
+class EntityState {
+	bool isActive = false;
+	int eventFlags = 0;
+	EntityAction action;
+	EntityDirection direction;
 public:
-	enum class State {
-		idle, moving
-	};
-	enum class Direction {
-		up, down, left, right
-	};
-	void setState(const State state);
-	void setDirection(const Direction facing);
-
-	State getState()const;
-	Direction getDirection()const;
-
-	bool didChangeOccur()const;
-	void handeledChange();
-private:
-	bool wasChange = false;
-	State currentState = State::idle;
-	Direction currentDirection = Direction::down;
+	EntityState() :action(EntityAction::idle), direction(EntityDirection::down), isActive(true) {}
+	void deactivate();
+	bool isActivated()const;
+	void changeAction(EntityAction action);
+	void changeDirection(EntityDirection direction);
+	void setEvent(const EntityEvents events);
+	void flushEvents();
+	int getEvents()const;
+	bool containsEvent(EntityEvents event)const;
+	EntityDirection getDirection()const;
+	EntityAction getAction()const;
 };
 
 class Transform {
@@ -106,7 +116,6 @@ class Transform {
 	SDL_Point previousPosition{ 0,0 };
 	SDL_Point size{ 0,0 };
 	SDL_Point halfSize{ 0,0 };
-	SDL_Point velocity{ 0,0 };
 
 public:
 	Transform() = default;
@@ -129,46 +138,73 @@ public:
 		return &size;
 	}
 
-	void setPosFromCurrentVel() {
-		previousPosition = position;
-
-		position.x += velocity.x;
-		position.y += velocity.y;
-	}
 	void setPosStaight(int x, int y) {
 		previousPosition = position;
 
 		position.x = x;
 		position.y = y;
 	}
-	//maybe temp, will see
-	void clampPosition(int x, int y, int w, int h) {
+	void addToCurrentPosition(const SDL_Point& velocity) {
+		previousPosition = position;
+
+		position.x += velocity.x;
+		position.y += velocity.y;
+	}
+	bool doesIntersect(const SDL_Point& oPos, const SDL_Point& oSize)const {
+		return position.x < oPos.x + oSize.x && oPos.x < position.x + size.x &&
+			position.y < oPos.y + oSize.y && oPos.y < position.y + size.y;
+	}
+
+	//does NOT belong here, is shit anyhow
+	bool clampPosition(int x, int y, int w, int h) {
+		bool isClamped = false;
 		if (position.x < x) {
 			position.x = x;
+			isClamped = true;
 		}
 		if (position.y < y) {
 			position.y = y;
+			isClamped = true;
 		}
 		if (position.x + size.x > w) {
 			position.x = w - size.x;
+			isClamped = true;
 		}
 		if (position.y + size.y > h) {
 			position.y = h - size.y;
+			isClamped = true;
 		}
+		return isClamped;
 	}
-	void setVelocity(const SDL_Point& newVelocity) {
-		velocity = newVelocity;
-	}
-	void resetVelocity() {
-		velocity.x = 0;
-		velocity.y = 0;
-	}
+
 	void applyDestinationTexture(SDL_FRect& dest)const {
 		dest.x = (float)position.x;
 		dest.y = (float)position.y;
 	}
+};
+class Physics {
+	SDL_Point velocity{ 0,0 };
+	float movementSpeed = 0;
+	float mass = 0;
+public:
+	Physics() = default;
+	Physics(float movementSpeed, float mass) :movementSpeed(movementSpeed), mass(mass) {}
 
+	void setVelocity(int x, int y) {
+		velocity.x = x;
+		velocity.y = y;
+	}
+	void setVelocity(const SDL_Point& velocity) {
+		this->velocity = velocity;
+	}
+	void reverseVelocity() {
+		velocity.x *= -1;
+		velocity.y *= -1;
+	}
 
+	const SDL_Point& getVelocity() {
+		return velocity;
+	}
 };
 
 struct EntityData {
@@ -189,14 +225,12 @@ public:
 	SDL_FRect textureDest{ 0,0,0,0 };
 	AnimationController animControlls;
 
-	NPCState state;
-
+	EntityState state;
 	Transform transform;
+	Physics physics;
 
 	PlayerID id = 0;
-	float movementSpeed = 0;
 	float healthPoints = 0;
-	float mass = 0;
 
 	Player(SDL_Texture* texture, const std::map<AnimID, AnimationReel>& animationData, const EntityData& data):texture(texture), animControlls(animationData) {
 		id = data.id;
@@ -204,9 +238,8 @@ public:
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		movementSpeed = data.movement_speed;
+		physics = Physics(data.movement_speed, data.mass);
 		healthPoints = data.health_points;
-		mass = data.mass;
 	}
 };
 
@@ -216,26 +249,19 @@ public:
 	SDL_FRect textureSrc{ 0,0,0,0 };
 	SDL_FRect textureDest{ 0,0,0,0 };
 
-	NPCState state;
+	EntityState state;
 	Transform transform;
+	Physics physics;
 
 	EnemyID id = 0;
-	float movement_speed = 0.f;
 	float health_points = 0.f;
-	float mass = 0.f;
-
-	bool isActivated = false;
-
 	EnemyBasic(SDL_Texture* texture, const EntityData& data):texture(texture) {
 		id = data.id;
 		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		movement_speed = data.movement_speed;
+		physics = Physics(data.movement_speed, data.mass);
 		health_points = data.health_points;
-		mass = data.mass;
-		
-		isActivated = true;
 	}
 };

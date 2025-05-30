@@ -12,13 +12,12 @@
 namespace MyUtils {
 
 	std::array<SDL_FPoint, 4> getCorners(const SDL_FRect& position);
-    void WASD_state(NPCState& state);
+    void WASD_state(EntityState& state);
     nlohmann::json* initJSON(const char* path);
 
 	//eventually integrate fully into transform OR make more options with transform funcs that a script handles
-	SDL_Point velocityOnDir(NPCState::Direction dir, const float moveSpeed);
-	void moveScriptBasic(Transform& transform, NPCState& state, const float moveSpeed);
+	void moveScriptBasic(Transform& transform, const EntityState& state, const float moveSpeed);
 
 
-	AnimID getReelOnState(const NPCState& state);
+	AnimID getReelOnState(EntityAction action, EntityDirection direction);
 }

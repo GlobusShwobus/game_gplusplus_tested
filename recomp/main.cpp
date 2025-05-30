@@ -48,6 +48,20 @@ TODO:: decide wtf to do with the player, should it or should it not be at least 
 
 */
 
+/*
+
+*MyUtils::MoveScript is dogshit. Velocity has no place in tranform class and should be held in physics class instead.
+*MyUtils::WASD_state is unique to player because only players moves on key press, implement it into the player class
+
+    reflect velocity
+    then test bouncing off off each other
+    then test if type A and type B instead of bounce type A stops and B bounces back
+    then test different coefficient additions with speed and mass determining how much to bounce
+
+    lastly store important data what i wished to save into transform
+
+*/
+
 int main() {
 
     
@@ -103,8 +117,13 @@ int main() {
     }
 
     //TEST CODE
-    TESTS::RandomNumberGenerator rng;
-    TESTS::ENTITY_MANAGER_TEST poop;
+    TESTS::RandomNumberGenerator rng;//DELETE AFTER TESTS
+    TESTS::ENTITY_MANAGER_TEST poop;//DELETE AFTER TESTS
+    TESTS::ASK_10_SPEARBOIS(poop);
+    TESTS::ASK_10_SWORDBOIS(poop);
+    poop.update(entityFactory);
+    TESTS::GIVE_RANDOM_POSITIONS_TO_ENEMIES(poop, rng);
+    TESTS::GIVE_RANDOM_VELOCITIES_TO_ENEMIES(poop, rng);
     //###################################################
 
     
@@ -123,7 +142,7 @@ int main() {
         MyUtils::WASD_state(player->state);
 
         //MOVEMENT
-        MyUtils::moveScriptBasic(player->transform, player->state, player->movementSpeed);
+        MyUtils::moveScriptBasic(player->transform, player->state, 5);//CURRENTLY BULLSHIT BUT I WANT TO GET RID OF THIS ANYWAY
         player->transform.clampPosition(0,0,2560,1440);//currently map does not exist
         //#################################################################################
 
@@ -133,11 +152,9 @@ int main() {
         //#################################################################################
 
         //ANIMATION
-        if (player->state.didChangeOccur()) {
-            player->animControlls.setNewReel(MyUtils::getReelOnState(player->state));
-            player->state.handeledChange();
+        if (player->state.containsEvent(directionChange)) {
+            player->animControlls.setNewReel(MyUtils::getReelOnState(player->state.getAction(), player->state.getDirection()));
         }
-
         player->animControlls.moveFrame();
         //#################################################################################
 
@@ -148,39 +165,31 @@ int main() {
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
         //pooptest
-        for (auto& each : poop.getEnemies()) {
-            each->transform.applyDestinationTexture(each->textureDest);
-            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);
-        }
+        for (auto& each : poop.getEnemies()) {//DELETE AFTER TESTS
+            each->transform.addToCurrentPosition(each->physics.getVelocity());
+            if (each->transform.clampPosition(0, 0, 2560, 1440)) {
+                each->physics.reverseVelocity();
+            }
+            each->transform.applyDestinationTexture(each->textureDest);//DELETE AFTER TESTS
+            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);//DELETE AFTER TESTS
+        }//DELETE AFTER TESTS
         //#####
 
+        //MAIN LOGIC ENDING
+        player->state.flushEvents();
         window.updateEnd();
+        ////#################################################################################
 
-        //TESTCODE FOR CREATING ENTITIES
-        const auto* meme = SDL_GetKeyboardState(nullptr);
-        bool k = meme[SDL_SCANCODE_K];
-        bool l = meme[SDL_SCANCODE_L];
-        bool m = meme[SDL_SCANCODE_M];
-        if (k) {
-            TESTS::ASK_10_ENEMIES(poop);
-        }
-        if (l) {
-            TESTS::GIVE_RANDOM_POSITIONS_TO_ENEMIES(poop, rng);
-        }
-        if (m) {
-            TESTS::CLEAR_ALL_ENTITIES(poop);
-        }
-        //#########################
    
-        //DO SHIT HERE LIKE CALLING "new" and "delete"
+        //HANDLE TASKS BETWEEN FRAMES
         if (window.shouldDelay()) {
 
             Uint64 delayTime = window.getDelayDuration();
             Uint64 startDelay = SDL_GetTicks();
 
             //DO SHIT HERE
-            poop.update(entityFactory, 1);
-            poop.removeEnemy();
+            poop.update(entityFactory, 1);//DELETE AFTER TESTS
+            poop.removeEnemy();//DELETE AFTER TESTS
             //#################################################################################
 
             Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
