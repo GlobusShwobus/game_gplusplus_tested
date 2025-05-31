@@ -81,14 +81,15 @@ enum class EntityAction {
 	idle, moving, jumping, attacking, dashing
 };
 enum class EntityDirection {
-	left, right, up, down
+	none, left, right, up, down
 };
 enum EntityEvents {
-	directionChange = 1 << 0,
-	collsion_immovable = 1 << 1,
-	collision_light = 1 << 2,
-	collision_medium = 1 << 3,
-	collision_hard = 1 << 4,
+	noEvent = 1 << 0,
+	directionChange = 1 << 1,
+	collsion_fromUp = 1 << 2,
+	collision_fromDown = 1 << 3,
+	collision_fromLeft = 1 << 4,
+	collision_fromRight = 1 << 5,
 };
 class EntityState {
 	bool isActive = false;
@@ -111,99 +112,86 @@ public:
 
 class Transform {
 	//scale?
+	SDL_Rect BB{ 0,0,0,0 };
+	SDL_Point prevPos{ 0,0 };
 
-	SDL_Point position{ 0,0 };
-	SDL_Point previousPosition{ 0,0 };
-	SDL_Point size{ 0,0 };
+	SDL_Point velocity{ 0,0 };
+
 	SDL_Point halfSize{ 0,0 };
-
 public:
 	Transform() = default;
 	Transform(int x, int y, int w, int h) {
-		
-		position.x = x;
-		position.y = y;
-		previousPosition = position;
-		size.x = w;
-		size.y = h;
-		halfSize.x = size.x / 2;
-		halfSize.y = size.y / 2;
-	
+		BB = { x,y,w,h };
+
+		prevPos.x = x;
+		prevPos.y = y;
+
+		halfSize.x = w / 2;
+		halfSize.y = w / 2;
 	}
 
-	const SDL_Point* const getPosition() {
-		return &position;
-	}
-	const SDL_Point* const getSize() {
-		return &size;
+	const SDL_Rect& getBB()const {
+		return BB;
 	}
 
-	void setPosStaight(int x, int y) {
-		previousPosition = position;
+	void setPosRaw(int x, int y) {
+		prevPos.x = BB.x;
+		prevPos.y = BB.y;
 
-		position.x = x;
-		position.y = y;
+		BB.x = x;
+		BB.y = y;
 	}
-	void addToCurrentPosition(const SDL_Point& velocity) {
-		previousPosition = position;
+	void updatePosition() {
+		prevPos.x = BB.x;
+		prevPos.y = BB.y;
 
-		position.x += velocity.x;
-		position.y += velocity.y;
+		BB.x += velocity.x;
+		BB.y += velocity.y;
 	}
-	bool doesIntersect(const SDL_Point& oPos, const SDL_Point& oSize)const {
-		return position.x < oPos.x + oSize.x && oPos.x < position.x + size.x &&
-			position.y < oPos.y + oSize.y && oPos.y < position.y + size.y;
-	}
-
-	//does NOT belong here, is shit anyhow
-	bool clampPosition(int x, int y, int w, int h) {
-		bool isClamped = false;
-		if (position.x < x) {
-			position.x = x;
-			isClamped = true;
-		}
-		if (position.y < y) {
-			position.y = y;
-			isClamped = true;
-		}
-		if (position.x + size.x > w) {
-			position.x = w - size.x;
-			isClamped = true;
-		}
-		if (position.y + size.y > h) {
-			position.y = h - size.y;
-			isClamped = true;
-		}
-		return isClamped;
-	}
-
-	void applyDestinationTexture(SDL_FRect& dest)const {
-		dest.x = (float)position.x;
-		dest.y = (float)position.y;
-	}
-};
-class Physics {
-	SDL_Point velocity{ 0,0 };
-	float movementSpeed = 0;
-	float mass = 0;
-public:
-	Physics() = default;
-	Physics(float movementSpeed, float mass) :movementSpeed(movementSpeed), mass(mass) {}
-
 	void setVelocity(int x, int y) {
 		velocity.x = x;
 		velocity.y = y;
 	}
-	void setVelocity(const SDL_Point& velocity) {
-		this->velocity = velocity;
+
+	//checks if this obj contains another whole
+	bool contains(const SDL_Rect& r)const {
+		return(BB.x <= r.x) && (r.x + r.w < BB.x + BB.w) &&
+			(BB.y <= r.y) && (r.y + r.h < BB.y + BB.h);
 	}
-	void reverseVelocity() {
-		velocity.x *= -1;
-		velocity.y *= -1;
+	//checks if two rects overlap
+	bool overlaps(const SDL_Rect& r)const {
+		return BB.x < r.x + r.w && r.x < BB.x + BB.w &&
+			BB.y < r.y + r.h && r.y < BB.y + BB.h;
+	}
+	//reflects velocity
+	void reflectVelocity(const SDL_Rect& r) {
+		if (BB.x<r.x || BB.x + BB.w>r.x + r.w) {
+			velocity.x *= -1;
+		}
+		if (BB.y<r.y || BB.y + BB.h>r.y + r.h) {
+			velocity.y *= -1;
+		}
 	}
 
-	const SDL_Point& getVelocity() {
-		return velocity;
+	//MOVE THIS LATER SOMWHERE ELSE
+	void clampInsideOf(const SDL_Rect& object) {
+		if (BB.x < object.x) {
+			BB.x = object.x;
+		}
+		if (BB.y < object.y) {
+			BB.y = object.y;
+		}
+		if (BB.x + BB.w > object.w) {
+			BB.x = object.w - BB.w;
+		}
+		if (BB.y + BB.h > object.h) {
+			BB.y = object.h - BB.h;
+		}
+	}
+	//MOVE THIS LATER SOMWHERE ELSE
+	void applyDestinationTexture(SDL_FRect& dest)const {
+		dest.x = (float)BB.x;
+		dest.y = (float)BB.y;
 	}
 };
 
@@ -227,7 +215,9 @@ public:
 
 	EntityState state;
 	Transform transform;
-	Physics physics;
+	float movementSpeed = 0;
+	float mass = 0;
+
 
 	PlayerID id = 0;
 	float healthPoints = 0;
@@ -238,7 +228,8 @@ public:
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		physics = Physics(data.movement_speed, data.mass);
+		movementSpeed = data.movement_speed;
+		mass = data.mass;
 		healthPoints = data.health_points;
 	}
 };
@@ -251,7 +242,8 @@ public:
 
 	EntityState state;
 	Transform transform;
-	Physics physics;
+	float movementSpeed = 0;
+	float mass = 0;
 
 	EnemyID id = 0;
 	float health_points = 0.f;
@@ -261,7 +253,8 @@ public:
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		physics = Physics(data.movement_speed, data.mass);
+		movementSpeed = data.movement_speed;
+		mass = data.mass;
 		health_points = data.health_points;
 	}
 };

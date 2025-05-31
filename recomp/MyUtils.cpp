@@ -77,7 +77,7 @@ namespace MyUtils {
 			return;
 		}
 
-		SDL_Point adjustPos{ 0,0 };
+		SDL_Rect adjustPos = transform.getBB();
 		switch (state.getDirection()) {
 		case EntityDirection::up:    adjustPos.y -= (int)moveSpeed; break;
 		case EntityDirection::down:  adjustPos.y += (int)moveSpeed; break;
@@ -87,7 +87,7 @@ namespace MyUtils {
 			break;
 		}
 
-		transform.addToCurrentPosition(adjustPos);
+		transform.setPosRaw(adjustPos.x, adjustPos.y);
 	}
 
 

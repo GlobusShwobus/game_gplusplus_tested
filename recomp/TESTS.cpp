@@ -15,10 +15,10 @@ namespace TESTS {
         const auto& enemies = entman.getEnemies();
 
         for (auto& each : enemies) {
-            int x = lolw.getRand(0, 10);
-            int y = lolw.getRand(0, 10);
+            int x = lolw.getRand(0, 3);
+            int y = lolw.getRand(0, 3);
 
-            each->physics.setVelocity(x, y);
+            each->transform.setVelocity(x, y);
         }
     }
 
@@ -29,7 +29,7 @@ namespace TESTS {
             int x = lolw.getRand(0, 500);
             int y = lolw.getRand(0, 500);
 
-            each->transform.setPosStaight(x, y);
+            each->transform.setPosRaw(x, y);
         }
 
     }

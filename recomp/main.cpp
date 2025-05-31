@@ -143,12 +143,12 @@ int main() {
 
         //MOVEMENT
         MyUtils::moveScriptBasic(player->transform, player->state, 5);//CURRENTLY BULLSHIT BUT I WANT TO GET RID OF THIS ANYWAY
-        player->transform.clampPosition(0,0,2560,1440);//currently map does not exist
+        player->transform.clampInsideOf({0,0,2560,1440});
         //#################################################################################
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        window.updateCamera(player->transform.getPosition(), player->transform.getSize(), { 0,0,2560,1440 });
+        window.updateCamera(player->transform.getBB(), {0,0,2560,1440});
         //#################################################################################
 
         //ANIMATION
@@ -164,16 +164,40 @@ int main() {
 
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
-        //pooptest
-        for (auto& each : poop.getEnemies()) {//DELETE AFTER TESTS
-            each->transform.addToCurrentPosition(each->physics.getVelocity());
-            if (each->transform.clampPosition(0, 0, 2560, 1440)) {
-                each->physics.reverseVelocity();
+        //pooptest//DELETE AFTER TESTS
+        const Transform worldBB(0, 0, 500, 500);
+        auto& megaPoop = poop.getEnemies();
+       
+        for (auto& each : megaPoop) {
+            each->transform.updatePosition();
+        }
+
+        for (int i = 0; i < megaPoop.size(); i++) {
+            for (int j = i + 1; j < megaPoop.size(); j++) {
+                auto& a = megaPoop[i]->transform;
+                auto& b = megaPoop[j]->transform;
+
+                if (a.overlaps(b.getBB())) {
+                    a.reflectVelocity(b.getBB());
+                    b.reflectVelocity(a.getBB());
+                }
+
+
+                if (!worldBB.contains(a.getBB())) {
+                    a.reflectVelocity(worldBB.getBB());
+                }
+                if (!worldBB.contains(b.getBB())) {
+                    b.reflectVelocity(worldBB.getBB());
+                }
+
             }
-            each->transform.applyDestinationTexture(each->textureDest);//DELETE AFTER TESTS
-            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);//DELETE AFTER TESTS
-        }//DELETE AFTER TESTS
-        //#####
+        }
+
+        for (auto& each : megaPoop) {
+            each->transform.applyDestinationTexture(each->textureDest);
+            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);
+        }
+        //#####//DELETE AFTER TESTS
 
         //MAIN LOGIC ENDING
         player->state.flushEvents();

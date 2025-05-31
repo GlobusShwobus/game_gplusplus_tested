@@ -50,7 +50,7 @@ public:
 	SDL_Renderer* getRenderer();
 	bool shouldDelay()const;
 	Uint64 getDelayDuration()const;
-	void updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp);
+	void updateCamera(const SDL_Rect& target, SDL_Rect clamp);
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);

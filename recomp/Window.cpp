@@ -72,10 +72,10 @@ bool Window::shouldDelay()const {
 Uint64 Window::getDelayDuration()const {
 	return frameLimiter.delayDuration;
 }
-void Window::updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp) {
+void Window::updateCamera(const SDL_Rect& target, SDL_Rect clamp) {
 
-	camera.topLeft.x = (target->x + (targetSize->x / 2)) - camera.halfWidth;
-	camera.topLeft.y = (target->y + (targetSize->y / 2)) - camera.halfHeight;
+	camera.topLeft.x = (target.x + (target.w / 2)) - camera.halfWidth;
+	camera.topLeft.y = (target.y + (target.h / 2)) - camera.halfHeight;
 
 
 	if (camera.topLeft.x < clamp.x) {
