@@ -18,10 +18,7 @@ Window::Window(const nlohmann::json* const windowConfig) {
 
 	frameLimiter.maximumFrameDuration = frameLimiter.ms_in_second / FPSTarget;
 
-	camera.width = cameraWidth;
-	camera.height = cameraHeight;
-	camera.halfWidth = cameraWidth / 2;
-	camera.halfHeight = cameraHeight / 2;
+	camera = Camera(cameraWidth, cameraHeight);
 
 	//THIS IS NOT INTENDED BEHAVIOR, CAMERA SHOULD DETERMINE LOGICAL RENDERING NOT WINDOW SIZE, FIX LATER
 	SDL_SetRenderLogicalPresentation(renderer, windowWidth, windowHeight, SDL_LOGICAL_PRESENTATION_STRETCH);
@@ -44,12 +41,12 @@ SDL_Renderer* Window::getRenderer() {
 	return renderer;
 }
 void Window::drawTexture(SDL_Texture* texture, SDL_FRect* src, SDL_FRect* dest)const {
-	camera.applyDestinationFromCamera(dest);
+	camera.destToCameraSpace(dest);
 	SDL_RenderTexture(renderer, texture, src, dest);
 }
-void Window::Camera::applyDestinationFromCamera(SDL_FRect* const entity)const {
-	entity->x -= topLeft.x;
-	entity->y -= topLeft.y;
+void Window::Camera::destToCameraSpace(SDL_FRect* const entity)const {
+	entity->x -= rect.x;
+	entity->y -= rect.y;
 };
 void Window::FrameLimiter::beginFrame() {
 	frameStart = SDL_GetTicks();
@@ -72,23 +69,11 @@ bool Window::shouldDelay()const {
 Uint64 Window::getDelayDuration()const {
 	return frameLimiter.delayDuration;
 }
-void Window::updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp) {
+void Window::updateCamera(const SDL_FRect& target, SDL_FRect clamp) {
 
-	camera.topLeft.x = (target->x + (targetSize->x / 2)) - camera.halfWidth;
-	camera.topLeft.y = (target->y + (targetSize->y / 2)) - camera.halfHeight;
+	camera.rect.x = (target.x + (target.w / 2)) - camera.halfWidth;
+	camera.rect.y = (target.y + (target.h / 2)) - camera.halfHeight;
 
-
-	if (camera.topLeft.x < clamp.x) {
-		camera.topLeft.x = clamp.x;
-	}
-	if (camera.topLeft.y < clamp.y) {
-		camera.topLeft.y = clamp.y;
-	}
-	if (camera.topLeft.x + camera.width > clamp.w) {
-		camera.topLeft.x = clamp.w - camera.width;
-	}
-	if (camera.topLeft.y + camera.height > clamp.h) {
-		camera.topLeft.y = clamp.h - camera.height;
-	}
+	Collision::clampInOf(clamp, camera.rect);
 }
 

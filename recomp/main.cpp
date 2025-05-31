@@ -115,6 +115,7 @@ int main() {
         return -1;
     }
 
+    SDL_FRect worldBB{ 0,0,2560,1440 };
     
     bool gameRunning = true;
     SDL_Event event;
@@ -131,13 +132,15 @@ int main() {
         MyUtils::WASD_state(player->state);
 
         //MOVEMENT
-        MyUtils::moveScriptBasic(player->transform, player->state, 5);//CURRENTLY BULLSHIT BUT I WANT TO GET RID OF THIS ANYWAY
-        player->transform.clampPosition(0,0,2560,1440);//currently map does not exist
+        SDL_FPoint newPlayerVel = MyUtils::calculatePlayerVelocity(player->state, 5);
+        player->transform.setVelocity(newPlayerVel);
+        player->transform.moveOnVector();
+        Collision::clampInOf(worldBB, player->transform.getRectFree());
         //#################################################################################
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        window.updateCamera(player->transform.getPosition(), player->transform.getSize(), { 0,0,2560,1440 });
+        window.updateCamera(player->transform.getRectRead(), worldBB);
         //#################################################################################
 
         //ANIMATION
@@ -147,9 +150,8 @@ int main() {
         player->animControlls.moveFrame();
         //#################################################################################
 
-        player->animControlls.applySourceFromFrame(player->textureSrc);//MAKE THIS FUNCTION PART OF PLAYER NOT ANIMCONTROLLS OR UTILITY
-        player->transform.applyDestinationTexture(player->textureDest);//MAKE THIS FUNCTION PART OF PLAYER NOT TRANSFORM OR UTILITY
-
+        player->applySourceBoxToRenderBox();
+        player->applyCollisionBoxToRenderBox();
 
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 

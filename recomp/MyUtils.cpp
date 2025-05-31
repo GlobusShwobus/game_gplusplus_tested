@@ -72,22 +72,22 @@ namespace MyUtils {
 		}
 		return id;
 	}
-	void moveScriptBasic(Transform& transform, const EntityState& state, const float moveSpeed) {
-		if (state.getAction() == EntityAction::idle) {
-			return;
-		}
+	
 
-		SDL_Point adjustPos{ 0,0 };
-		switch (state.getDirection()) {
-		case EntityDirection::up:    adjustPos.y -= (int)moveSpeed; break;
-		case EntityDirection::down:  adjustPos.y += (int)moveSpeed; break;
-		case EntityDirection::left:  adjustPos.x -= (int)moveSpeed; break;
-		case EntityDirection::right: adjustPos.x += (int)moveSpeed; break;
-		default://no change but other dirs should not exist (maybe diagonals later)
-			break;
-		}
+	SDL_FPoint calculatePlayerVelocity(const EntityState& state, const float speed) {
+		SDL_FPoint vel{ 0,0 };
 
-		transform.addToCurrentPosition(adjustPos);
+		if (state.getAction() == EntityAction::moving) {
+			switch (state.getDirection()) {
+			case EntityDirection::up:    vel.y -= speed; break;
+			case EntityDirection::down:  vel.y += speed; break;
+			case EntityDirection::left:  vel.x -= speed; break;
+			case EntityDirection::right: vel.x += speed; break;
+			default://no change but other dirs should not exist (maybe diagonals later)
+				break;
+			}
+		}
+		return vel;
 	}
 
 

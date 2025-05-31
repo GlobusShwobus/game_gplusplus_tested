@@ -27,14 +27,14 @@ class Window {
 
 	struct Camera {
 		//zooming requires another member variable float scalar, then call the setRenderScale in rendering logic, but not to get ahead too much
-		SDL_Point topLeft{ 0,0 };
+		SDL_FRect rect{0,0,0,0};
 
-		int width = 0;
-		int height = 0;
 		int halfWidth = 0;
 		int halfHeight = 0;
+		Camera() = default;
+		Camera(int width, int height) :rect{ 0,0,(float)width, (float)height }, halfWidth(width / 2), halfHeight(height / 2) {}
 
-		void applyDestinationFromCamera(SDL_FRect* const entity)const;
+		void destToCameraSpace(SDL_FRect* const entity)const;
 	};
 	Camera camera;
 
@@ -50,7 +50,7 @@ public:
 	SDL_Renderer* getRenderer();
 	bool shouldDelay()const;
 	Uint64 getDelayDuration()const;
-	void updateCamera(const SDL_Point* const target, const SDL_Point* const targetSize, SDL_Rect clamp);
+	void updateCamera(const SDL_FRect& target, SDL_FRect clamp);
 
 	~Window() {
 		SDL_DestroyRenderer(renderer);

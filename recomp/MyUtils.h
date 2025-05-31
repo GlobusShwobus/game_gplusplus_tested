@@ -16,8 +16,7 @@ namespace MyUtils {
     nlohmann::json* initJSON(const char* path);
 
 	//eventually integrate fully into transform OR make more options with transform funcs that a script handles
-	void moveScriptBasic(Transform& transform, const EntityState& state, const float moveSpeed);
-
+	SDL_FPoint calculatePlayerVelocity(const EntityState& state, const float speed);
 
 	AnimID getReelOnState(EntityAction action, EntityDirection direction);
 }

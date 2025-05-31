@@ -109,107 +109,62 @@ public:
 	EntityAction getAction()const;
 };
 
-class Transform {
-	//scale?
-
-	SDL_Point position{ 0,0 };
-	SDL_Point previousPosition{ 0,0 };
-	SDL_Point size{ 0,0 };
-	SDL_Point halfSize{ 0,0 };
+class RectTransform {
+	SDL_FRect rect{ 0,0,0,0 };
+	SDL_FPoint velocity{ 0,0 };
 
 public:
-	Transform() = default;
-	Transform(int x, int y, int w, int h) {
-		
-		position.x = x;
-		position.y = y;
-		previousPosition = position;
-		size.x = w;
-		size.y = h;
-		halfSize.x = size.x / 2;
-		halfSize.y = size.y / 2;
-	
-	}
+	RectTransform() = default;
+	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
 
-	const SDL_Point* const getPosition() {
-		return &position;
+	const SDL_FRect& getRectRead()const {
+		return rect;
 	}
-	const SDL_Point* const getSize() {
-		return &size;
+	SDL_FRect& getRectFree() {
+		return rect;
 	}
-
-	void setPosStaight(int x, int y) {
-		previousPosition = position;
-
-		position.x = x;
-		position.y = y;
+	const SDL_FPoint& getVelocity()const {
+		return velocity;
 	}
-	void addToCurrentPosition(const SDL_Point& velocity) {
-		previousPosition = position;
-
-		position.x += velocity.x;
-		position.y += velocity.y;
+	void setVelocity(const SDL_FPoint& someVel) {
+		velocity = someVel;
 	}
-	bool doesIntersect(const SDL_Point& oPos, const SDL_Point& oSize)const {
-		return position.x < oPos.x + oSize.x && oPos.x < position.x + size.x &&
-			position.y < oPos.y + oSize.y && oPos.y < position.y + size.y;
-	}
-
-	//does NOT belong here, is shit anyhow
-	bool clampPosition(int x, int y, int w, int h) {
-		bool isClamped = false;
-		if (position.x < x) {
-			position.x = x;
-			isClamped = true;
-		}
-		if (position.y < y) {
-			position.y = y;
-			isClamped = true;
-		}
-		if (position.x + size.x > w) {
-			position.x = w - size.x;
-			isClamped = true;
-		}
-		if (position.y + size.y > h) {
-			position.y = h - size.y;
-			isClamped = true;
-		}
-		return isClamped;
-	}
-
-	void applyDestinationTexture(SDL_FRect& dest)const {
-		dest.x = (float)position.x;
-		dest.y = (float)position.y;
+	void moveOnVector() {
+		rect.x += velocity.x;
+		rect.y += velocity.y;
 	}
 };
-class Physics {
-	SDL_Point velocity{ 0,0 };
-	float movementSpeed = 0;
-	float mass = 0;
-public:
-	Physics() = default;
-	Physics(float movementSpeed, float mass) :movementSpeed(movementSpeed), mass(mass) {}
 
-	void setVelocity(int x, int y) {
-		velocity.x = x;
-		velocity.y = y;
+struct Collision {
+	static bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point) {
+		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
 	}
-	void setVelocity(const SDL_Point& velocity) {
-		this->velocity = velocity;
+	static bool containsRect(const SDL_FRect& outer, const SDL_FRect& inner) {
+		return (inner.x >= outer.x && inner.y >= outer.y && inner.x + inner.w <= outer.x + outer.w && inner.y + inner.h <= outer.y + outer.h);
 	}
-	void reverseVelocity() {
-		velocity.x *= -1;
-		velocity.y *= -1;
+	static bool intersects(const SDL_FRect& a, const SDL_FRect& b) {
+		return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y);
 	}
 
-	const SDL_Point& getVelocity() {
-		return velocity;
+	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
+		if (inner.x < outer.x) {
+			inner.x = outer.x;
+		}
+		if (inner.y < outer.y) {
+			inner.y = outer.y;
+		}
+		if (inner.x + inner.w > outer.w) {
+			inner.x = outer.w - inner.w;
+		}
+		if (inner.y + inner.h > outer.h) {
+			inner.y = outer.h - inner.h;
+		}
 	}
 };
 
 struct EntityData {
 	EntityGeneric id = 0;
-	Transform transform;
+	RectTransform transform;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float mass = 0.f;
@@ -226,8 +181,8 @@ public:
 	AnimationController animControlls;
 
 	EntityState state;
-	Transform transform;
-	Physics physics;
+	RectTransform transform;
+
 
 	PlayerID id = 0;
 	float healthPoints = 0;
@@ -238,8 +193,14 @@ public:
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		physics = Physics(data.movement_speed, data.mass);
 		healthPoints = data.health_points;
+	}
+
+	void applyCollisionBoxToRenderBox() {
+		textureDest = transform.getRectRead();
+	}
+	void applySourceBoxToRenderBox() {
+		animControlls.applySourceFromFrame(textureSrc);
 	}
 };
 
@@ -250,8 +211,7 @@ public:
 	SDL_FRect textureDest{ 0,0,0,0 };
 
 	EntityState state;
-	Transform transform;
-	Physics physics;
+	RectTransform transform;
 
 	EnemyID id = 0;
 	float health_points = 0.f;
@@ -261,7 +221,6 @@ public:
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		physics = Physics(data.movement_speed, data.mass);
 		health_points = data.health_points;
 	}
 };
