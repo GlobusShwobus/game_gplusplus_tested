@@ -4,7 +4,6 @@
 
 
 #include "MyUtils.h"
-#include "TESTS.h"
 
 /*
 
@@ -116,16 +115,6 @@ int main() {
         return -1;
     }
 
-    //TEST CODE
-    TESTS::RandomNumberGenerator rng;//DELETE AFTER TESTS
-    TESTS::ENTITY_MANAGER_TEST poop;//DELETE AFTER TESTS
-    TESTS::ASK_10_SPEARBOIS(poop);
-    TESTS::ASK_10_SWORDBOIS(poop);
-    poop.update(entityFactory);
-    TESTS::GIVE_RANDOM_POSITIONS_TO_ENEMIES(poop, rng);
-    TESTS::GIVE_RANDOM_VELOCITIES_TO_ENEMIES(poop, rng);
-    //###################################################
-
     
     bool gameRunning = true;
     SDL_Event event;
@@ -164,16 +153,6 @@ int main() {
 
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
-        //pooptest
-        for (auto& each : poop.getEnemies()) {//DELETE AFTER TESTS
-            each->transform.addToCurrentPosition(each->physics.getVelocity());
-            if (each->transform.clampPosition(0, 0, 2560, 1440)) {
-                each->physics.reverseVelocity();
-            }
-            each->transform.applyDestinationTexture(each->textureDest);//DELETE AFTER TESTS
-            window.drawTexture(each->texture, &each->textureSrc, &each->textureDest);//DELETE AFTER TESTS
-        }//DELETE AFTER TESTS
-        //#####
 
         //MAIN LOGIC ENDING
         player->state.flushEvents();
@@ -188,8 +167,7 @@ int main() {
             Uint64 startDelay = SDL_GetTicks();
 
             //DO SHIT HERE
-            poop.update(entityFactory, 1);//DELETE AFTER TESTS
-            poop.removeEnemy();//DELETE AFTER TESTS
+
             //#################################################################################
 
             Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
