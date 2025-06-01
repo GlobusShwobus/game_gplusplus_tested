@@ -118,8 +118,8 @@ int main() {
     //TESTCODE
     SDL_FRect worldBB{ 0,0,2560,1440 };
     
-    SDL_FRect floor{ 0,200,500,32 };
-    SDL_FRect someBox{ 100,300,32,32 };
+    RectTransform floor(0, 200, 500, 32);
+
     SDL_Texture* worldmeme = IMG_LoadTexture(window.getRenderer(), "../Textures/worldmap.png");
     SDL_FRect worldmemeS = { 0,0,2560,1440 };
     SDL_FRect worldmemeD = { 0,0,2560,1440 };
@@ -158,11 +158,10 @@ int main() {
         //#################################################################################
 
         //COLLISION
-        CollisionData cData;
-        if (Collision::rayIntersection(player->transform.rect, player->transform.velocity, floor, cData) && cData.tHitNear < 1.0f) {
-            SDL_SetRenderDrawColor(window.getRenderer(), 0, 255, 0, 255);
-            SDL_RenderFillRect(window.getRenderer(), &someBox);
-            SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+
+        CollisionResult pCol = Collision::getCollisionResult(player->transform, floor);
+        if (pCol.isColliding) {
+            Collision::resolveOverlap(player->transform.rect, pCol.overlap, pCol.normal);
         }
         //#################################################################################
 
@@ -170,9 +169,9 @@ int main() {
         player->applyCollisionBoxToRenderBox();
 
         //TESSTCODE
-        //window.drawTexture(worldmeme, &worldmemeS, &worldmemeD);
+        window.drawTexture(worldmeme, &worldmemeS, &worldmemeD);
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        SDL_RenderFillRect(window.getRenderer(), &floor);
+        SDL_RenderFillRect(window.getRenderer(), &floor.rect);
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 

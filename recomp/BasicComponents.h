@@ -175,6 +175,10 @@ struct Collision {
 		result.isColliding = true;
 		return result;
 	}
+	static void resolveOverlap(SDL_FRect& overlapper, const SDL_FRect& overlapData, const SDL_FPoint& normal) {
+		overlapper.x += normal.x * overlapData.w;
+		overlapper.y += normal.y * overlapData.h;
+	}
 	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
 		if (inner.x < outer.x) {
 			inner.x = outer.x;
