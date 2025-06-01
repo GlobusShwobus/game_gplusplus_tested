@@ -140,10 +140,10 @@ struct Collision {
 	static bool containsRect(const SDL_FRect& outer, const SDL_FRect& inner) {
 		return (inner.x >= outer.x && inner.y >= outer.y && inner.x + inner.w <= outer.x + outer.w && inner.y + inner.h <= outer.y + outer.h);
 	}
-	static bool intersects(const SDL_FRect& a, const SDL_FRect& b) {
+	static bool basicAABBcollision(const SDL_FRect& a, const SDL_FRect& b) {
 		return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y);
 	}
-	static CollisionResult getCollisionResult(const RectTransform& a, const RectTransform& b) {
+	static CollisionResult complexAABBcollision(const RectTransform& a, const RectTransform& b) {
 		CollisionResult result;
 
 		SDL_FPoint aCenter = { a.rect.x + a.halfWidth, a.rect.y + a.halfHeight };

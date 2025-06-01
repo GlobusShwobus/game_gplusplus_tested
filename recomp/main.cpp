@@ -159,7 +159,7 @@ int main() {
 
         //COLLISION
 
-        CollisionResult pCol = Collision::getCollisionResult(player->transform, floor);
+        CollisionResult pCol = Collision::complexAABBcollision(player->transform, floor);
         if (pCol.isColliding) {
             Collision::resolveOverlap(player->transform.rect, pCol.overlap, pCol.normal);
         }
