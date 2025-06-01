@@ -109,23 +109,16 @@ public:
 	EntityAction getAction()const;
 };
 
-class RectTransform {
+struct RectTransform {
+
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
+	float halfWidth = 0;
+	float halfHeight = 0;
 
-public:
 	RectTransform() = default;
-	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
+	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
 
-	const SDL_FRect& getRectRead()const {
-		return rect;
-	}
-	SDL_FRect& getRectFree() {
-		return rect;
-	}
-	const SDL_FPoint& getVelocity()const {
-		return velocity;
-	}
 	void setVelocity(const SDL_FPoint& someVel) {
 		velocity = someVel;
 	}
@@ -133,6 +126,11 @@ public:
 		rect.x += velocity.x;
 		rect.y += velocity.y;
 	}
+};
+struct CollisionResult {
+	bool isColliding = false;
+	SDL_FPoint normal{ 0,0 };
+	SDL_FRect overlap{ 0,0,0,0 };
 };
 
 struct Collision {
@@ -145,7 +143,38 @@ struct Collision {
 	static bool intersects(const SDL_FRect& a, const SDL_FRect& b) {
 		return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y);
 	}
+	static CollisionResult getCollisionResult(const RectTransform& a, const RectTransform& b) {
+		CollisionResult result;
 
+		SDL_FPoint aCenter = { a.rect.x + a.halfWidth, a.rect.y + a.halfHeight };
+		SDL_FPoint bCenter = { b.rect.x + b.halfWidth, b.rect.y + b.halfHeight };
+
+		float dx = bCenter.x - aCenter.x;
+		float dy = bCenter.y - aCenter.y;
+		float minDistX = a.halfWidth + b.halfWidth;
+		float minDistY = a.halfHeight + b.halfHeight;
+
+		if (abs(dx) > minDistX || abs(dy) > minDistY) {
+			return result;
+		}
+
+		float overLapX = minDistX - abs(dx);
+		float overLapY = minDistY - abs(dy);
+
+
+		if (overLapX < overLapY) {
+			result.normal = (dx < 0) ? SDL_FPoint{ 1.0f,0.f } : SDL_FPoint{ -1.0f,0.f };
+			result.overlap = { (dx < 0) ? a.rect.x + a.rect.w - b.rect.x : b.rect.x + b.rect.w - a.rect.x,
+				0, overLapX, 0 };
+		}
+		else {
+			result.normal = (dy < 0) ? SDL_FPoint{ 0.f,1.0f } : SDL_FPoint{ 0.f,-1.0f };
+			result.overlap = { 0, (dy < 0) ? a.rect.y + a.rect.h - b.rect.y : b.rect.y + b.rect.h - a.rect.y,
+			0.f,overLapY };
+		}
+		result.isColliding = true;
+		return result;
+	}
 	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
 		if (inner.x < outer.x) {
 			inner.x = outer.x;
@@ -197,7 +226,7 @@ public:
 	}
 
 	void applyCollisionBoxToRenderBox() {
-		textureDest = transform.getRectRead();
+		textureDest = transform.rect;
 	}
 	void applySourceBoxToRenderBox() {
 		animControlls.applySourceFromFrame(textureSrc);
