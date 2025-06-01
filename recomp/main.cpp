@@ -138,11 +138,9 @@ int main() {
         }
         MyUtils::WASD_state(player->state);
 
-        //MOVEMENT
+        //VELOCITY LOGIC
         SDL_FPoint newPlayerVel = MyUtils::calculatePlayerVelocity(player->state, 5);
         player->transform.setVelocity(newPlayerVel);
-        player->transform.moveOnVector();
-        Collision::clampInOf(worldBB, player->transform.rect);
         //#################################################################################
 
         //CAMERA
@@ -160,9 +158,11 @@ int main() {
         //COLLISION
         CollisionSweptResult pCol;
         if (Collision::dynamicSweptAABBcollision(player->transform.rect, player->transform.velocity, floor.rect, pCol)) {//
-
+            Collision::clampNextTo(player->transform.rect, player->transform.velocity, pCol.tHitNear, pCol.normal);
+            player->transform.setVelocity({ 0,0 });
         }
-
+        player->transform.moveOnVector();//MOVEMENT HAS TO COME AFTER COLLISION DETECTION
+        Collision::clampInOf(worldBB, player->transform.rect);
         //###############################################################################
 
         player->applySourceBoxToRenderBox();

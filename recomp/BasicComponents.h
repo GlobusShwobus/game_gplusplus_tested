@@ -173,6 +173,37 @@ struct Collision {
 
 		return true;
 	}
+	static bool dynamicSweptAABBcollision(const SDL_FRect& moving, const SDL_FPoint& velocity, const SDL_FRect& target, CollisionSweptResult& result) {
+		if (velocity.x == 0 && velocity.y == 0)
+			return false;
+
+		SDL_FRect expandedTarget = {
+			target.x - moving.w / 2.0f,
+			target.y - moving.h / 2.0f,
+			target.w + moving.w,
+			target.h + moving.h
+		};
+
+		SDL_FPoint movingCenter = {
+			moving.x + moving.w / 2.0f,
+			moving.y + moving.h / 2.0f
+		};
+
+		SDL_FRect originAsPoint = { movingCenter.x, movingCenter.y, 0, 0 };
+
+		if (sweptAABBcollision(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f) {
+			return true;
+		}
+		return false;
+	}
+	static void clampNextTo(SDL_FRect& origin, const SDL_FPoint& velocity, float tHitNear, const SDL_FPoint& normal) {
+		origin.x += velocity.x * tHitNear;
+		origin.y += velocity.y * tHitNear;
+
+		const float epsilon = 0.001f;//a small buffer zone or else it's fucky
+		origin.x += normal.x * epsilon;
+		origin.y += normal.y * epsilon;
+	}
 	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
 		if (inner.x < outer.x) {
 			inner.x = outer.x;
