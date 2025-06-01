@@ -158,12 +158,12 @@ int main() {
         //#################################################################################
 
         //COLLISION
+        CollisionSweptResult pCol;
+        if (Collision::dynamicSweptAABBcollision(player->transform.rect, player->transform.velocity, floor.rect, pCol)) {//
 
-        CollisionResult pCol = Collision::complexAABBcollision(player->transform, floor);
-        if (pCol.isColliding) {
-            Collision::resolveOverlap(player->transform.rect, pCol.overlap, pCol.normal);
         }
-        //#################################################################################
+
+        //###############################################################################
 
         player->applySourceBoxToRenderBox();
         player->applyCollisionBoxToRenderBox();

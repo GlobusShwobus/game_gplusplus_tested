@@ -113,11 +113,9 @@ struct RectTransform {
 
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
-	float halfWidth = 0;
-	float halfHeight = 0;
 
 	RectTransform() = default;
-	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
+	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
 
 	void setVelocity(const SDL_FPoint& someVel) {
 		velocity = someVel;
@@ -127,12 +125,12 @@ struct RectTransform {
 		rect.y += velocity.y;
 	}
 };
-struct CollisionResult {
-	bool isColliding = false;
-	SDL_FPoint normal{ 0,0 };
-	SDL_FRect overlap{ 0,0,0,0 };
-};
 
+struct CollisionSweptResult {
+	SDL_FPoint contactPoint{ 0.f,0.f };
+	SDL_FPoint normal{ 0.f,0.f };
+	float tHitNear = 0.f;
+};
 struct Collision {
 	static bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point) {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -143,41 +141,37 @@ struct Collision {
 	static bool basicAABBcollision(const SDL_FRect& a, const SDL_FRect& b) {
 		return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y);
 	}
-	static CollisionResult complexAABBcollision(const RectTransform& a, const RectTransform& b) {
-		CollisionResult result;
 
-		SDL_FPoint aCenter = { a.rect.x + a.halfWidth, a.rect.y + a.halfHeight };
-		SDL_FPoint bCenter = { b.rect.x + b.halfWidth, b.rect.y + b.halfHeight };
+	static bool sweptAABBcollision(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
+		SDL_FPoint tEntry{ (target.x - originPos.x) / originVel.x,(target.y - originPos.y) / originVel.y };
+		SDL_FPoint tExit{ (target.x + target.w - originPos.x) / originVel.x, (target.y + target.h - originPos.y) / originVel.y };
 
-		float dx = bCenter.x - aCenter.x;
-		float dy = bCenter.y - aCenter.y;
-		float minDistX = a.halfWidth + b.halfWidth;
-		float minDistY = a.halfHeight + b.halfHeight;
+		if (tEntry.x > tExit.x) std::swap(tEntry.x, tExit.x);
+		if (tEntry.y > tExit.y) std::swap(tEntry.y, tExit.y);
 
-		if (abs(dx) > minDistX || abs(dy) > minDistY) {
-			return result;
+		if (tEntry.x > tExit.y || tEntry.y > tExit.x) return false;//didn't quite understand this one
+
+		result.tHitNear = std::max(tEntry.x, tEntry.y);//something something going backwards
+		float tHitFar = std::min(tExit.x, tExit.y);
+
+		if (tHitFar < 0) return false; //means ray is going opposite way
+
+		result.contactPoint = { originPos.x + result.tHitNear * originVel.x, originPos.y + result.tHitNear * originVel.y };//really need to make some SDL shorthands as i can't use my own vec2.h
+
+		if (tEntry.x > tEntry.y) {
+			if (originVel.x < 0)
+				result.normal = { 1,0 };
+			else
+				result.normal = { -1,0 };
+		}
+		else if(tEntry.x < tEntry.y) {
+			if (originVel.y < 0)
+				result.normal = { 0,1 };
+			else
+				result.normal = { 0,-1 };
 		}
 
-		float overLapX = minDistX - abs(dx);
-		float overLapY = minDistY - abs(dy);
-
-
-		if (overLapX < overLapY) {
-			result.normal = (dx < 0) ? SDL_FPoint{ 1.0f,0.f } : SDL_FPoint{ -1.0f,0.f };
-			result.overlap = { (dx < 0) ? a.rect.x + a.rect.w - b.rect.x : b.rect.x + b.rect.w - a.rect.x,
-				0, overLapX, 0 };
-		}
-		else {
-			result.normal = (dy < 0) ? SDL_FPoint{ 0.f,1.0f } : SDL_FPoint{ 0.f,-1.0f };
-			result.overlap = { 0, (dy < 0) ? a.rect.y + a.rect.h - b.rect.y : b.rect.y + b.rect.h - a.rect.y,
-			0.f,overLapY };
-		}
-		result.isColliding = true;
-		return result;
-	}
-	static void resolveOverlap(SDL_FRect& overlapper, const SDL_FRect& overlapData, const SDL_FPoint& normal) {
-		overlapper.x += normal.x * overlapData.w;
-		overlapper.y += normal.y * overlapData.h;
+		return true;
 	}
 	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
 		if (inner.x < outer.x) {
