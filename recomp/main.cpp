@@ -115,8 +115,14 @@ int main() {
         return -1;
     }
 
+    //TESTCODE
     SDL_FRect worldBB{ 0,0,2560,1440 };
     
+    SDL_FRect floor{ 0,200,500,32 };
+    SDL_Texture* worldmeme = IMG_LoadTexture(window.getRenderer(), "../Textures/worldmap.png");
+    SDL_FRect worldmemeS = { 0,0,2560,1440 };
+    SDL_FRect worldmemeD = { 0,0,2560,1440 };
+    //###################################################################
     bool gameRunning = true;
     SDL_Event event;
 
@@ -153,8 +159,14 @@ int main() {
         player->applySourceBoxToRenderBox();
         player->applyCollisionBoxToRenderBox();
 
-        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
+        //TESSTCODE
+        window.drawTexture(worldmeme, &worldmemeS, &worldmemeD);
+        SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+        SDL_RenderFillRect(window.getRenderer(), &floor);
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+        //#######################
 
+        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
         //MAIN LOGIC ENDING
         player->state.flushEvents();
@@ -181,7 +193,7 @@ int main() {
         //#################################################################################
     }
 
-
+    SDL_DestroyTexture(worldmeme);
     SDL_Quit();
 
     //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER

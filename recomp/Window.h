@@ -34,7 +34,7 @@ class Window {
 		Camera() = default;
 		Camera(int width, int height) :rect{ 0,0,(float)width, (float)height }, halfWidth(width / 2), halfHeight(height / 2) {}
 
-		void destToCameraSpace(SDL_FRect* const entity)const;
+		SDL_FRect cameraSpaceDest(const SDL_FRect* const dest)const;
 	};
 	Camera camera;
 

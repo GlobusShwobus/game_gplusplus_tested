@@ -41,12 +41,11 @@ SDL_Renderer* Window::getRenderer() {
 	return renderer;
 }
 void Window::drawTexture(SDL_Texture* texture, SDL_FRect* src, SDL_FRect* dest)const {
-	camera.destToCameraSpace(dest);
-	SDL_RenderTexture(renderer, texture, src, dest);
+	SDL_FRect adjustedDest = camera.cameraSpaceDest(dest);
+	SDL_RenderTexture(renderer, texture, src, &adjustedDest);
 }
-void Window::Camera::destToCameraSpace(SDL_FRect* const entity)const {
-	entity->x -= rect.x;
-	entity->y -= rect.y;
+SDL_FRect Window::Camera::cameraSpaceDest(const SDL_FRect* const dest)const {
+	return{ dest->x - rect.x, dest->y - rect.y, dest->w, dest->h };
 };
 void Window::FrameLimiter::beginFrame() {
 	frameStart = SDL_GetTicks();
