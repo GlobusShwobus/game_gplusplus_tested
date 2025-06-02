@@ -145,7 +145,7 @@ int main() {
 
         //CAMERA
         //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        window.updateCamera(player->transform.rect, worldBB);
+        window.updateCamera(player->transform.getRect(), worldBB);
         //#################################################################################
 
         //ANIMATION
@@ -157,12 +157,12 @@ int main() {
 
         //COLLISION
         CollisionSweptResult pCol;
-        if (Collision::dynamicSweptAABBcollision(player->transform.rect, player->transform.velocity, floor.rect, pCol)) {//
-            Collision::clampNextTo(player->transform.rect, player->transform.velocity, pCol.tHitNear, pCol.normal);
-            player->transform.setVelocity({ 0,0 });
+        if (player->transform.sweptAABB_adjusted(floor.getRect(), pCol)) {
+            player->transform.clampOnCollision(pCol);
         }
-        player->transform.moveOnVector();//MOVEMENT HAS TO COME AFTER COLLISION DETECTION
-        Collision::clampInOf(worldBB, player->transform.rect);
+        else {
+            player->transform.updatePosUnrestricted();
+        }
         //###############################################################################
 
         player->applySourceBoxToRenderBox();
@@ -171,7 +171,7 @@ int main() {
         //TESSTCODE
         window.drawTexture(worldmeme, &worldmemeS, &worldmemeD);
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        SDL_RenderFillRect(window.getRenderer(), &floor.rect);
+        SDL_RenderFillRect(window.getRenderer(), &floor.getRect());
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 

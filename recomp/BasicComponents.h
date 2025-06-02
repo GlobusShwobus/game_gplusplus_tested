@@ -109,40 +109,20 @@ public:
 	EntityAction getAction()const;
 };
 
-struct RectTransform {
-
-	SDL_FRect rect{ 0,0,0,0 };
-	SDL_FPoint velocity{ 0,0 };
-
-	RectTransform() = default;
-	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
-
-	void setVelocity(const SDL_FPoint& someVel) {
-		velocity = someVel;
-	}
-	void moveOnVector() {
-		rect.x += velocity.x;
-		rect.y += velocity.y;
-	}
-};
 
 struct CollisionSweptResult {
 	SDL_FPoint contactPoint{ 0.f,0.f };
 	SDL_FPoint normal{ 0.f,0.f };
 	float tHitNear = 0.f;
 };
-struct Collision {
-	static bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point) {
-		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
-	}
-	static bool containsRect(const SDL_FRect& outer, const SDL_FRect& inner) {
-		return (inner.x >= outer.x && inner.y >= outer.y && inner.x + inner.w <= outer.x + outer.w && inner.y + inner.h <= outer.y + outer.h);
-	}
-	static bool basicAABBcollision(const SDL_FRect& a, const SDL_FRect& b) {
-		return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y);
-	}
+class RectTransform {
 
-	static bool sweptAABBcollision(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
+	SDL_FRect rect{ 0,0,0,0 };
+	SDL_FPoint velocity{ 0,0 };
+	float halfWidth = 0.f;
+	float halfHeight = 0.f;
+
+	bool sweptAABB_unadjusted(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
 		SDL_FPoint tEntry{ (target.x - originPos.x) / originVel.x,(target.y - originPos.y) / originVel.y };
 		SDL_FPoint tExit{ (target.x + target.w - originPos.x) / originVel.x, (target.y + target.h - originPos.y) / originVel.y };
 
@@ -164,7 +144,7 @@ struct Collision {
 			else
 				result.normal = { -1,0 };
 		}
-		else if(tEntry.x < tEntry.y) {
+		else if (tEntry.x < tEntry.y) {
 			if (originVel.y < 0)
 				result.normal = { 0,1 };
 			else
@@ -173,36 +153,64 @@ struct Collision {
 
 		return true;
 	}
-	static bool dynamicSweptAABBcollision(const SDL_FRect& moving, const SDL_FPoint& velocity, const SDL_FRect& target, CollisionSweptResult& result) {
+public:
+	RectTransform() = default;
+	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
+	const SDL_FRect& getRect()const {
+		return rect;
+	}
+	void setVelocity(const SDL_FPoint& someVel) {
+		velocity = someVel;
+	}
+	void updatePosUnrestricted() {
+		rect.x += velocity.x;
+		rect.y += velocity.y;
+	}
+	bool containsPoint(const SDL_FPoint& point)const {
+		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
+	}
+	bool containsRect(const SDL_FRect& inner)const {
+		return (inner.x >= rect.x && inner.y >= rect.y && inner.x + inner.w <= rect.x + rect.w && inner.y + inner.h <= rect.y + rect.h);
+	}
+	bool basicAABBcollision(const SDL_FRect& another)const {
+		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
+	}
+	bool sweptAABB_adjusted(const SDL_FRect& target, CollisionSweptResult& result) {
 		if (velocity.x == 0 && velocity.y == 0)
 			return false;
 
 		SDL_FRect expandedTarget = {
-			target.x - moving.w / 2.0f,
-			target.y - moving.h / 2.0f,
-			target.w + moving.w,
-			target.h + moving.h
+			target.x - halfWidth,
+			target.y - halfHeight,
+			target.w + rect.w,
+			target.h + rect.h
 		};
 
-		SDL_FPoint movingCenter = {
-			moving.x + moving.w / 2.0f,
-			moving.y + moving.h / 2.0f
-		};
+		SDL_FRect originAsPoint = { rect.x + halfWidth, rect.y + halfHeight, 0, 0 };
 
-		SDL_FRect originAsPoint = { movingCenter.x, movingCenter.y, 0, 0 };
-
-		if (sweptAABBcollision(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f) {
-			return true;
-		}
-		return false;
+		return sweptAABB_unadjusted(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f;
 	}
-	static void clampNextTo(SDL_FRect& origin, const SDL_FPoint& velocity, float tHitNear, const SDL_FPoint& normal) {
-		origin.x += velocity.x * tHitNear;
-		origin.y += velocity.y * tHitNear;
+	void clampOnCollision(const CollisionSweptResult& colData) {
+		rect.x += velocity.x * colData.tHitNear;
+		rect.y += velocity.y * colData.tHitNear;
 
-		const float epsilon = 0.001f;//a small buffer zone or else it's fucky
-		origin.x += normal.x * epsilon;
-		origin.y += normal.y * epsilon;
+		static const float epsilon = 0.001f;//a small buffer zone or else it's fucky
+		rect.x += colData.normal.x * epsilon;
+		rect.y += colData.normal.y * epsilon;
+	}
+	void clampInOf(const SDL_FRect& outer) {
+		if (rect.x < outer.x) {
+			rect.x = outer.x;
+		}
+		if (rect.y < outer.y) {
+			rect.y = outer.y;
+		}
+		if (rect.x + rect.w > outer.w) {
+			rect.x = outer.w - rect.w;
+		}
+		if (rect.y + rect.h > outer.h) {
+			rect.y = outer.h - rect.h;
+		}
 	}
 	static void clampInOf(const SDL_FRect& outer, SDL_FRect& inner) {
 		if (inner.x < outer.x) {
@@ -255,7 +263,7 @@ public:
 	}
 
 	void applyCollisionBoxToRenderBox() {
-		textureDest = transform.rect;
+		textureDest = transform.getRect();
 	}
 	void applySourceBoxToRenderBox() {
 		animControlls.applySourceFromFrame(textureSrc);
