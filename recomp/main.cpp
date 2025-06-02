@@ -161,14 +161,24 @@ int main() {
         //#################################################################################
 
         //COLLISION
+        CollisionSweptResult eCol;
+        bool foundCollision = false;
+        float earliestTime = 1.0f;
+
         for (auto& eachRect : rects) {
             CollisionSweptResult pCol;
             if (player->transform.sweptAABB_adjusted(eachRect, pCol)) {
-                player->state.setEvent(collsion_immovable);
-                player->transform.clampOnCollision(pCol);
+                if (pCol.tHitNear < earliestTime) {
+                    earliestTime = pCol.tHitNear;
+                    eCol = pCol;
+                    foundCollision = true;
+                }
             }
         }
-        if (!player->state.containsEvent(collsion_immovable)) {
+        if (foundCollision) {
+            player->transform.clampOnCollision(eCol);
+        }
+        else {
             player->transform.updatePosUnrestricted();
         }
         //###############################################################################
