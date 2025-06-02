@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <random>
+#include <array>
 
 //cool new stuff
 
@@ -117,13 +118,12 @@ struct CollisionSweptResult {
 	float tHitNear = 0.f;
 };
 class RectTransform {
-
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
-	float halfWidth = 0.f;
-	float halfHeight = 0.f;
 
-	bool sweptAABB_unadjusted(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
+	//std::array<const SDL_FRect*, 4> contact;
+
+	bool sweptAABB_core(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
 		SDL_FPoint tEntry{ (target.x - originPos.x) / originVel.x,(target.y - originPos.y) / originVel.y };
 		SDL_FPoint tExit{ (target.x + target.w - originPos.x) / originVel.x, (target.y + target.h - originPos.y) / originVel.y };
 
@@ -155,17 +155,26 @@ class RectTransform {
 		return true;
 	}
 public:
+
+	std::array<const SDL_FRect*, 4> contact{ nullptr,nullptr,nullptr,nullptr };
+
 	RectTransform() = default;
-	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
+	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
+
 	const SDL_FRect& getRect()const {
 		return rect;
 	}
 	void setVelocity(const SDL_FPoint& someVel) {
 		velocity = someVel;
 	}
-	void updatePosUnrestricted() {
+	void updatePos() {
 		rect.x += velocity.x;
 		rect.y += velocity.y;
+
+		contact[0] = nullptr;
+		contact[1] = nullptr;
+		contact[2] = nullptr;
+		contact[3] = nullptr;
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -176,28 +185,37 @@ public:
 	bool basicAABBcollision(const SDL_FRect& another)const {
 		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
 	}
-	bool sweptAABB_adjusted(const SDL_FRect& target, CollisionSweptResult& result) {
+	bool sweptAABB_unresolved(const SDL_FRect& target, CollisionSweptResult& result) {
 		if (velocity.x == 0 && velocity.y == 0)
 			return false;
 
 		SDL_FRect expandedTarget = {
-			target.x - halfWidth,
-			target.y - halfHeight,
+			target.x - rect.w / 2,
+			target.y - rect.h / 2,
 			target.w + rect.w,
 			target.h + rect.h
 		};
 
-		SDL_FRect originAsPoint = { rect.x + halfWidth, rect.y + halfHeight, 0, 0 };
+		SDL_FRect originAsPoint = { rect.x + rect.w / 2, rect.y + rect.h / 2, 0, 0 };
 
-		return sweptAABB_unadjusted(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f;
+		return sweptAABB_core(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f;
 	}
-	void clampOnCollision(const CollisionSweptResult& colData) {
-		rect.x += velocity.x * colData.tHitNear;
-		rect.y += velocity.y * colData.tHitNear;
+	bool sweptAABB_resolved(const SDL_FRect& target) {
 
-		static const float epsilon = 0.001f;//a small buffer zone or else it's fucky
-		rect.x += colData.normal.x * epsilon;
-		rect.y += colData.normal.y * epsilon;
+		CollisionSweptResult colD;
+		if (sweptAABB_unresolved(target, colD))
+		{
+			if (colD.normal.y > 0) contact[0] = &target; else contact[0] = nullptr;
+			if (colD.normal.x < 0) contact[1] = &target; else contact[1] = nullptr;
+			if (colD.normal.y < 0) contact[2] = &target; else contact[2] = nullptr;
+			if (colD.normal.x > 0) contact[3] = &target; else contact[3] = nullptr;
+
+			velocity.x += colD.normal.x * std::abs(velocity.x) * (1 - colD.tHitNear);
+			velocity.y += colD.normal.y * std::abs(velocity.y) * (1 - colD.tHitNear);
+			return true;
+		}
+
+		return false;
 	}
 	void clampInOf(const SDL_FRect& outer) {
 		if (rect.x < outer.x) {

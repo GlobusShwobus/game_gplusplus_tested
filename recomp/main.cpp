@@ -1,7 +1,5 @@
 #include "EntityFactory.h"
 #include "Window.h"
-#include "Grid.h"
-
 
 #include "MyUtils.h"
 
@@ -94,18 +92,6 @@ int main() {
         return -1;
     }
 
-    //###################################################
-    // 
-    // Grid to become scene, which holds the map and any entities associated with it.
-    // 
-    // 
-    // Sprite worldMap = textureManager.createSprite(SpriteID::world_map);
-     Grid grid = Grid(2560, 1440);
-    // 
-    // 
-    //#####################################################################
-
-
     //player
     //WRAP THIS SHIT UP
     PlayerID id = HASH("player_version1");
@@ -149,7 +135,6 @@ int main() {
         //#################################################################################
 
         //CAMERA
-        //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
         window.updateCamera(player->transform.getRect(), worldBB);
         //#################################################################################
 
@@ -160,32 +145,6 @@ int main() {
         player->animControlls.moveFrame();
         //#################################################################################
 
-        //COLLISION
-        CollisionSweptResult eCol;
-        bool foundCollision = false;
-        float earliestTime = 1.0f;
-
-        for (auto& eachRect : rects) {
-            CollisionSweptResult pCol;
-            if (player->transform.sweptAABB_adjusted(eachRect, pCol)) {
-                if (pCol.tHitNear < earliestTime) {
-                    earliestTime = pCol.tHitNear;
-                    eCol = pCol;
-                    foundCollision = true;
-                }
-            }
-        }
-        if (foundCollision) {
-            player->transform.clampOnCollision(eCol);
-        }
-        else {
-            player->transform.updatePosUnrestricted();
-        }
-        //###############################################################################
-
-        player->applySourceBoxToRenderBox();
-        player->applyCollisionBoxToRenderBox();
-
         //TESSTCODE
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
         for (auto& eachrect : rects) {
@@ -193,10 +152,40 @@ int main() {
         }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
+      
+        //COLLISION
+        std::vector<std::pair<int, float>>z;
+        for (int i = 0; i < rects.size(); i++) {
+            CollisionSweptResult col;
+            if (player->transform.sweptAABB_unresolved(rects[i], col)) {
+                z.push_back({ i, col.tHitNear });
+            }
+        }
+        std::sort(z.begin(), z.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+            return a.second < b.second;
+            });
+
+        for (auto& j: z) {
+            player->transform.sweptAABB_resolved(rects[j.first]);
+        }
+        for (int i = 0; i < 4; i++) {
+            if (player->transform.contact[i]) {
+                SDL_SetRenderDrawColor(window.getRenderer(), 0, 255, 0, 255);
+                window.drawBasicRect(player->transform.contact[i]);
+            }
+        }
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+        player->transform.updatePos();
+        //###############################################################################
+
+
+
+        //MAIN LOGIC ENDING
+        player->applySourceBoxToRenderBox();
+        player->applyCollisionBoxToRenderBox();
 
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
-        //MAIN LOGIC ENDING
         player->state.flushEvents();
         window.updateEnd();
         ////#################################################################################
