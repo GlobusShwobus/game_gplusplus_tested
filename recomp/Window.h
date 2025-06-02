@@ -46,6 +46,10 @@ public:
 	void updateEnd();
 
 	void drawTexture(SDL_Texture* texture, SDL_FRect* src, SDL_FRect* dest)const;
+	void drawBasicRect(const SDL_FRect* rect) {
+		SDL_FRect adjustedDest = camera.cameraSpaceDest(rect);
+		SDL_RenderFillRect(renderer, &adjustedDest);
+	}
 
 	SDL_Renderer* getRenderer();
 	bool shouldDelay()const;

@@ -3,6 +3,7 @@
 #include "SDL3/SDL.h"
 #include <map>
 #include <vector>
+#include <random>
 
 //cool new stuff
 
@@ -225,6 +226,18 @@ public:
 		if (inner.y + inner.h > outer.h) {
 			inner.y = outer.h - inner.h;
 		}
+	}
+};
+
+class RandomNumberGenerator {
+	std::random_device rd;
+	std::unique_ptr<std::mt19937> rng;
+
+public:
+	RandomNumberGenerator(): rng(std::make_unique<std::mt19937>(rd())) {}
+
+	int getRand(int min, int max) {
+		return std::uniform_int_distribution<int>(min, max)(*rng);
 	}
 };
 

@@ -117,12 +117,17 @@ int main() {
 
     //TESTCODE
     SDL_FRect worldBB{ 0,0,2560,1440 };
-    
-    RectTransform floor(0, 200, 500, 32);
+    RandomNumberGenerator rnggen;
+    std::vector<SDL_FRect> rects;
+    for (int i = 0; i < 1000; i++) {
+        SDL_FRect rect;
+        rect.x = rnggen.getRand(0, 2560);
+        rect.y = rnggen.getRand(0, 1440);
+        rect.w = rnggen.getRand(5, 16);
+        rect.h = rnggen.getRand(5, 16);
 
-    SDL_Texture* worldmeme = IMG_LoadTexture(window.getRenderer(), "../Textures/worldmap.png");
-    SDL_FRect worldmemeS = { 0,0,2560,1440 };
-    SDL_FRect worldmemeD = { 0,0,2560,1440 };
+        rects.push_back(rect);
+    }
     //###################################################################
     bool gameRunning = true;
     SDL_Event event;
@@ -156,11 +161,14 @@ int main() {
         //#################################################################################
 
         //COLLISION
-        CollisionSweptResult pCol;
-        if (player->transform.sweptAABB_adjusted(floor.getRect(), pCol)) {
-            player->transform.clampOnCollision(pCol);
+        for (auto& eachRect : rects) {
+            CollisionSweptResult pCol;
+            if (player->transform.sweptAABB_adjusted(eachRect, pCol)) {
+                player->state.setEvent(collsion_immovable);
+                player->transform.clampOnCollision(pCol);
+            }
         }
-        else {
+        if (!player->state.containsEvent(collsion_immovable)) {
             player->transform.updatePosUnrestricted();
         }
         //###############################################################################
@@ -169,9 +177,10 @@ int main() {
         player->applyCollisionBoxToRenderBox();
 
         //TESSTCODE
-        window.drawTexture(worldmeme, &worldmemeS, &worldmemeD);
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        SDL_RenderFillRect(window.getRenderer(), &floor.getRect());
+        for (auto& eachrect : rects) {
+            window.drawBasicRect(&eachrect);
+        }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 
@@ -201,8 +210,6 @@ int main() {
         }
         //#################################################################################
     }
-
-    SDL_DestroyTexture(worldmeme);
     SDL_Quit();
 
     //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
