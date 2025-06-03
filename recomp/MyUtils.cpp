@@ -22,16 +22,16 @@ namespace MyUtils {
 		if (w || a || s || d) {
 			state.changeAction(EntityAction::moving);
 			if (w) {
-				state.changeDirection(EntityDirection::up);
+				state.changeDirection(Direction::up);
 			}
 			else if (a) {
-				state.changeDirection(EntityDirection::left);
+				state.changeDirection(Direction::left);
 			}
 			else if (s) {
-				state.changeDirection(EntityDirection::down);
+				state.changeDirection(Direction::down);
 			}
 			else if (d) {
-				state.changeDirection(EntityDirection::right);
+				state.changeDirection(Direction::right);
 			}
 
 		}
@@ -51,23 +51,23 @@ namespace MyUtils {
 
 		return json;
 	}
-	AnimID getReelOnState(EntityAction action, EntityDirection direction) {
+	AnimID getReelOnState(EntityAction action, Direction direction) {
 		AnimID id = 0;
 
 		if (action == EntityAction::moving) {
 			switch (direction) {
-			case EntityDirection::up:	 id = AnimID_WALK_UP; break;
-			case EntityDirection::down:  id = AnimID_WALK_DOWN; break;
-			case EntityDirection::left:  id = AnimID_WALK_LEFT; break;
-			case EntityDirection::right: id = AnimID_WALK_RIGHT; break;
+			case Direction::up:	 id = AnimID_WALK_UP; break;
+			case Direction::down:  id = AnimID_WALK_DOWN; break;
+			case Direction::left:  id = AnimID_WALK_LEFT; break;
+			case Direction::right: id = AnimID_WALK_RIGHT; break;
 			}
 		}
 		else if (action == EntityAction::idle) {
 			switch (direction) {
-			case EntityDirection::up:	 id = AnimID_IDLE_UP; break;
-			case EntityDirection::down:  id = AnimID_IDLE_DOWN; break;
-			case EntityDirection::left:  id = AnimID_IDLE_LEFT; break;
-			case EntityDirection::right: id = AnimID_IDLE_RIGHT; break;
+			case Direction::up:	 id = AnimID_IDLE_UP; break;
+			case Direction::down:  id = AnimID_IDLE_DOWN; break;
+			case Direction::left:  id = AnimID_IDLE_LEFT; break;
+			case Direction::right: id = AnimID_IDLE_RIGHT; break;
 			}
 		}
 		return id;
@@ -79,10 +79,10 @@ namespace MyUtils {
 
 		if (state.getAction() == EntityAction::moving) {
 			switch (state.getDirection()) {
-			case EntityDirection::up:    vel.y -= speed; break;
-			case EntityDirection::down:  vel.y += speed; break;
-			case EntityDirection::left:  vel.x -= speed; break;
-			case EntityDirection::right: vel.x += speed; break;
+			case Direction::up:    vel.y -= speed; break;
+			case Direction::down:  vel.y += speed; break;
+			case Direction::left:  vel.x -= speed; break;
+			case Direction::right: vel.x += speed; break;
 			default://no change but other dirs should not exist (maybe diagonals later)
 				break;
 			}

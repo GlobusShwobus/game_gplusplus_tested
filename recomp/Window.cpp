@@ -73,6 +73,6 @@ void Window::updateCamera(const SDL_FRect& target, SDL_FRect clamp) {
 	camera.rect.x = (target.x + (target.w / 2)) - camera.halfWidth;
 	camera.rect.y = (target.y + (target.h / 2)) - camera.halfHeight;
 
-	RectTransform::clampInOf(clamp, camera.rect);
+	Transform::clampInOf(clamp, camera.rect);
 }
 

@@ -18,5 +18,5 @@ namespace MyUtils {
 	//eventually integrate fully into transform OR make more options with transform funcs that a script handles
 	SDL_FPoint calculatePlayerVelocity(const EntityState& state, const float speed);
 
-	AnimID getReelOnState(EntityAction action, EntityDirection direction);
+	AnimID getReelOnState(EntityAction action, Direction direction);
 }

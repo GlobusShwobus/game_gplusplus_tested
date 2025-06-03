@@ -149,8 +149,7 @@ int main() {
         //#################################################################################
 
         //CAMERA
-        //(camera must be applied AFTER the entity moves, otherwise the camera falls behind by a frame)
-        window.updateCamera(player->transform.getRect(), worldBB);
+        window.updateCamera(player->transform.rect, worldBB);
         //#################################################################################
 
         //ANIMATION
@@ -161,30 +160,26 @@ int main() {
         //#################################################################################
 
         //COLLISION
-        CollisionSweptResult eCol;
-        bool foundCollision = false;
-        float earliestTime = 1.0f;
-
-        for (auto& eachRect : rects) {
-            CollisionSweptResult pCol;
-            if (player->transform.sweptAABB_adjusted(eachRect, pCol)) {
-                if (pCol.tHitNear < earliestTime) {
-                    earliestTime = pCol.tHitNear;
-                    eCol = pCol;
-                    foundCollision = true;
-                }
+        std::vector<std::pair<int, float>> collisions;
+        RectRayProjection proj;
+        SDL_FPoint JUNK;
+        for (int i = 0; i < rects.size();i++) {
+            float contactTime = 0;
+            if (player->transform.projectionHitBoxAdjusted(rects[i], proj, JUNK, contactTime)) {
+                collisions.push_back({ i, contactTime });
             }
         }
-        if (foundCollision) {
-            player->transform.clampOnCollision(eCol);
+        std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+            return a.second < b.second;
+            });
+        for (auto& j : collisions) {
+            if (player->transform.projectionFirstResolution(rects[j.first], JUNK)) {
+                
+                //nothing, can but dont do anything with contact point and the array at which side is hit
+            }
         }
-        else {
-            player->transform.updatePosUnrestricted();
-        }
+        player->transform.updatePos();
         //###############################################################################
-
-        player->applySourceBoxToRenderBox();
-        player->applyCollisionBoxToRenderBox();
 
         //TESSTCODE
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
@@ -194,9 +189,11 @@ int main() {
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 
-        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
 
         //MAIN LOGIC ENDING
+        player->applySourceBoxToRenderBox();
+        player->applyCollisionBoxToRenderBox();
+        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
         player->state.flushEvents();
         window.updateEnd();
         ////#################################################################################

@@ -49,7 +49,7 @@ void EntityFactory::initEntityData(std::map<EntityGeneric, EntityData>& containe
 
 	if (entityData.contains("transform")) {
 		auto& transform = entityData["transform"];
-		entry.transform = RectTransform(transform["x"], transform["y"], transform["w"], transform["h"]);
+		entry.transform = Transform(transform["x"], transform["y"], transform["w"], transform["h"]);
 	}
 	if (entityData.contains("texturePath")) {
 		SDL_Texture* texture = IMG_LoadTexture(renderer, entityData["texturePath"].get<std::string>().c_str());

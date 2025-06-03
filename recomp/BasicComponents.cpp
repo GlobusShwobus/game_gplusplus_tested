@@ -11,7 +11,7 @@ void EntityState::changeAction(EntityAction action) {
 		this->action = action;
 	}
 }
-void EntityState::changeDirection(EntityDirection direction) {
+void EntityState::changeDirection(Direction direction) {
 	if (this->direction != direction) {
 		this->direction = direction;
 		eventFlags |= EntityEvents::directionChange;
@@ -29,7 +29,7 @@ int EntityState::getEvents()const {
 bool EntityState::containsEvent(EntityEvents event)const {
 	return eventFlags & event;
 }
-EntityDirection EntityState::getDirection()const {
+Direction EntityState::getDirection()const {
 	return direction;
 }
 EntityAction EntityState::getAction()const {

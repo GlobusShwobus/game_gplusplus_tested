@@ -4,7 +4,9 @@
 #include <map>
 #include <vector>
 #include <random>
+#include <array>
 
+#include <iostream>
 //cool new stuff
 
 typedef uint32_t HASH_ID_TYPE;
@@ -81,9 +83,11 @@ public:
 enum class EntityAction {
 	idle, moving, jumping, attacking, dashing
 };
-enum class EntityDirection {
-	left, right, up, down
+
+enum Direction {
+	left = 0, right = 1, up = 2, down = 3
 };
+
 enum EntityEvents {
 	directionChange = 1 << 0,
 	collsion_immovable = 1 << 1,
@@ -95,77 +99,49 @@ class EntityState {
 	bool isActive = false;
 	int eventFlags = 0;
 	EntityAction action;
-	EntityDirection direction;
+	Direction direction;
 public:
-	EntityState() :action(EntityAction::idle), direction(EntityDirection::down), isActive(true) {}
+	EntityState() :action(EntityAction::idle), direction(Direction::down), isActive(true) {}
 	void deactivate();
 	bool isActivated()const;
 	void changeAction(EntityAction action);
-	void changeDirection(EntityDirection direction);
+	void changeDirection(Direction direction);
 	void setEvent(const EntityEvents events);
 	void flushEvents();
 	int getEvents()const;
 	bool containsEvent(EntityEvents event)const;
-	EntityDirection getDirection()const;
+	Direction getDirection()const;
 	EntityAction getAction()const;
 };
 
+struct RectRayProjection {
+	SDL_FPoint entry{ 0,0 };
+	SDL_FPoint exit{ 0,0 };
 
-struct CollisionSweptResult {
-	SDL_FPoint contactPoint{ 0.f,0.f };
-	SDL_FPoint normal{ 0.f,0.f };
-	float tHitNear = 0.f;
+	void projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target) {
+		SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
+
+		entry = { (target.x - origin.x) * inverse.x,(target.y - origin.y) * inverse.y };
+		exit = { (target.x + target.w - origin.x) * inverse.x, (target.y + target.h - origin.y) * inverse.y };
+	}
 };
-class RectTransform {
-
+struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
-	float halfWidth = 0.f;
-	float halfHeight = 0.f;
 
-	bool sweptAABB_unadjusted(const SDL_FRect& originPos, const SDL_FPoint& originVel, const SDL_FRect& target, CollisionSweptResult& result) {
-		SDL_FPoint tEntry{ (target.x - originPos.x) / originVel.x,(target.y - originPos.y) / originVel.y };
-		SDL_FPoint tExit{ (target.x + target.w - originPos.x) / originVel.x, (target.y + target.h - originPos.y) / originVel.y };
+	std::array<bool, 4> collisionSide{ false,false,false,false };
 
-		if (tEntry.x > tExit.x) std::swap(tEntry.x, tExit.x);
-		if (tEntry.y > tExit.y) std::swap(tEntry.y, tExit.y);
+	Transform() = default;
+	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
 
-		if (tEntry.x > tExit.y || tEntry.y > tExit.x) return false;//didn't quite understand this one
-
-		result.tHitNear = std::max(tEntry.x, tEntry.y);//something something going backwards
-		float tHitFar = std::min(tExit.x, tExit.y);
-
-		if (tHitFar < 0) return false; //means ray is going opposite way
-
-		result.contactPoint = { originPos.x + result.tHitNear * originVel.x, originPos.y + result.tHitNear * originVel.y };//really need to make some SDL shorthands as i can't use my own vec2.h
-
-		if (tEntry.x > tEntry.y) {
-			if (originVel.x < 0)
-				result.normal = { 1,0 };
-			else
-				result.normal = { -1,0 };
-		}
-		else if (tEntry.x < tEntry.y) {
-			if (originVel.y < 0)
-				result.normal = { 0,1 };
-			else
-				result.normal = { 0,-1 };
-		}
-
-		return true;
-	}
-public:
-	RectTransform() = default;
-	RectTransform(float x, float y, float w, float h) :rect{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
-	const SDL_FRect& getRect()const {
-		return rect;
-	}
-	void setVelocity(const SDL_FPoint& someVel) {
-		velocity = someVel;
-	}
-	void updatePosUnrestricted() {
+	void updatePos() {
 		rect.x += velocity.x;
 		rect.y += velocity.y;
+		std::ranges::fill(collisionSide, false);
+	}
+	void setVelocity(const SDL_FPoint& someVel) {
+		velocity.x = someVel.x;
+		velocity.y = someVel.y;
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -176,29 +152,86 @@ public:
 	bool basicAABBcollision(const SDL_FRect& another)const {
 		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
 	}
-	bool sweptAABB_adjusted(const SDL_FRect& target, CollisionSweptResult& result) {
-		if (velocity.x == 0 && velocity.y == 0)
+
+	bool projectionHitDetect(RectRayProjection& proj, float& hitTimeEntry) {
+
+		if (std::isnan(proj.entry.x) || std::isnan(proj.entry.y) || std::isnan(proj.exit.x) || std::isnan(proj.exit.y))
 			return false;
 
-		SDL_FRect expandedTarget = {
-			target.x - halfWidth,
-			target.y - halfHeight,
+		if (proj.entry.x > proj.exit.x) std::swap(proj.entry.x, proj.exit.x);//sort if from otherside
+		if (proj.entry.y > proj.exit.y) std::swap(proj.entry.y, proj.exit.y);//sort if from otherside
+
+		if (proj.entry.x > proj.exit.y || proj.entry.y > proj.exit.x) return false;//if ray does not penetrate
+
+		hitTimeEntry = std::max(proj.entry.x, proj.entry.y);//closest hit time
+		float tHitFar = std::min(proj.exit.x, proj.exit.y);//furthest hit time
+
+		if (tHitFar < 0) return false; //if ray is pointing away
+
+		return true;
+	}
+	bool projectionHitBoxAdjusted(const SDL_FRect& target, RectRayProjection& projection, SDL_FPoint& contactPoint, float& hitTimeEntry) {
+		if (velocity.x == 0 && velocity.y == 0) return false;//no movement so nothing
+
+		SDL_FRect expandedTarget = { // need to expand the target to get a prediction 
+			target.x - rect.w * 0.5f,
+			target.y - rect.h * 0.5f,
 			target.w + rect.w,
 			target.h + rect.h
 		};
 
-		SDL_FRect originAsPoint = { rect.x + halfWidth, rect.y + halfHeight, 0, 0 };
+		SDL_FRect originAsPoint = { rect.x + rect.w * 0.5f, rect.y + rect.h * 0.5f, 0, 0 };// center point of the origin rect
 
-		return sweptAABB_unadjusted(originAsPoint, velocity, expandedTarget, result) && result.tHitNear <= 1.0f;
+		projection.projectRay(originAsPoint, velocity, expandedTarget);//applies values to entry and exit points
+		if (projectionHitDetect(projection, hitTimeEntry) && hitTimeEntry <= 1.0f) {
+			contactPoint = { originAsPoint.x + hitTimeEntry * velocity.x, originAsPoint.y + hitTimeEntry * velocity.y };//if we hit, aquire the contact point
+			return true;
+		}
+		return false;
 	}
-	void clampOnCollision(const CollisionSweptResult& colData) {
-		rect.x += velocity.x * colData.tHitNear;
-		rect.y += velocity.y * colData.tHitNear;
 
-		static const float epsilon = 0.001f;//a small buffer zone or else it's fucky
-		rect.x += colData.normal.x * epsilon;
-		rect.y += colData.normal.y * epsilon;
+	bool projectionFirstResolution(const SDL_FRect& target, SDL_FPoint& contactPoint){
+		RectRayProjection proj;
+		float contactTime = 0;
+		if (projectionHitBoxAdjusted(target, proj, contactPoint, contactTime)) {
+			
+			SDL_FPoint normal{ 0,0 };
+			if (proj.entry.x > proj.entry.y) {
+				if (velocity.x < 0) {
+					collisionSide[(int)right] = true;
+					normal = { 1,0 };
+				}
+				else {
+					collisionSide[(int)left] = true;
+					normal = { -1,0 };
+				}
+			}
+			else if (proj.entry.x < proj.entry.y) {
+				if (velocity.y < 0) {
+					collisionSide[(int)down] = true;
+					normal = { 0,1 };
+				}
+				else {
+					collisionSide[(int)up] = true;
+					normal = { 0,-1 };
+				}
+			}
+			velocity.x += normal.x * std::fabs(velocity.x) * (1 - contactTime);
+			velocity.y += normal.y * std::fabs(velocity.y) * (1 - contactTime);
+
+			std::cout << "\nContactTime: " << contactTime << "\n";
+			std::cout << "EntryX: " << proj.entry.x << " EntryY: " << proj.entry.y << "\n";
+			std::cout << "Normal: " << normal.x << ", " << normal.y << "\n";
+			std::cout << "Velocity: " << velocity.x << ", " << velocity.y << "\n";
+			std::cout << "PlayerPos: " << rect.x << ", " << rect.y << "\n";
+			std::cout << "Target: " << target.x << ", " << target.y << ", w=" << target.w << ", h=" << target.h << "\n";
+
+			return true;
+		}
+		return false;
 	}
+
+
 	void clampInOf(const SDL_FRect& outer) {
 		if (rect.x < outer.x) {
 			rect.x = outer.x;
@@ -228,7 +261,6 @@ public:
 		}
 	}
 };
-
 class RandomNumberGenerator {
 	std::random_device rd;
 	std::unique_ptr<std::mt19937> rng;
@@ -243,7 +275,7 @@ public:
 
 struct EntityData {
 	EntityGeneric id = 0;
-	RectTransform transform;
+	Transform transform;
 	float movement_speed = 0.f;
 	float health_points = 0.f;
 	float mass = 0.f;
@@ -260,7 +292,7 @@ public:
 	AnimationController animControlls;
 
 	EntityState state;
-	RectTransform transform;
+	Transform transform;
 
 
 	PlayerID id = 0;
@@ -276,7 +308,7 @@ public:
 	}
 
 	void applyCollisionBoxToRenderBox() {
-		textureDest = transform.getRect();
+		textureDest = transform.rect;
 	}
 	void applySourceBoxToRenderBox() {
 		animControlls.applySourceFromFrame(textureSrc);
@@ -290,7 +322,7 @@ public:
 	SDL_FRect textureDest{ 0,0,0,0 };
 
 	EntityState state;
-	RectTransform transform;
+	Transform transform;
 
 	EnemyID id = 0;
 	float health_points = 0.f;
