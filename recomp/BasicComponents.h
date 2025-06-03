@@ -119,8 +119,8 @@ struct RectRayProjection {
 	SDL_FPoint exit{ 0,0 };
 
 	void projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target) {
-		SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
 
+		SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
 		entry = { (target.x - origin.x) * inverse.x,(target.y - origin.y) * inverse.y };
 		exit = { (target.x + target.w - origin.x) * inverse.x, (target.y + target.h - origin.y) * inverse.y };
 	}
@@ -155,23 +155,22 @@ struct Transform {
 
 	bool projectionHitDetect(RectRayProjection& proj, float& hitTimeEntry) {
 
-		if (std::isnan(proj.entry.x) || std::isnan(proj.entry.y) || std::isnan(proj.exit.x) || std::isnan(proj.exit.y))
-			return false;
+		if (std::isnan(proj.entry.x) || std::isnan(proj.entry.y) || std::isnan(proj.exit.x) || std::isnan(proj.exit.y)) {return false;}
 
 		if (proj.entry.x > proj.exit.x) std::swap(proj.entry.x, proj.exit.x);//sort if from otherside
 		if (proj.entry.y > proj.exit.y) std::swap(proj.entry.y, proj.exit.y);//sort if from otherside
 
-		if (proj.entry.x > proj.exit.y || proj.entry.y > proj.exit.x) return false;//if ray does not penetrate
+		if (proj.entry.x > proj.exit.y || proj.entry.y > proj.exit.x) { return false; }//if ray does not penetrate
 
 		hitTimeEntry = std::max(proj.entry.x, proj.entry.y);//closest hit time
 		float tHitFar = std::min(proj.exit.x, proj.exit.y);//furthest hit time
 
-		if (tHitFar < 0) return false; //if ray is pointing away
+		if (tHitFar < 0 || hitTimeEntry < 0) { return false; } //if ray is pointing away
 
 		return true;
 	}
 	bool projectionHitBoxAdjusted(const SDL_FRect& target, RectRayProjection& projection, SDL_FPoint& contactPoint, float& hitTimeEntry) {
-		if (velocity.x == 0 && velocity.y == 0) return false;//no movement so nothing
+		if (velocity.x == 0 && velocity.y == 0) { return false; }//no movement so nothing
 
 		SDL_FRect expandedTarget = { // need to expand the target to get a prediction 
 			target.x - rect.w * 0.5f,
