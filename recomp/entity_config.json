@@ -17,57 +17,73 @@
     "animations": {
       "walk_up": {
         "clip_id": "walk_up",
-        "beginX": 0,
-        "beginY": 0,
-        "frame_count": 8,
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32,
+        "frameCount": 8,
         "loops": true
       },
       "walk_down": {
         "clip_id": "walk_down",
-        "beginX": 0,
-        "beginY": 32,
+        "x": 0,
+        "y": 32,
+        "w": 32,
+        "h": 32,
         "frameCount": 8,
         "loops": true
       },
       "walk_left": {
         "clip_id": "walk_left",
-        "beginX": 0,
-        "beginY": 64,
+        "x": 0,
+        "y": 64,
+        "w": 32,
+        "h": 32,
         "frameCount": 8,
         "loops": true
       },
       "walk_right": {
         "clip_id": "walk_right",
-        "beginX": 0,
-        "beginY": 96,
+        "x": 0,
+        "y": 96,
+        "w": 32,
+        "h": 32,
         "frameCount": 8,
         "loops": true
       },
       "idle_up": {
         "clip_id": "idle_up",
-        "beginX": 0,
-        "beginY": 128,
+        "x": 0,
+        "y": 128,
+        "w": 32,
+        "h": 32,
         "frameCount": 2,
         "loops": true
       },
       "idle_down": {
         "clip_id": "idle_down",
-        "beginX": 64,
-        "beginY": 128,
+        "x": 64,
+        "y": 128,
+        "w": 32,
+        "h": 32,
         "frameCount": 2,
         "loops": true
       },
       "idle_left": {
         "clip_id": "idle_left",
-        "beginX": 128,
-        "beginY": 128,
+        "x": 128,
+        "y": 128,
+        "w": 32,
+        "h": 32,
         "frameCount": 2,
         "loops": true
       },
       "idle_right": {
         "clip_id": "idle_right",
-        "beginX": 192,
-        "beginY": 128,
+        "x": 192,
+        "y": 128,
+        "w": 32,
+        "h": 32,
         "frameCount": 2,
         "loops": true
       }

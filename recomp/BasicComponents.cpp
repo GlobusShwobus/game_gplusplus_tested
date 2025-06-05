@@ -1,67 +1,55 @@
 #include "BasicComponents.h"
 
-void EntityState::deactivate() {
-	isActive = false;
-}
-bool EntityState::isActivated()const {
-	return isActive;
-}
-void EntityState::changeAction(EntityAction action) {
-	if (this->action != action) {
-		this->action = action;
+AnimController::AnimController(const std::vector<FrameMap>& reels) :clips(reels) {
+	if (!reels.empty()) {
+		current = &reels.front();
 	}
 }
-void EntityState::changeDirection(Direction direction) {
-	if (this->direction != direction) {
-		this->direction = direction;
-		eventFlags |= EntityEvents::directionChange;
-	}
-}
-void EntityState::setEvent(const EntityEvents events) {
-	eventFlags |= events;
-}
-void EntityState::flushEvents() {
-	eventFlags = 0;
-}
-int EntityState::getEvents()const {
-	return eventFlags;
-}
-bool EntityState::containsEvent(EntityEvents event)const {
-	return eventFlags & event;
-}
-Direction EntityState::getDirection()const {
-	return direction;
-}
-EntityAction EntityState::getAction()const {
-	return action;
-}
-
-
-
-void AnimationController::moveFrame() {
-	if (!currentReel->isLooping && frameIndex >= currentReel->frameCount) return;//not looping so nothing to update
+void AnimController::moveFrame() {
 	frameTimer++;
-
-	//if we haven't reached the treshhold to update frame, leave
 	if (frameTimer < frameDelay)return;
-
-	//entered next frame
 	frameTimer = 0;
 	frameIndex++;
-	//reset it if it is looping type and reached the end
-	if (currentReel->isLooping && frameIndex >= currentReel->frameCount) {
-		frameIndex = 0;
-	}
-}
-void AnimationController::setNewReel(AnimID id) {
-	if (clips->contains(id) && currentID != id) {
-		currentID = id;
-		currentReel = &clips->at(id);
-		frameIndex = 0;
-	}
-}
-void AnimationController::applySourceFromFrame(SDL_FRect& rect)const {
-	rect.x = currentReel->beginX + (rect.w * frameIndex);
-	rect.y = currentReel->beginY;
-}
 
+	if (current->isLooping) {
+		if (frameIndex >= current->frames.size())
+			frameIndex = 0;
+	}
+	else {
+		if (frameIndex >= current->frames.size())
+			frameIndex = current->frames.size() - 1;
+	}
+}
+bool AnimController::setIfNew(const AnimID id) {
+	if (current->id == id) return false;
+
+	for (auto& each : clips) {
+		if (each.id == id) {
+			current = &each;
+			frameIndex = 0;
+			return true;
+		}
+	}
+	return false;
+}
+void AnimController::applySourceFromFrame(SDL_FRect& rect)const {
+	const SDL_Rect& cr = current->frames[frameIndex];
+	rect = { (float)cr.x, (float)cr.y,(float)cr.w,(float)cr.h };
+}
+void RectRayProjection::projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target) {
+	SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
+	entry = { (target.x - origin.x) * inverse.x,(target.y - origin.y) * inverse.y };
+	exit = { (target.x + target.w - origin.x) * inverse.x, (target.y + target.h - origin.y) * inverse.y };
+}
+bool EntityEvent::containsEvent(MyPersonalEvents event)const {
+	return events & event;
+}
+bool EntityEvent::containsEvent(const Uint64& events, MyPersonalEvents event) {
+	return events & event;
+}
+void EntityEvent::setEvent(const int events) {
+	this->events |= events;
+}
+void EntityEvent::flushEvents() {
+	events = 0;
+}

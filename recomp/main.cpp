@@ -141,23 +141,23 @@ int main() {
                 gameRunning = false;
             }
         }
-        MyUtils::WASD_state(player->state);
-
-        //VELOCITY LOGIC
-        SDL_FPoint newPlayerVel = MyUtils::calculatePlayerVelocity(player->state, 5);
-        player->transform.setVelocity(newPlayerVel);
-        //#################################################################################
-
-        //CAMERA
-        window.updateCamera(player->transform.rect, worldBB);
-        //#################################################################################
-
-        //ANIMATION
-        if (player->state.containsEvent(directionChange)) {
-            player->animControlls.setNewReel(MyUtils::getReelOnState(player->state.getAction(), player->state.getDirection()));
+        //VELOCITY AND FRAME
+        if (MyUtils::WASD_PlayerVelocity(player->transform.velocity, 5)) {
+            player->events.setEvent(MPE_movingObject | MPE_checkDirection);
         }
+        player->events.setEvent(MPE_checkAnimation);//otherwise if idle it doesn't change it
+
+        if (player->events.containsEvent(MPE_checkDirection)) {
+            player->direction = MyUtils::directionOfVelocity(player->transform.velocity);
+        }
+
+        if (player->events.containsEvent(MPE_checkAnimation)) {
+            AnimID id = MyUtils::movableObjectSheetIDTable(player->direction, player->events.events);
+            player->animControlls.setIfNew(id);
+        }
+
         player->animControlls.moveFrame();
-        //#################################################################################
+        //###############################################################################
 
         //COLLISION
         std::vector<std::pair<int, float>> collisions;
@@ -181,6 +181,10 @@ int main() {
         player->transform.updatePos();
         //###############################################################################
 
+        //CAMERA
+        window.updateCamera(player->transform.rect, worldBB);
+        //#################################################################################
+
         //TESSTCODE
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
         for (auto& eachrect : rects) {
@@ -194,7 +198,8 @@ int main() {
         player->applySourceBoxToRenderBox();
         player->applyCollisionBoxToRenderBox();
         window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
-        player->state.flushEvents();
+        player->events.flushEvents();
+        player->transform.velocity = { 0.0f,0.0f };//temporary
         window.updateEnd();
         ////#################################################################################
 

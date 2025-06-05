@@ -63,26 +63,32 @@ void EntityFactory::initEntityData(std::map<EntityGeneric, EntityData>& containe
 }
 void EntityFactory::initAnimations(const nlohmann::json& animationData, const EntityGeneric entityID) {
 
-	std::map<AnimID, AnimationReel> reelCollection;//autismus maximus
+	std::vector<FrameMap> reelCollection;//autismus maximus
+	reelCollection.reserve(16);//idk, is 16 is good for now
 
 	for (const auto& data : animationData) {
+		FrameMap clip;
 
-		AnimationReel clip;
-		
-		if (!data.contains("clip_id")) {
-			printf("data missing clip_id: <%d>", entityID);
-			continue;
-		}
-		AnimID id = HASH(data["clip_id"].get<std::string>().c_str());
-
-		clip.beginX = data.value("beginX", 0);
-		clip.beginY = data.value("beginY", 0);
-		clip.frameCount = data.value("frameCount", 1);
+		clip.id = HASH(data["clip_id"].get<std::string>().c_str());
 		clip.isLooping = data.value("loops", false);
 
-		reelCollection.emplace(id, std::move(clip));
-	}
+		const int frameCount = data["frameCount"];
 
+		for (int i = 0; i < frameCount; i++) {
+
+			int x = data["x"];
+			int y = data["y"];
+			int w = data["w"];
+			int h = data["h"];
+
+			SDL_Rect frame{ x + (i * w), y,w,h };
+
+			clip.frames.emplace_back(std::move(frame));
+		}
+
+		reelCollection.emplace_back(std::move(clip));
+	}
+	reelCollection.shrink_to_fit();
 	animationComponents.emplace(entityID, std::move(reelCollection));
 }
 

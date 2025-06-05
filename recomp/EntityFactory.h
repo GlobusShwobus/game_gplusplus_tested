@@ -13,7 +13,7 @@
 class EntityFactory {
 
 	std::map<EntityGeneric, SDL_Texture*> textureComponents;//owner of the textures returned by IMG_LoadTexture and cleaned up at factory destructor
-	std::map<EntityGeneric, std::map<AnimID, AnimationReel>> animationComponents;
+	std::map<EntityGeneric, std::vector<FrameMap>> animationComponents;
 
 	std::map<EnemyID, EntityData> enemyData;
 	std::map<PlayerID, EntityData> playerData;

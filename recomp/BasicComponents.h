@@ -6,7 +6,6 @@
 #include <random>
 #include <array>
 
-#include <iostream>
 //cool new stuff
 
 typedef uint32_t HASH_ID_TYPE;
@@ -48,83 +47,52 @@ constexpr bool definedEntityType(const EntityType hashedType) {
 	return hashedType == EntityType_PLAYER || hashedType == EntityType_ENEMY;
 }
 
-struct AnimationReel {
-	int beginX = 0;
-	int beginY = 0;
-	int frameCount = 0;
+struct FrameMap {
+	AnimID id = 0;//int
+	std::vector<SDL_Rect> frames;
 	bool isLooping = false;
 };
-
-class AnimationController {
+class AnimController {
 	static constexpr int frameDelay = 6;
-	
-	const std::map<AnimID, AnimationReel>* clips = nullptr;//not owner, points to real data
-	AnimID currentID = 0;
-	const AnimationReel* currentReel = nullptr;//points to clips, which is also not owner
-	
+
+	const std::vector<FrameMap>& clips;
+	const FrameMap* current = nullptr;
+
 	int frameIndex = 0;
 	int frameTimer = 0;
-
 public:
-	//reels originates from EntityFactory witch holds the data, it is always valid, should not be freed, AND DO NOT FUCK WITH FACTORY MEMORY, otherwise GGWP
-	AnimationController(const std::map<AnimID, AnimationReel>& reels) :clips(&reels) {
-		if (!reels.empty()) {
-			currentID = reels.begin()->first;
-			currentReel = &reels.begin()->second;
-		}
-	}
-
+	AnimController(const std::vector<FrameMap>& reels);
 	void moveFrame();
-	void setNewReel(AnimID id);
-	//applies source coordinates for the texture
+	bool setIfNew(const AnimID id);
 	void applySourceFromFrame(SDL_FRect& rect)const;
 };
 
-enum class EntityAction {
-	idle, moving, jumping, attacking, dashing
+enum MyPersonalEvents : Uint64 {
+	MPE_cleanup = 1 << 0,
+	MPE_movingObject = 1 << 1,
+	MPE_checkAnimation = 1 << 2,
+	MPE_checkDirection = 1 << 3,
 };
 
-enum Direction {
-	left = 0, right = 1, up = 2, down = 3
-};
-
-enum EntityEvents {
-	directionChange = 1 << 0,
-	collsion_immovable = 1 << 1,
-	collision_light = 1 << 2,
-	collision_medium = 1 << 3,
-	collision_hard = 1 << 4,
-};
-class EntityState {
-	bool isActive = false;
-	int eventFlags = 0;
-	EntityAction action;
-	Direction direction;
-public:
-	EntityState() :action(EntityAction::idle), direction(Direction::down), isActive(true) {}
-	void deactivate();
-	bool isActivated()const;
-	void changeAction(EntityAction action);
-	void changeDirection(Direction direction);
-	void setEvent(const EntityEvents events);
+struct EntityEvent {
+	Uint64 events = 0;
+	bool containsEvent(MyPersonalEvents event)const;
+	static bool containsEvent(const Uint64& events, MyPersonalEvents event);
+	void setEvent(const int events);
 	void flushEvents();
-	int getEvents()const;
-	bool containsEvent(EntityEvents event)const;
-	Direction getDirection()const;
-	EntityAction getAction()const;
+};
+
+enum class Direction {
+	right=0, down=1, left=2, up = 3, none
 };
 
 struct RectRayProjection {
 	SDL_FPoint entry{ 0,0 };
 	SDL_FPoint exit{ 0,0 };
 
-	void projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target) {
-
-		SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
-		entry = { (target.x - origin.x) * inverse.x,(target.y - origin.y) * inverse.y };
-		exit = { (target.x + target.w - origin.x) * inverse.x, (target.y + target.h - origin.y) * inverse.y };
-	}
+	void projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target);
 };
+
 struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
@@ -138,10 +106,6 @@ struct Transform {
 		rect.x += velocity.x;
 		rect.y += velocity.y;
 		std::ranges::fill(collisionSide, false);
-	}
-	void setVelocity(const SDL_FPoint& someVel) {
-		velocity.x = someVel.x;
-		velocity.y = someVel.y;
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -196,34 +160,25 @@ struct Transform {
 			
 			SDL_FPoint normal{ 0,0 };
 			if (proj.entry.x > proj.entry.y) {
-				if (velocity.x < 0) {
-					collisionSide[(int)right] = true;
+				if (velocity.x < 0) 
 					normal = { 1,0 };
-				}
-				else {
-					collisionSide[(int)left] = true;
+				else 
 					normal = { -1,0 };
-				}
 			}
 			else if (proj.entry.x < proj.entry.y) {
-				if (velocity.y < 0) {
-					collisionSide[(int)down] = true;
+				if (velocity.y < 0) 
 					normal = { 0,1 };
-				}
-				else {
-					collisionSide[(int)up] = true;
+				else 
 					normal = { 0,-1 };
-				}
 			}
+
+			if (normal.x > 0)  collisionSide[(int)Direction::right] = true;	 //maybe wrong dir
+			if (normal.y > 0)  collisionSide[(int)Direction::down]  = true;	 //maybe wrong dir
+			if (normal.x < 0)  collisionSide[(int)Direction::left]  = true;	 //maybe wrong dir
+			if (normal.y < 0)  collisionSide[(int)Direction::up]    = true;	 //maybe wrong dir
+
 			velocity.x += normal.x * std::fabs(velocity.x) * (1 - contactTime);
 			velocity.y += normal.y * std::fabs(velocity.y) * (1 - contactTime);
-
-			std::cout << "\nContactTime: " << contactTime << "\n";
-			std::cout << "EntryX: " << proj.entry.x << " EntryY: " << proj.entry.y << "\n";
-			std::cout << "Normal: " << normal.x << ", " << normal.y << "\n";
-			std::cout << "Velocity: " << velocity.x << ", " << velocity.y << "\n";
-			std::cout << "PlayerPos: " << rect.x << ", " << rect.y << "\n";
-			std::cout << "Target: " << target.x << ", " << target.y << ", w=" << target.w << ", h=" << target.h << "\n";
 
 			return true;
 		}
@@ -288,22 +243,19 @@ public:
 	SDL_Texture* texture = nullptr;//not owner
 	SDL_FRect textureSrc{ 0,0,0,0 };
 	SDL_FRect textureDest{ 0,0,0,0 };
-	AnimationController animControlls;
+	AnimController animControlls;
 
-	EntityState state;
 	Transform transform;
 
+	EntityEvent events;
+	Direction direction = Direction::none;
 
-	PlayerID id = 0;
-	float healthPoints = 0;
 
-	Player(SDL_Texture* texture, const std::map<AnimID, AnimationReel>& animationData, const EntityData& data):texture(texture), animControlls(animationData) {
-		id = data.id;
+	Player(SDL_Texture* texture, const std::vector<FrameMap>& frameMap, const EntityData& data):texture(texture), animControlls(frameMap) {
 		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		healthPoints = data.health_points;
 	}
 
 	void applyCollisionBoxToRenderBox() {
@@ -320,17 +272,12 @@ public:
 	SDL_FRect textureSrc{ 0,0,0,0 };
 	SDL_FRect textureDest{ 0,0,0,0 };
 
-	EntityState state;
 	Transform transform;
 
-	EnemyID id = 0;
-	float health_points = 0.f;
 	EnemyBasic(SDL_Texture* texture, const EntityData& data):texture(texture) {
-		id = data.id;
 		textureSrc = { 0,0,data.frameWidth, data.frameHeight };
 		textureDest = { 0,0,data.frameWidth, data.frameHeight };
 
 		transform = data.transform;
-		health_points = data.health_points;
 	}
 };
