@@ -86,18 +86,9 @@ enum class Direction {
 	right=0, down=1, left=2, up = 3, none
 };
 
-struct RectRayProjection {
-	SDL_FPoint entry{ 0,0 };
-	SDL_FPoint exit{ 0,0 };
-
-	void projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target);
-};
-
 struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
-
-	std::array<bool, 4> collisionSide{ false,false,false,false };
 
 	Transform() = default;
 	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
@@ -105,7 +96,6 @@ struct Transform {
 	void updatePos() {
 		rect.x += velocity.x;
 		rect.y += velocity.y;
-		std::ranges::fill(collisionSide, false);
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -117,23 +107,41 @@ struct Transform {
 		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
 	}
 
-	bool projectionHitDetect(RectRayProjection& proj, float& hitTimeEntry) {
+	bool projectionHitDetect(const SDL_FRect& originRect, const SDL_FPoint& originVel, const SDL_FRect& target, SDL_FPoint& contactPoint, SDL_FPoint& contactNormal, float& hitTimeEntry) {
 
-		if (std::isnan(proj.entry.x) || std::isnan(proj.entry.y) || std::isnan(proj.exit.x) || std::isnan(proj.exit.y)) {return false;}
+		SDL_FPoint inverse = { 1.0f / originVel.x, 1.0f / originVel.y };
+		SDL_FPoint entry = { (target.x - originRect.x) * inverse.x, (target.y - originRect.y) * inverse.y };
+		SDL_FPoint exit = { (target.x + target.w - originRect.x) * inverse.x, (target.y + target.h - originRect.y) * inverse.y };
 
-		if (proj.entry.x > proj.exit.x) std::swap(proj.entry.x, proj.exit.x);//sort if from otherside
-		if (proj.entry.y > proj.exit.y) std::swap(proj.entry.y, proj.exit.y);//sort if from otherside
+		if (std::isnan(entry.x) || std::isnan(entry.y) || std::isnan(exit.x) || std::isnan(exit.y)) {return false;}
 
-		if (proj.entry.x > proj.exit.y || proj.entry.y > proj.exit.x) { return false; }//if ray does not penetrate
+		if (entry.x > exit.x) std::swap(entry.x,exit.x);//sort if from otherside
+		if (entry.y > exit.y) std::swap(entry.y,exit.y);//sort if from otherside
 
-		hitTimeEntry = std::max(proj.entry.x, proj.entry.y);//closest hit time
-		float tHitFar = std::min(proj.exit.x, proj.exit.y);//furthest hit time
+		if (entry.x > exit.y || entry.y > exit.x) { return false; }//if ray does not penetrate
+
+		hitTimeEntry = std::max(entry.x, entry.y);//closest hit time
+		float tHitFar = std::min(exit.x, exit.y);//furthest hit time
 
 		if (tHitFar < 0 || hitTimeEntry < 0) { return false; } //if ray is pointing away
 
+		//if there is a hit get the contact point and normal
+		contactPoint = { originRect.x + hitTimeEntry * originVel.x, originRect.y + hitTimeEntry * originVel.y };
+
+		if (entry.x > entry.y)
+			if (inverse.x < 0)
+				contactNormal = { 1, 0 };
+			else
+				contactNormal = { -1, 0 };
+		else if (entry.x < entry.y)
+			if (inverse.y < 0)
+				contactNormal = { 0, 1 };
+			else
+				contactNormal = { 0, -1 };
+
 		return true;
 	}
-	bool projectionHitBoxAdjusted(const SDL_FRect& target, RectRayProjection& projection, SDL_FPoint& contactPoint, float& hitTimeEntry) {
+	bool projectionHitBoxAdjusted(const SDL_FRect& target, SDL_FPoint& contactPoint, SDL_FPoint& contactNormal, float& hitTimeEntry) {
 		if (velocity.x == 0 && velocity.y == 0) { return false; }//no movement so nothing
 
 		SDL_FRect expandedTarget = { // need to expand the target to get a prediction 
@@ -145,46 +153,8 @@ struct Transform {
 
 		SDL_FRect originAsPoint = { rect.x + rect.w * 0.5f, rect.y + rect.h * 0.5f, 0, 0 };// center point of the origin rect
 
-		projection.projectRay(originAsPoint, velocity, expandedTarget);//applies values to entry and exit points
-		if (projectionHitDetect(projection, hitTimeEntry) && hitTimeEntry <= 1.0f) {
-			contactPoint = { originAsPoint.x + hitTimeEntry * velocity.x, originAsPoint.y + hitTimeEntry * velocity.y };//if we hit, aquire the contact point
-			return true;
-		}
-		return false;
+		return projectionHitDetect(originAsPoint, velocity, expandedTarget, contactPoint, contactNormal, hitTimeEntry) && hitTimeEntry <= 1.0f;
 	}
-
-	bool projectionFirstResolution(const SDL_FRect& target, SDL_FPoint& contactPoint){
-		RectRayProjection proj;
-		float contactTime = 0;
-		if (projectionHitBoxAdjusted(target, proj, contactPoint, contactTime)) {
-			
-			SDL_FPoint normal{ 0,0 };
-			if (proj.entry.x > proj.entry.y) {
-				if (velocity.x < 0) 
-					normal = { 1,0 };
-				else 
-					normal = { -1,0 };
-			}
-			else if (proj.entry.x < proj.entry.y) {
-				if (velocity.y < 0) 
-					normal = { 0,1 };
-				else 
-					normal = { 0,-1 };
-			}
-
-			if (normal.x > 0)  collisionSide[(int)Direction::right] = true;	 //maybe wrong dir
-			if (normal.y > 0)  collisionSide[(int)Direction::down]  = true;	 //maybe wrong dir
-			if (normal.x < 0)  collisionSide[(int)Direction::left]  = true;	 //maybe wrong dir
-			if (normal.y < 0)  collisionSide[(int)Direction::up]    = true;	 //maybe wrong dir
-
-			velocity.x += normal.x * std::fabs(velocity.x) * (1 - contactTime);
-			velocity.y += normal.y * std::fabs(velocity.y) * (1 - contactTime);
-
-			return true;
-		}
-		return false;
-	}
-
 
 	void clampInOf(const SDL_FRect& outer) {
 		if (rect.x < outer.x) {

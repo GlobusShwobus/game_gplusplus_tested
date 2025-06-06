@@ -47,20 +47,6 @@ TODO:: decide wtf to do with the player, should it or should it not be at least 
 
 */
 
-/*
-
-*MyUtils::MoveScript is dogshit. Velocity has no place in tranform class and should be held in physics class instead.
-*MyUtils::WASD_state is unique to player because only players moves on key press, implement it into the player class
-
-    reflect velocity
-    then test bouncing off off each other
-    then test if type A and type B instead of bounce type A stops and B bounces back
-    then test different coefficient additions with speed and mass determining how much to bounce
-
-    lastly store important data what i wished to save into transform
-
-*/
-
 int main() {
 
     
@@ -116,17 +102,29 @@ int main() {
     }
 
     //TESTCODE
-    SDL_FRect worldBB{ 0,0,2560,1440 };
+    SDL_FRect worldBBr{ 0,0,500,500 };
+    Transform worldBB;
+    worldBB.rect = worldBBr;
     RandomNumberGenerator rnggen;
-    std::vector<SDL_FRect> rects;
-    for (int i = 0; i < 1000; i++) {
-        SDL_FRect rect;
-        rect.x = rnggen.getRand(0, 2560);
-        rect.y = rnggen.getRand(0, 1440);
-        rect.w = rnggen.getRand(5, 16);
-        rect.h = rnggen.getRand(5, 16);
+    std::vector<Transform> rects;
 
-        rects.push_back(rect);
+    for (int i = 0; i < 25; i++) {
+        SDL_FRect frect;
+        SDL_FPoint fvel;
+
+        frect.x = rnggen.getRand(0, 400);
+        frect.y = rnggen.getRand(0, 400);
+        frect.w = rnggen.getRand(32, 32);
+        frect.h = rnggen.getRand(32, 32);
+
+        fvel.x = rnggen.getRand(-2, 2);
+        fvel.y = rnggen.getRand(-2, 2);
+
+        Transform afafa;
+        afafa.rect = frect;
+        afafa.velocity = fvel;
+
+        rects.push_back(afafa);
     }
     //###################################################################
     bool gameRunning = true;
@@ -158,37 +156,67 @@ int main() {
 
         player->animControlls.moveFrame();
         //###############################################################################
+        
 
         //COLLISION
         std::vector<std::pair<int, float>> collisions;
-        RectRayProjection proj;
-        SDL_FPoint JUNK;
+
         for (int i = 0; i < rects.size();i++) {
-            float contactTime = 0;
-            if (player->transform.projectionHitBoxAdjusted(rects[i], proj, JUNK, contactTime)) {
-                collisions.push_back({ i, contactTime });
+            SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+            float hitTime = 0;
+            if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
+                collisions.push_back({ i, hitTime });
             }
         }
         std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
             return a.second < b.second;
             });
         for (auto& j : collisions) {
-            if (player->transform.projectionFirstResolution(rects[j.first], JUNK)) {
-                
-                //nothing, can but dont do anything with contact point and the array at which side is hit
+            SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+            float hitTime = 0;
+            if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
+                player->transform.velocity.x += contactN.x * std::fabs(player->transform.velocity.x) * (1 - hitTime);
+                player->transform.velocity.y += contactN.y * std::fabs(player->transform.velocity.y) * (1 - hitTime);
             }
         }
         player->transform.updatePos();
         //###############################################################################
+        
+        //COLLISION OTHER MOVING OBJECTS
+        for (int i = 0; i < rects.size(); i++) {
+            for (int j = i + 1; j < rects.size(); j++) {
+                SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+                float hitTime = 0;
+
+                if (rects[i].projectionHitBoxAdjusted(rects[j].rect, contactP, contactN, hitTime)) {
+                    float dotI = rects[i].velocity.x * contactN.x + rects[i].velocity.y * contactN.y;
+                    rects[i].velocity.x -= 2 * dotI * contactN.x;
+                    rects[i].velocity.y -= 2 * dotI * contactN.y;
+
+                    float dotJ = rects[j].velocity.x * -contactN.x + rects[j].velocity.y * -contactN.y;
+                    rects[j].velocity.x -= 2 * dotJ * -contactN.x;
+                    rects[j].velocity.y -= 2 * dotJ * -contactN.y;
+
+                }
+                if (!worldBB.containsRect(rects[i].rect)) {
+                    rects[i].velocity.x *= -1;
+                    rects[i].velocity.y *= -1;
+                }
+            }
+        }
+        for (auto& each : rects) {
+            each.updatePos();
+        }
+        ///////////////////////////////////
 
         //CAMERA
-        window.updateCamera(player->transform.rect, worldBB);
+        window.updateCamera(player->transform.rect, worldBBr);
         //#################################################################################
 
         //TESSTCODE
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
         for (auto& eachrect : rects) {
-            window.drawBasicRect(&eachrect);
+            window.drawBasicRect(&eachrect.rect);
         }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################

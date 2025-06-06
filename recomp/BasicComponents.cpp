@@ -36,11 +36,6 @@ void AnimController::applySourceFromFrame(SDL_FRect& rect)const {
 	const SDL_Rect& cr = current->frames[frameIndex];
 	rect = { (float)cr.x, (float)cr.y,(float)cr.w,(float)cr.h };
 }
-void RectRayProjection::projectRay(const SDL_FRect& origin, const SDL_FPoint& vel, const SDL_FRect& target) {
-	SDL_FPoint inverse = { 1.0f / vel.x, 1.0f / vel.y };
-	entry = { (target.x - origin.x) * inverse.x,(target.y - origin.y) * inverse.y };
-	exit = { (target.x + target.w - origin.x) * inverse.x, (target.y + target.h - origin.y) * inverse.y };
-}
 bool EntityEvent::containsEvent(MyPersonalEvents event)const {
 	return events & event;
 }
