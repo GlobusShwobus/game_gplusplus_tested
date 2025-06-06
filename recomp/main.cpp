@@ -175,8 +175,8 @@ int main() {
             SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
             float hitTime = 0;
             if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
-                player->transform.velocity.x += contactN.x * std::fabs(player->transform.velocity.x) * (1 - hitTime);
-                player->transform.velocity.y += contactN.y * std::fabs(player->transform.velocity.y) * (1 - hitTime);
+                player->transform.clampNextTo(rects[j.first].rect, contactN);
+                player->transform.clearVelocity();
             }
         }
         player->transform.updatePos();
@@ -189,14 +189,10 @@ int main() {
                 float hitTime = 0;
 
                 if (rects[i].projectionHitBoxAdjusted(rects[j].rect, contactP, contactN, hitTime)) {
-                    float dotI = rects[i].velocity.x * contactN.x + rects[i].velocity.y * contactN.y;
-                    rects[i].velocity.x -= 2 * dotI * contactN.x;
-                    rects[i].velocity.y -= 2 * dotI * contactN.y;
-
-                    float dotJ = rects[j].velocity.x * -contactN.x + rects[j].velocity.y * -contactN.y;
-                    rects[j].velocity.x -= 2 * dotJ * -contactN.x;
-                    rects[j].velocity.y -= 2 * dotJ * -contactN.y;
-
+                    rects[i].clampNextTo(rects[j].rect, contactN);
+                    rects[i].reflectVelocity(contactN);
+                    rects[i].flipNormalized(contactN);
+                    rects[j].reflectVelocity(contactN);
                 }
                 if (!worldBB.containsRect(rects[i].rect)) {
                     rects[i].velocity.x *= -1;
@@ -210,7 +206,7 @@ int main() {
         ///////////////////////////////////
 
         //CAMERA
-        window.updateCamera(player->transform.rect, worldBBr);
+        window.updateCamera(player->transform.rect, worldBBr);//wrong clamp size btw
         //#################################################################################
 
         //TESSTCODE

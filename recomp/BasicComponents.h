@@ -83,7 +83,7 @@ struct EntityEvent {
 };
 
 enum class Direction {
-	right=0, down=1, left=2, up = 3, none
+	right, down, left, up, none
 };
 
 struct Transform {
@@ -154,6 +154,47 @@ struct Transform {
 		SDL_FRect originAsPoint = { rect.x + rect.w * 0.5f, rect.y + rect.h * 0.5f, 0, 0 };// center point of the origin rect
 
 		return projectionHitDetect(originAsPoint, velocity, expandedTarget, contactPoint, contactNormal, hitTimeEntry) && hitTimeEntry <= 1.0f;
+	}
+	void clampNextTo(const SDL_FRect& target, const SDL_FPoint& normalized) {
+		if (normalized.x == 1.0f)
+			rect.x = target.x + target.w; // to the right of target
+		else if (normalized.x == -1.0f)
+			rect.x = target.x - rect.w;   // to the left of target
+		if (normalized.y == 1.0f)
+			rect.y = target.y + target.h; // below the target
+		else if (normalized.y == -1.0f)
+			rect.y = target.y - rect.h;   // above the target
+	}
+	void flipNormalized(SDL_FPoint& normalized) {
+		normalized.x = -normalized.x;
+		normalized.y = -normalized.y;
+	}
+	void reflectVelocity(const SDL_FPoint& normalized) {
+		if (normalized.x != 0.0f) {
+			velocity.x = -velocity.x;
+		}
+		if (normalized.y != 0.0f) {
+			velocity.y = -velocity.y;
+		}
+	}
+	SDL_FPoint getNormalizedSign(const SDL_FPoint& velocity) {
+		SDL_FPoint out = { 0.0f, 0.0f };
+		if (velocity.x > 0.0f) 
+			out.x = 1.0f;
+		else if (velocity.x < 0.0f) 
+			out.x = -1.0f;
+		if (velocity.y > 0.0f) 
+			out.y = 1.0f;
+		else if (velocity.y < 0.0f) 
+			out.y = -1.0f;
+		return out;
+	}
+	void clearVelocity() {
+		velocity = { 0,0 };
+	}
+	void setVelocityMinimalBeforeHit(const SDL_FPoint& contactN, float hitTime) {
+		velocity.x += contactN.x * std::fabs(velocity.x) * (1 - hitTime);
+		velocity.y += contactN.y * std::fabs(velocity.y) * (1 - hitTime);
 	}
 
 	void clampInOf(const SDL_FRect& outer) {
