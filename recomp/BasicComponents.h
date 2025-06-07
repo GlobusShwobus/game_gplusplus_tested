@@ -89,6 +89,7 @@ enum class Direction {
 struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
+	float mass = 0;
 
 	Transform() = default;
 	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
@@ -118,7 +119,8 @@ struct Transform {
 		if (entry.x > exit.x) std::swap(entry.x,exit.x);//sort if from otherside
 		if (entry.y > exit.y) std::swap(entry.y,exit.y);//sort if from otherside
 
-		if (entry.x > exit.y || entry.y > exit.x) { return false; }//if ray does not penetrate
+		//if (entry.x > exit.y || entry.y > exit.x) { return false; }//if ray does not penetrate
+		if (entry.x > exit.x || entry.y > exit.y) { return false; }//if ray does not penetrate
 
 		hitTimeEntry = std::max(entry.x, entry.y);//closest hit time
 		float tHitFar = std::min(exit.x, exit.y);//furthest hit time
@@ -143,17 +145,20 @@ struct Transform {
 	}
 	bool projectionHitBoxAdjusted(const SDL_FRect& target, SDL_FPoint& contactPoint, SDL_FPoint& contactNormal, float& hitTimeEntry) {
 		if (velocity.x == 0 && velocity.y == 0) { return false; }//no movement so nothing
-
+		SDL_FPoint relVelocity = { velocity.x, velocity.y };
 		SDL_FRect expandedTarget = { // need to expand the target to get a prediction 
-			target.x - rect.w * 0.5f,
-			target.y - rect.h * 0.5f,
+			target.x - (rect.w*0.5f),
+			target.y - (rect.h*0.5f),
 			target.w + rect.w,
 			target.h + rect.h
 		};
 
-		SDL_FRect originAsPoint = { rect.x + rect.w * 0.5f, rect.y + rect.h * 0.5f, 0, 0 };// center point of the origin rect
+		SDL_FRect originAsPoint = {
+			rect.x + (rect.w*0.5f),
+			rect.y + (rect.h*0.5f),
+			0, 0 };// center point of the origin rect
 
-		return projectionHitDetect(originAsPoint, velocity, expandedTarget, contactPoint, contactNormal, hitTimeEntry) && hitTimeEntry <= 1.0f;
+		return projectionHitDetect(originAsPoint, relVelocity, expandedTarget, contactPoint, contactNormal, hitTimeEntry) && hitTimeEntry <= 1.0f;
 	}
 	void clampNextTo(const SDL_FRect& target, const SDL_FPoint& normalized) {
 		if (normalized.x == 1.0f)
@@ -224,6 +229,26 @@ struct Transform {
 		if (inner.y + inner.h > outer.h) {
 			inner.y = outer.h - inner.h;
 		}
+	}
+
+	void velReflectWithMass(SDL_FPoint& othersVel, float othersMass, const SDL_FPoint& normalized) {
+		SDL_FPoint relativeVel = {velocity.x - othersVel.x,velocity.y - othersVel.y};
+
+		float velAlongNormal = relativeVel.x * normalized.x + relativeVel.y * normalized.y;
+		if (velAlongNormal > 0.0f) return;
+
+		const float restitution = 1.0f;
+
+		float j = -(1.0f + restitution) * velAlongNormal;
+		j /= (1.0f / mass) + (1.0f / othersMass);
+
+		SDL_FPoint impulse = { j * normalized.x,j * normalized.y };
+
+		velocity.x += impulse.x / mass;
+		velocity.y += impulse.y / mass;
+
+		othersVel.x -= impulse.x / othersMass;
+		othersVel.y -= impulse.y / othersMass;
 	}
 };
 class RandomNumberGenerator {

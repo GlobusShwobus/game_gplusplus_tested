@@ -120,10 +120,12 @@ int main() {
         fvel.x = rnggen.getRand(-2, 2);
         fvel.y = rnggen.getRand(-2, 2);
 
+
+
         Transform afafa;
         afafa.rect = frect;
         afafa.velocity = fvel;
-
+        afafa.mass = rnggen.getRand(3, 25);
         rects.push_back(afafa);
     }
     //###################################################################
@@ -190,9 +192,7 @@ int main() {
 
                 if (rects[i].projectionHitBoxAdjusted(rects[j].rect, contactP, contactN, hitTime)) {
                     rects[i].clampNextTo(rects[j].rect, contactN);
-                    rects[i].reflectVelocity(contactN);
-                    rects[i].flipNormalized(contactN);
-                    rects[j].reflectVelocity(contactN);
+                    rects[i].velReflectWithMass(rects[j].velocity, rects[j].mass, contactN);
                 }
                 if (!worldBB.containsRect(rects[i].rect)) {
                     rects[i].velocity.x *= -1;

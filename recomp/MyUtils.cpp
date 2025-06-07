@@ -45,9 +45,8 @@ namespace MyUtils {
 		float angle = std::atan2(velocity.y, velocity.x) * 180.f / PI;
 		if (angle < 0)angle += 360.f;
 
-		int angleReal = (int)std::round(angle / 90.f) % 4;
+		int angleReal = (int)std::round(angle / 90.f) * 90 % 360;
 		Direction dir = Direction::none;
-
 
 		switch (angleReal) {
 		case 0:	  dir= Direction::right;  break;
