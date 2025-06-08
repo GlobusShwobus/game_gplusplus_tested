@@ -100,12 +100,7 @@ int main() {
         fvel.x = rnggen.getRand(-2, 2);
         fvel.y = rnggen.getRand(-2, 2);
 
-
-
-        Transform afafa;
-        afafa.rect = frect;
-        afafa.velocity = fvel;
-        afafa.mass = rnggen.getRand(3, 25);
+        Transform afafa(frect, fvel);
         rects.push_back(afafa);
     }
     //###################################################################
@@ -169,23 +164,24 @@ int main() {
         for (int i = 0; i < rects.size(); i++) {
             for (int j = i + 1; j < rects.size(); j++) {
                 if (rects[i].containsLine(rects[j].rect)) {
-
-                    if (rects[i].enhancedAABB(rects[j].rect)) {
-                        
-                        SDL_FPoint normalized = rects[i].getNormalizedSign(rects[i].velocity);
-
+                    SDL_FPoint shiftDir = { 0,0 };
+                    if (rects[i].enhancedAABB(rects[j].rect, shiftDir)) {
+ 
                     }
 
-                }
-                if (!worldBB.containsRect(rects[i].rect)) {
-                    rects[i].velocity.x *= -1;
-                    rects[i].velocity.y *= -1;
                 }
             }
         }
         for (auto& each : rects) {
             each.updatePos();
         }
+        for (auto& each : rects) {
+            if (!worldBB.containsRect(each.rect)) {
+                each.velocity.x *= -1;
+                each.velocity.y *= -1;
+            }
+        }
+
         ///////////////////////////////////
 
         //CAMERA

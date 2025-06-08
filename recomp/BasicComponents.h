@@ -90,17 +90,16 @@ struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
 
-	float mass = 0;
+	float halfWidth = 0;
+	float halfHeight = 0;
 
 	Transform() = default;
 	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
+	Transform(const SDL_FRect& rectangle, const SDL_FPoint& vel) :rect(rectangle), velocity(vel), halfWidth(rectangle.x*0.5f), halfHeight(rectangle.y*0.5f) {}
 
 	void updatePos() {
 		rect.x = rect.x + velocity.x;
 		rect.y = rect.y + velocity.y;
-	}
-	static bool containsPoint(const SDL_FRect& container, const SDL_FPoint& point) {
-		return (point.x >= container.x && point.y >= container.y && point.x < container.x + container.w && point.y < container.y + container.h);
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -108,17 +107,24 @@ struct Transform {
 	bool containsRect(const SDL_FRect& inner)const {
 		return (inner.x >= rect.x && inner.y >= rect.y && inner.x + inner.w <= rect.x + rect.w && inner.y + inner.h <= rect.y + rect.h);
 	}
-	bool basicAABBcollision(const SDL_FRect& another)const {
-		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
+	bool basicAABBcollision(const SDL_FRect& origin, const SDL_FRect& target)const {
+		return (
+			origin.x < target.x + target.w &&
+			origin.x + origin.w > target.x &&
+			origin.y < target.y + target.h &&
+			origin.y + origin.h > target.y
+			);
 	}
 	//used to predict a collision, not checking if currently collides
-	bool containsLine(const SDL_FRect& target){
+	bool containsLine(const SDL_FRect& target)const{
+		if (velocity.x == 0 || velocity.y == 0)return false;
+
 		// Cache division
 		SDL_FPoint inverse = { 1.0f / velocity.x, 1.0f / velocity.y };
 		// Calculate intersections with rectangle bounding axes
 		SDL_FPoint tNear = {
 			(target.x - rect.x) * inverse.x,
-			(target.x - rect.y) * inverse.y
+			(target.y - rect.y) * inverse.y
 		};
 		SDL_FPoint tFar = {
 			(target.x + target.w - rect.x) * inverse.x,
@@ -146,57 +152,25 @@ struct Transform {
 			return false;
 		return tHitNear <= 1.0f;
 	}
-	bool enhancedAABB(const SDL_FRect& target) {
+	bool enhancedAABB(const Transform& target) {
+		if (velocity.x == 0 || velocity.y == 0)return false;
+		SDL_FPoint centerA = { rect.x + halfWidth, rect.y + halfHeight };
+		SDL_FPoint centerB = { target.rect.x + target.halfWidth, target.rect.y + target.halfHeight };
 
-		// Calculate half sizes for center-based collision
-		float aHalfW = rect.w * 0.5f;
-		float aHalfH = rect.h * 0.5f;
-		float bHalfW = target.w * 0.5f;
-		float bHalfH = target.h * 0.5f;
+		float dx = SDL_abs(centerB.x - centerA.x);
+		float dy = SDL_abs(centerB.y - centerA.y);
 
-		// Calculate centers
-		SDL_FPoint aCenter = {
-			rect.x + aHalfW,
-			rect.y + aHalfH
-		};
-		SDL_FPoint bCenter = {
-			target.x + bHalfW,
-			target.y + bHalfH
-		};
+		float ox = halfWidth + target.halfWidth - dx;
+		float oy = halfHeight + target.halfHeight - dy;
 
-		// Calculate distance between centers
-		float dx = bCenter.x - aCenter.x;
-		float dy = bCenter.y - aCenter.y;
-		float minDistX = aHalfW + bHalfW;
-		float minDistY = aHalfH + bHalfH;
+		//no overlap
+		if (ox <= 0.0f || oy <= 0.0f)return false;
 
-		// Early exit if no overlap possible
-		if (abs(dx) > minDistX || abs(dy) > minDistY) {
-			return false; // isColliding = false
-		}
-
-		// Calculate overlap amounts
-		float overlapX = minDistX - abs(dx);
-		float overlapY = minDistY - abs(dy);
-
-
+		//resolution!!!!
 
 		return true;
 	}
-	void flipNormalized(SDL_FPoint& normalized) {
-		normalized.x = -normalized.x;
-		normalized.y = -normalized.y;
-	}
-	void reflectVelocity(const SDL_FPoint& normalized) {
-		
-		if (normalized.x != 0.0f) {
-			velocity.x = -velocity.x;
-		}
-		if (normalized.y != 0.0f) {
-			velocity.y = -velocity.y;
-		}
 
-	}
 	SDL_FPoint getNormalizedSign(const SDL_FPoint& velocity) {
 		SDL_FPoint out = { 0.0f, 0.0f };
 		if (velocity.x > 0.0f) 
@@ -209,9 +183,7 @@ struct Transform {
 			out.y = -1.0f;
 		return out;
 	}
-	void clearVelocity() {
-		velocity = { 0,0 };
-	}
+
 	void clampInOf(const SDL_FRect& outer) {
 		if (rect.x < outer.x) {
 			rect.x = outer.x;
@@ -239,26 +211,6 @@ struct Transform {
 		if (inner.y + inner.h > outer.h) {
 			inner.y = outer.h - inner.h;
 		}
-	}
-
-	void velReflectWithMass(SDL_FPoint& othersVel, float othersMass, const SDL_FPoint& normalized) {
-		SDL_FPoint relativeVel = {velocity.x - othersVel.x,velocity.y - othersVel.y};
-
-		float velAlongNormal = relativeVel.x * normalized.x + relativeVel.y * normalized.y;
-		if (velAlongNormal > 0.0f) return;
-
-		const float restitution = 1.0f;
-
-		float j = -(1.0f + restitution) * velAlongNormal;
-		j /= (1.0f / mass) + (1.0f / othersMass);
-
-		SDL_FPoint impulse = { j * normalized.x,j * normalized.y };
-
-		velocity.x += impulse.x / mass;
-		velocity.y += impulse.y / mass;
-
-		othersVel.x -= impulse.x / othersMass;
-		othersVel.y -= impulse.y / othersMass;
 	}
 };
 class RandomNumberGenerator {
