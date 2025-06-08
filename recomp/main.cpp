@@ -7,29 +7,9 @@
 
 /*
 
-TODO:: TRANSFORM COMPONENT:
-       currently sprite destination is used for pos checking, instead there should be dedicated transform
-       similarly to how sprites source information is derived from animation controller class, sprite destination will be derived from transform, meaning it should be applied at the very end before drawing
-
-TODO:: COLLISIONS:
-       horizontal overlap == if top of rect A is higher than bottom of rect B, and top of rect B is higher than bottom of rect A;  [y1<y2+h2  &&  y2<y1+h1] ==> less than sign because we start top left
-       vertical overlap == if left of rect A is to the left of the right side of rect B, and if the left side of rect B is to the left of the right side of rect A; [x1<x2+w2  &&  x2<x1+w1]
-       if overlap both horizontally AND vertically == collision
-       store data for how much was collided (x, y), probably need -+ to know from which direction
-
-TODO:: add physics struct that holds speed, mass, maybe other and use it instead of basic float speed
-
-TODO:: TEST: set up some random npc spawning and make them move randomly and basically just test the collision
-       give player some weight, or enemies some differing weights, calcualte the differential in overlap, speed and weight
-       values to determine how much and were to push back, 
-       DESIRED RESULTS:: 
-       for the transform to be able to handle collision and outcomes, that's it, the test code will be junk
-TODO:: CLEAN UP!!! 
-       variable names
-       behavior encapsulation
-       at least try to be const correct
-       if possible some optimization
-       of note:: entities are in kind of a free for all with all vars being public and names are all over the place
+basic ray cast collision detect -> get a bool and a distance out of it
+pepega AABB collision detection -> get normal and overlap rect
+done
 
 TODO:: Grid to scene
        retains grid functionality
@@ -163,36 +143,39 @@ int main() {
         //COLLISION
         std::vector<std::pair<int, float>> collisions;
 
-        for (int i = 0; i < rects.size();i++) {
-            SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-            float hitTime = 0;
-            if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
-                collisions.push_back({ i, hitTime });
-            }
-        }
-        std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-            return a.second < b.second;
-            });
-        for (auto& j : collisions) {
-            SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-            float hitTime = 0;
-            if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
-                player->transform.clampNextTo(rects[j.first].rect, contactN);
-                player->transform.clearVelocity();
-            }
-        }
-        player->transform.updatePos();
+        //for (int i = 0; i < rects.size();i++) {
+        //    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+        //    float hitTime = 0;
+        //    if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
+        //        collisions.push_back({ i, hitTime });
+        //    }
+        //}
+        //std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+        //    return a.second < b.second;
+        //    });
+        //for (auto& j : collisions) {
+        //    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+        //    float hitTime = 0;
+        //    if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
+        //        player->transform.clampNextTo(rects[j.first].rect, contactN);
+        //        player->transform.clearVelocity();
+        //    }
+        //}
+        //player->transform.updatePos();
+        
         //###############################################################################
         
         //COLLISION OTHER MOVING OBJECTS
         for (int i = 0; i < rects.size(); i++) {
             for (int j = i + 1; j < rects.size(); j++) {
-                SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-                float hitTime = 0;
+                if (rects[i].containsLine(rects[j].rect)) {
 
-                if (rects[i].projectionHitBoxAdjusted(rects[j].rect, contactP, contactN, hitTime)) {
-                    rects[i].clampNextTo(rects[j].rect, contactN);
-                    rects[i].velReflectWithMass(rects[j].velocity, rects[j].mass, contactN);
+                    if (rects[i].enhancedAABB(rects[j].rect)) {
+                        
+                        SDL_FPoint normalized = rects[i].getNormalizedSign(rects[i].velocity);
+
+                    }
+
                 }
                 if (!worldBB.containsRect(rects[i].rect)) {
                     rects[i].velocity.x *= -1;

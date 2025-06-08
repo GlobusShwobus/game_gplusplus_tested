@@ -89,14 +89,18 @@ enum class Direction {
 struct Transform {
 	SDL_FRect rect{ 0,0,0,0 };
 	SDL_FPoint velocity{ 0,0 };
+
 	float mass = 0;
 
 	Transform() = default;
 	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
 
 	void updatePos() {
-		rect.x += velocity.x;
-		rect.y += velocity.y;
+		rect.x = rect.x + velocity.x;
+		rect.y = rect.y + velocity.y;
+	}
+	static bool containsPoint(const SDL_FRect& container, const SDL_FPoint& point) {
+		return (point.x >= container.x && point.y >= container.y && point.x < container.x + container.w && point.y < container.y + container.h);
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -107,80 +111,91 @@ struct Transform {
 	bool basicAABBcollision(const SDL_FRect& another)const {
 		return (rect.x < another.x + another.w && rect.x + rect.w > another.x && rect.y < another.y + another.h && rect.y + rect.h > another.y);
 	}
-
-	bool projectionHitDetect(const SDL_FRect& originRect, const SDL_FPoint& originVel, const SDL_FRect& target, SDL_FPoint& contactPoint, SDL_FPoint& contactNormal, float& hitTimeEntry) {
-
-		SDL_FPoint inverse = { 1.0f / originVel.x, 1.0f / originVel.y };
-		SDL_FPoint entry = { (target.x - originRect.x) * inverse.x, (target.y - originRect.y) * inverse.y };
-		SDL_FPoint exit = { (target.x + target.w - originRect.x) * inverse.x, (target.y + target.h - originRect.y) * inverse.y };
-
-		if (std::isnan(entry.x) || std::isnan(entry.y) || std::isnan(exit.x) || std::isnan(exit.y)) {return false;}
-
-		if (entry.x > exit.x) std::swap(entry.x,exit.x);//sort if from otherside
-		if (entry.y > exit.y) std::swap(entry.y,exit.y);//sort if from otherside
-
-		//if (entry.x > exit.y || entry.y > exit.x) { return false; }//if ray does not penetrate
-		if (entry.x > exit.x || entry.y > exit.y) { return false; }//if ray does not penetrate
-
-		hitTimeEntry = std::max(entry.x, entry.y);//closest hit time
-		float tHitFar = std::min(exit.x, exit.y);//furthest hit time
-
-		if (tHitFar < 0 || hitTimeEntry < 0) { return false; } //if ray is pointing away
-
-		//if there is a hit get the contact point and normal
-		contactPoint = { originRect.x + hitTimeEntry * originVel.x, originRect.y + hitTimeEntry * originVel.y };
-
-		if (entry.x > entry.y)
-			if (inverse.x < 0)
-				contactNormal = { 1, 0 };
-			else
-				contactNormal = { -1, 0 };
-		else if (entry.x < entry.y)
-			if (inverse.y < 0)
-				contactNormal = { 0, 1 };
-			else
-				contactNormal = { 0, -1 };
-
-		return true;
-	}
-	bool projectionHitBoxAdjusted(const SDL_FRect& target, SDL_FPoint& contactPoint, SDL_FPoint& contactNormal, float& hitTimeEntry) {
-		if (velocity.x == 0 && velocity.y == 0) { return false; }//no movement so nothing
-		SDL_FPoint relVelocity = { velocity.x, velocity.y };
-		SDL_FRect expandedTarget = { // need to expand the target to get a prediction 
-			target.x - (rect.w*0.5f),
-			target.y - (rect.h*0.5f),
-			target.w + rect.w,
-			target.h + rect.h
+	//used to predict a collision, not checking if currently collides
+	bool containsLine(const SDL_FRect& target){
+		// Cache division
+		SDL_FPoint inverse = { 1.0f / velocity.x, 1.0f / velocity.y };
+		// Calculate intersections with rectangle bounding axes
+		SDL_FPoint tNear = {
+			(target.x - rect.x) * inverse.x,
+			(target.x - rect.y) * inverse.y
+		};
+		SDL_FPoint tFar = {
+			(target.x + target.w - rect.x) * inverse.x,
+			(target.y + target.h - rect.y) * inverse.y
 		};
 
-		SDL_FRect originAsPoint = {
-			rect.x + (rect.w*0.5f),
-			rect.y + (rect.h*0.5f),
-			0, 0 };// center point of the origin rect
+		if (std::isnan(tFar.y) || std::isnan(tFar.x)) return false;
+		if (std::isnan(tNear.y) || std::isnan(tNear.x)) return false;
 
-		return projectionHitDetect(originAsPoint, relVelocity, expandedTarget, contactPoint, contactNormal, hitTimeEntry) && hitTimeEntry <= 1.0f;
+		// Sort distances
+		if (tNear.x > tFar.x) std::swap(tNear.x, tFar.x);
+		if (tNear.y > tFar.y) std::swap(tNear.y, tFar.y);
+
+		// Early rejection, no intersection		
+		if (tNear.x > tFar.y || tNear.y > tFar.x) return false;
+
+		// Closest 'time' will be the first contact
+		float tHitNear = std::max(tNear.x, tNear.y);
+
+		// Furthest 'time' is contact on opposite side of target
+		float tHitFar = std::min(tFar.x, tFar.y);
+
+		// Reject if ray direction is pointing away from object
+		if (tHitFar < 0) // May have to check tHitNear as well because i am a dumbo
+			return false;
+		return tHitNear <= 1.0f;
 	}
-	void clampNextTo(const SDL_FRect& target, const SDL_FPoint& normalized) {
-		if (normalized.x == 1.0f)
-			rect.x = target.x + target.w; // to the right of target
-		else if (normalized.x == -1.0f)
-			rect.x = target.x - rect.w;   // to the left of target
-		if (normalized.y == 1.0f)
-			rect.y = target.y + target.h; // below the target
-		else if (normalized.y == -1.0f)
-			rect.y = target.y - rect.h;   // above the target
+	bool enhancedAABB(const SDL_FRect& target) {
+
+		// Calculate half sizes for center-based collision
+		float aHalfW = rect.w * 0.5f;
+		float aHalfH = rect.h * 0.5f;
+		float bHalfW = target.w * 0.5f;
+		float bHalfH = target.h * 0.5f;
+
+		// Calculate centers
+		SDL_FPoint aCenter = {
+			rect.x + aHalfW,
+			rect.y + aHalfH
+		};
+		SDL_FPoint bCenter = {
+			target.x + bHalfW,
+			target.y + bHalfH
+		};
+
+		// Calculate distance between centers
+		float dx = bCenter.x - aCenter.x;
+		float dy = bCenter.y - aCenter.y;
+		float minDistX = aHalfW + bHalfW;
+		float minDistY = aHalfH + bHalfH;
+
+		// Early exit if no overlap possible
+		if (abs(dx) > minDistX || abs(dy) > minDistY) {
+			return false; // isColliding = false
+		}
+
+		// Calculate overlap amounts
+		float overlapX = minDistX - abs(dx);
+		float overlapY = minDistY - abs(dy);
+
+
+
+		return true;
 	}
 	void flipNormalized(SDL_FPoint& normalized) {
 		normalized.x = -normalized.x;
 		normalized.y = -normalized.y;
 	}
 	void reflectVelocity(const SDL_FPoint& normalized) {
+		
 		if (normalized.x != 0.0f) {
 			velocity.x = -velocity.x;
 		}
 		if (normalized.y != 0.0f) {
 			velocity.y = -velocity.y;
 		}
+
 	}
 	SDL_FPoint getNormalizedSign(const SDL_FPoint& velocity) {
 		SDL_FPoint out = { 0.0f, 0.0f };
@@ -197,11 +212,6 @@ struct Transform {
 	void clearVelocity() {
 		velocity = { 0,0 };
 	}
-	void setVelocityMinimalBeforeHit(const SDL_FPoint& contactN, float hitTime) {
-		velocity.x += contactN.x * std::fabs(velocity.x) * (1 - hitTime);
-		velocity.y += contactN.y * std::fabs(velocity.y) * (1 - hitTime);
-	}
-
 	void clampInOf(const SDL_FRect& outer) {
 		if (rect.x < outer.x) {
 			rect.x = outer.x;
