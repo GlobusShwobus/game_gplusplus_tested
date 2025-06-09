@@ -82,27 +82,16 @@ int main() {
     }
 
     //TESTCODE
-    SDL_FRect worldBBr{ 0,0,500,500 };
     Transform worldBB;
-    worldBB.rect = worldBBr;
+    worldBB.rect = { 0,0,500,500 };
     RandomNumberGenerator rnggen;
-    std::vector<Transform> rects;
 
-    for (int i = 0; i < 25; i++) {
-        SDL_FRect frect;
-        SDL_FPoint fvel;
+    Transform rect1({ 500,500, 60,60 }, {-5,-5});
+    Transform rect2({ 0,0,60,60 }, {5,5});
 
-        frect.x = rnggen.getRand(0, 400);
-        frect.y = rnggen.getRand(0, 400);
-        frect.w = rnggen.getRand(32, 32);
-        frect.h = rnggen.getRand(32, 32);
-
-        fvel.x = rnggen.getRand(-2, 2);
-        fvel.y = rnggen.getRand(-2, 2);
-
-        Transform afafa(frect, fvel);
-        rects.push_back(afafa);
-    }
+    std::vector<Transform> formers;
+    formers.push_back(rect1);
+    formers.push_back(rect2);
     //###################################################################
     bool gameRunning = true;
     SDL_Event event;
@@ -161,38 +150,49 @@ int main() {
         //###############################################################################
         
         //COLLISION OTHER MOVING OBJECTS
-        for (int i = 0; i < rects.size(); i++) {
-            for (int j = i + 1; j < rects.size(); j++) {
-                if (rects[i].containsLine(rects[j].rect)) {
-                    SDL_FPoint shiftDir = { 0,0 };
-                    if (rects[i].enhancedAABB(rects[j].rect, shiftDir)) {
- 
-                    }
+        SDL_FPoint cp1{ 0,0 };
+        SDL_FPoint cn1{ 0,0 };
+        float hitTime1 = 0;
 
+        struct Collider {
+            Transform* rect1 = nullptr;
+            Transform* rect2 = nullptr;
+            //float hitTime = 0;
+        };
+        std::vector<Collider> colliders;
+
+        for (int i = 0; i < formers.size(); i++) {
+            for (int j = i + 1; j < formers.size(); j++) {
+                SDL_FPoint cp1{ 0,0 };
+                SDL_FPoint cn1{ 0,0 };
+                float hitTime1 = 0;
+
+                if (formers[i].dynamicSweptAABB(formers[j], cp1, cn1, hitTime1)) {
+                    colliders.push_back({&formers[i], &formers[j]});
                 }
             }
         }
-        for (auto& each : rects) {
-            each.updatePos();
-        }
-        for (auto& each : rects) {
-            if (!worldBB.containsRect(each.rect)) {
-                each.velocity.x *= -1;
-                each.velocity.y *= -1;
-            }
+        for (auto& move : formers) {
+            move.noResolutionMove();
         }
 
+        for (auto& col : colliders) {
+            if (col.rect1->staticAABBOverlap(*col.rect2)) {
+                col.rect1->velocity = { 0,0 };
+                col.rect2->velocity = { 0,0 };
+            }
+        }
         ///////////////////////////////////
 
         //CAMERA
-        window.updateCamera(player->transform.rect, worldBBr);//wrong clamp size btw
+        window.updateCamera(player->transform.rect, worldBB.rect);//wrong clamp size btw
         //#################################################################################
 
         //TESSTCODE
         SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        for (auto& eachrect : rects) {
-            window.drawBasicRect(&eachrect.rect);
-        }
+        window.drawBasicRect(&formers[0].rect);
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 255, 255);
+        window.drawBasicRect(&formers[1].rect);
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 

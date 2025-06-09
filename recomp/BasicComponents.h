@@ -95,11 +95,11 @@ struct Transform {
 
 	Transform() = default;
 	Transform(float x, float y, float w, float h) :rect{ x,y,w,h } {}
-	Transform(const SDL_FRect& rectangle, const SDL_FPoint& vel) :rect(rectangle), velocity(vel), halfWidth(rectangle.x*0.5f), halfHeight(rectangle.y*0.5f) {}
+	Transform(const SDL_FRect& rectangle, const SDL_FPoint& vel) :rect(rectangle), velocity(vel), halfWidth(rectangle.w*0.5f), halfHeight(rectangle.h*0.5f) {}
 
-	void updatePos() {
-		rect.x = rect.x + velocity.x;
-		rect.y = rect.y + velocity.y;
+	void noResolutionMove() {
+		rect.x += velocity.x;
+		rect.y += velocity.y;
 	}
 	bool containsPoint(const SDL_FPoint& point)const {
 		return (point.x >= rect.x && point.y >= rect.y && point.x < rect.x + rect.w && point.y < rect.y + rect.h);
@@ -115,60 +115,115 @@ struct Transform {
 			origin.y + origin.h > target.y
 			);
 	}
-	//used to predict a collision, not checking if currently collides
-	bool containsLine(const SDL_FRect& target)const{
-		if (velocity.x == 0 || velocity.y == 0)return false;
+	bool staticSweptAABB(const SDL_FPoint& rayOrigin, const SDL_FPoint& vector, const SDL_FRect& expandedTarget, SDL_FPoint& contactP, SDL_FPoint& contactN, float& hitTimeEntry) {
+		// Inverse direction
+		SDL_FPoint inverse = {
+			vector.x != 0.0f ? 1.0f / vector.x : INFINITY,
+			vector.y != 0.0f ? 1.0f / vector.y : INFINITY
+		};
 
-		// Cache division
-		SDL_FPoint inverse = { 1.0f / velocity.x, 1.0f / velocity.y };
 		// Calculate intersections with rectangle bounding axes
 		SDL_FPoint tNear = {
-			(target.x - rect.x) * inverse.x,
-			(target.y - rect.y) * inverse.y
+			(expandedTarget.x - rayOrigin.x) * inverse.x,
+			(expandedTarget.y - rayOrigin.y) * inverse.y
 		};
 		SDL_FPoint tFar = {
-			(target.x + target.w - rect.x) * inverse.x,
-			(target.y + target.h - rect.y) * inverse.y
+			(expandedTarget.x + expandedTarget.w - rayOrigin.x) * inverse.x,
+			(expandedTarget.y + expandedTarget.h - rayOrigin.y) * inverse.y
 		};
 
-		if (std::isnan(tFar.y) || std::isnan(tFar.x)) return false;
-		if (std::isnan(tNear.y) || std::isnan(tNear.x)) return false;
+		if (std::isnan(tNear.x) || std::isnan(tNear.y) ||
+			std::isnan(tFar.x) || std::isnan(tFar.y)) return false;
 
-		// Sort distances
+		// Swap near and far
 		if (tNear.x > tFar.x) std::swap(tNear.x, tFar.x);
 		if (tNear.y > tFar.y) std::swap(tNear.y, tFar.y);
 
-		// Early rejection, no intersection		
+		// Check for ray miss
 		if (tNear.x > tFar.y || tNear.y > tFar.x) return false;
 
-		// Closest 'time' will be the first contact
-		float tHitNear = std::max(tNear.x, tNear.y);
-
-		// Furthest 'time' is contact on opposite side of target
+		// Time of hit
+		hitTimeEntry = std::max(tNear.x, tNear.y);
 		float tHitFar = std::min(tFar.x, tFar.y);
 
-		// Reject if ray direction is pointing away from object
-		if (tHitFar < 0) // May have to check tHitNear as well because i am a dumbo
-			return false;
-		return tHitNear <= 1.0f;
-	}
-	bool enhancedAABB(const Transform& target) {
-		if (velocity.x == 0 || velocity.y == 0)return false;
-		SDL_FPoint centerA = { rect.x + halfWidth, rect.y + halfHeight };
-		SDL_FPoint centerB = { target.rect.x + target.halfWidth, target.rect.y + target.halfHeight };
+		if (tHitFar < 0.0f) return false;
 
-		float dx = SDL_abs(centerB.x - centerA.x);
-		float dy = SDL_abs(centerB.y - centerA.y);
 
-		float ox = halfWidth + target.halfWidth - dx;
-		float oy = halfHeight + target.halfHeight - dy;
+		//contact point
+		contactP = {
+		(vector.x * hitTimeEntry) + rayOrigin.x,
+		(vector.y * hitTimeEntry) + rayOrigin.y
+		};
 
-		//no overlap
-		if (ox <= 0.0f || oy <= 0.0f)return false;
-
-		//resolution!!!!
+		//normalized
+		if (tNear.x > tNear.y)
+			if (vector.x < 0)
+				contactN = { 1, 0 };
+			else
+				contactN = { -1, 0 };
+		else if (tNear.x < tNear.y)
+			if (vector.y < 0)
+				contactN = { 0, 1 };
+			else
+				contactN = { 0, -1 };
 
 		return true;
+	}
+	bool dynamicSweptAABB(const Transform& target, SDL_FPoint& contactP, SDL_FPoint& contactN,float& hitTimeEntry) {
+		// Relative motion
+		SDL_FPoint relVelocity = {
+			velocity.x - target.velocity.x,
+			velocity.y - target.velocity.y
+		};
+
+		// Early out if no motion
+		if (relVelocity.x == 0.0f && relVelocity.y == 0.0f)
+			return false;
+
+		// Expand target rect by this rect's size (swept volume)
+		SDL_FRect expandedTarget = {
+			target.rect.x - halfWidth,
+			target.rect.y - halfHeight,
+			target.rect.w + rect.w,
+			target.rect.h + rect.h
+		};
+
+		// Ray origin is the center of this object
+		SDL_FPoint rayOrigin = {
+			rect.x + halfWidth,
+			rect.y + halfHeight
+		};
+		if (staticSweptAABB(rayOrigin, relVelocity, expandedTarget, contactP, contactN, hitTimeEntry)) {
+			return (hitTimeEntry >= 0.0f && hitTimeEntry < 1.0f);
+		}
+		return false;
+	}
+	bool staticAABBOverlap(const Transform& otherRect) {
+		float dx = (rect.x + halfWidth) - (otherRect.rect.x + otherRect.halfWidth);
+		float dy = (rect.y + halfHeight) - (otherRect.rect.y + otherRect.halfHeight);
+
+		float overlapX = (halfWidth + otherRect.halfWidth) - SDL_fabs(dx);
+		float overlapY = (halfHeight + otherRect.halfHeight) - SDL_fabs(dy);
+
+		if (overlapX > 0 && overlapY > 0) {
+			// Resolve using smaller overlap
+			if (overlapX < overlapY) {
+				rect.x += (dx > 0 ? overlapX : -overlapX);
+			}
+			else {
+				rect.y += (dy > 0 ? overlapY : -overlapY);
+			}
+			return true;
+		}
+		return false;
+	}
+	void reflectVelocity(const SDL_FPoint& contactNormal) {
+		if (contactNormal.x != 0.0f) {
+			velocity.x *= -1;
+		}
+		if (contactNormal.y != 0.0f) {
+			velocity.y *= -1;
+		}
 	}
 
 	SDL_FPoint getNormalizedSign(const SDL_FPoint& velocity) {
