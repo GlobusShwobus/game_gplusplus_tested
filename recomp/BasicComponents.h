@@ -225,6 +225,10 @@ struct Transform {
 			velocity.y *= -1;
 		}
 	}
+	static void flipNormalized(SDL_FPoint& normalized) {
+		normalized.x *= -1;
+		normalized.y *= -1;
+	}
 
 	SDL_FPoint getNormalizedSign(const SDL_FPoint& velocity) {
 		SDL_FPoint out = { 0.0f, 0.0f };

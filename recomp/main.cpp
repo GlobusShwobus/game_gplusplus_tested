@@ -84,14 +84,24 @@ int main() {
     //TESTCODE
     Transform worldBB;
     worldBB.rect = { 0,0,500,500 };
-    RandomNumberGenerator rnggen;
-
-    Transform rect1({ 500,500, 60,60 }, {-5,-5});
-    Transform rect2({ 0,0,60,60 }, {5,5});
+    RandomNumberGenerator rng;
 
     std::vector<Transform> formers;
-    formers.push_back(rect1);
-    formers.push_back(rect2);
+    for (int i = 0; i < 50; i++) {
+        SDL_FRect rect;
+        rect.x = rng.getRand(0, 500);
+        rect.y = rng.getRand(0, 500);
+        rect.w = rng.getRand(5, 32);
+        rect.h = rng.getRand(5, 32);
+
+        SDL_FPoint vel;
+        vel.x = rng.getRand(1, 5);
+        vel.y = rng.getRand(1, 5);
+
+        Transform transform(rect, vel);
+
+        formers.push_back(transform);
+    }
     //###################################################################
     bool gameRunning = true;
     SDL_Event event;
@@ -157,6 +167,7 @@ int main() {
         struct Collider {
             Transform* rect1 = nullptr;
             Transform* rect2 = nullptr;
+            SDL_FPoint contactNormal{ 0,0 };
             //float hitTime = 0;
         };
         std::vector<Collider> colliders;
@@ -168,7 +179,7 @@ int main() {
                 float hitTime1 = 0;
 
                 if (formers[i].dynamicSweptAABB(formers[j], cp1, cn1, hitTime1)) {
-                    colliders.push_back({&formers[i], &formers[j]});
+                    colliders.push_back({&formers[i], &formers[j], cn1});
                 }
             }
         }
@@ -178,8 +189,19 @@ int main() {
 
         for (auto& col : colliders) {
             if (col.rect1->staticAABBOverlap(*col.rect2)) {
-                col.rect1->velocity = { 0,0 };
-                col.rect2->velocity = { 0,0 };
+                SDL_FPoint normal = col.contactNormal;
+                col.rect1->reflectVelocity(normal);
+                Transform::flipNormalized(normal);
+                col.rect2->reflectVelocity(normal);
+
+            }
+        }
+
+        for (auto& each : formers) {
+            if (!worldBB.containsRect(each.rect)) {
+                Transform::clampInOf(worldBB.rect, each.rect);
+                each.velocity.x *= -1;
+                each.velocity.y *= -1;
             }
         }
         ///////////////////////////////////
@@ -189,10 +211,10 @@ int main() {
         //#################################################################################
 
         //TESSTCODE
-        SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        window.drawBasicRect(&formers[0].rect);
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 255, 255);
-        window.drawBasicRect(&formers[1].rect);
+        for (auto& each : formers) {
+            window.drawBasicRect(&each.rect);
+        }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 
