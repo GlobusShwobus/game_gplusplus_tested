@@ -155,6 +155,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyUtils.cpp" />
     <ClCompile Include="BasicComponents.cpp" />
+    <ClCompile Include="vec2.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="EntityFactory.cpp" />
   </ItemGroup>

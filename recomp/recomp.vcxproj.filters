@@ -27,9 +27,6 @@
     <ClInclude Include="BasicComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TESTS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MyUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -50,13 +47,13 @@
     <ClCompile Include="BasicComponents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TESTS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MyUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EntityFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vec2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
