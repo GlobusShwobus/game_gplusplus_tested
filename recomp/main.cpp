@@ -26,7 +26,6 @@ TODO:: warp json objects so they get a more secure/automatic clean up when they'
 TODO:: decide wtf to do with the player, should it or should it not be at least in some shortcut way be tied to scenes?
 
 */
-#include "vec2.h"
 
 int main() {
     using namespace badEngine;
@@ -103,9 +102,6 @@ int main() {
 
         formers.push_back(transform);
     }
-    CCP::HitBox hb1({ 10,0,50,50 }, { 0,5 });
-    CCP::HitBox hb2({0,500,50,50},{0,-5});
-    bool stop = false;
 
     //###################################################################
     bool gameRunning = true;
@@ -209,18 +205,6 @@ int main() {
                 each.velocity.y *= -1;
             }
         }
-
-        SDL_Rect output{ 0,0,0,0 };
-        if (!stop) {
-            if (CCP::collisionEnhancedAABB(hb1, hb2, &output)) {
-                CCP::resolveAABB_overlapSecond(hb1.rectangle, output);
-                stop = true;
-            }
-            else {
-                hb1.rectangle = CCP::addXY(hb1.rectangle, hb1.velocity);
-                hb2.rectangle = CCP::addXY(hb2.rectangle, hb2.velocity);
-            }
-        }
         ///////////////////////////////////
 
         //CAMERA
@@ -228,15 +212,10 @@ int main() {
         //#################################################################################
 
         //TESSTCODE
-       // SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 255, 255);
-       // for (auto& each : formers) {
-       //     window.drawBasicRect(&each.rect);
-       // }
-       // SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 255, 255);
-        window.drawBasicRect(&hb1.rectangle);
-        SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-        window.drawBasicRect(&hb2.rectangle);
+        for (auto& each : formers) {
+            window.drawBasicRect(&each.rect);
+        }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //#######################
 

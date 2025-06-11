@@ -117,9 +117,13 @@ struct Transform {
 	}
 	bool staticSweptAABB(const SDL_FPoint& rayOrigin, const SDL_FPoint& vector, const SDL_FRect& expandedTarget, SDL_FPoint& contactP, SDL_FPoint& contactN, float& hitTimeEntry) {
 		// Inverse direction
+	//SDL_FPoint inverse = {
+	//	vector.x != 0.0f ? 1.0f / vector.x : INFINITY,
+	//	vector.y != 0.0f ? 1.0f / vector.y : INFINITY
+	//};
 		SDL_FPoint inverse = {
-			vector.x != 0.0f ? 1.0f / vector.x : INFINITY,
-			vector.y != 0.0f ? 1.0f / vector.y : INFINITY
+	 1.0f / vector.x,
+	 1.0f / vector.y
 		};
 
 		// Calculate intersections with rectangle bounding axes
@@ -132,8 +136,8 @@ struct Transform {
 			(expandedTarget.y + expandedTarget.h - rayOrigin.y) * inverse.y
 		};
 
-		if (std::isnan(tNear.x) || std::isnan(tNear.y) ||
-			std::isnan(tFar.x) || std::isnan(tFar.y)) return false;
+		if (SDL_isnan(tNear.x) || SDL_isnan(tNear.y) ||
+			SDL_isnan(tFar.x) || SDL_isnan(tFar.y)) return false;
 
 		// Swap near and far
 		if (tNear.x > tFar.x) std::swap(tNear.x, tFar.x);
