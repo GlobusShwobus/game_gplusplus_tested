@@ -1,56 +1,9 @@
-#pragma once
-
-#include "SDL3/SDL.h"
+#include "CCPRect.h"
 
 namespace badEngine {
 
 	//cartesian coordinate physics
 	namespace CCP {
-
-		struct HitBox {
-			SDL_FRect rectangle{ 0,0,0,0 };
-			SDL_FPoint velocity{ 0,0 };
-
-			float halfWidth = 0.f;
-			float halfHeight = 0.f;
-
-			HitBox() = default;
-			HitBox(float x, float y, float w, float h) :rectangle{ x,y,w,h }, halfWidth(w * 0.5f), halfHeight(h * 0.5f) {}
-			HitBox(const SDL_FRect& rectangle, const SDL_FPoint& vel) :rectangle(rectangle), velocity(vel), halfWidth(rectangle.w * 0.5f), halfHeight(rectangle.h * 0.5f) {}
-		};
-		
-		SDL_FPoint operator+(const SDL_FPoint& a, const SDL_FPoint& b) {
-			return { a.x + b.x, a.y + b.y };
-		}
-		SDL_FPoint& operator+=(SDL_FPoint& a, const SDL_FPoint& b) {
-			a.x += b.x;
-			a.y += b.y;
-			return a;
-		}
-		SDL_FPoint operator-(const SDL_FPoint& a, const SDL_FPoint& b) {
-			return { a.x - b.x, a.y - b.y };
-		}
-		SDL_FPoint& operator-=(SDL_FPoint& a, const SDL_FPoint& b) {
-			a.x -= b.x;
-			a.y -= b.y;
-			return a;
-		}
-		SDL_FPoint operator*(const SDL_FPoint& a, float scalar) {
-			return { a.x * scalar, a.y * scalar };
-		}
-		SDL_FPoint& operator*=(SDL_FPoint& a, float scalar) {
-			a.x *= scalar;
-			a.y *= scalar;
-			return a;
-		}
-		SDL_FPoint operator/(const SDL_FPoint& a, float scalar) {
-			return { a.x / scalar, a.y / scalar };
-		}
-		SDL_FPoint& operator/=(SDL_FPoint& a, float scalar) {
-			a.x /= scalar;
-			a.y /= scalar;
-			return a;
-		}
 		float dotProduct(const SDL_FPoint& point) {
 			return (point.x * point.x) + (point.y * point.y);
 		}
@@ -63,9 +16,21 @@ namespace badEngine {
 
 			lenght = SDL_sqrtf(lenght);
 
-			if (lenght == 0.0f) return{ 0.0f,0.0f };
+			if (lenght == 0.f) return{ 0.f,0.f };
 
-			return point / lenght;
+			return { point.x / lenght, point.y / lenght };
+		}
+		SDL_FPoint signVector(const SDL_FPoint& point) {
+			SDL_FPoint out = { 0.0f, 0.0f };
+			if (point.x > 0.0f)
+				out.x = 1.0f;
+			else if (point.x < 0.0f)
+				out.x = -1.0f;
+			if (point.y > 0.0f)
+				out.y = 1.0f;
+			else if (point.y < 0.0f)
+				out.y = -1.0f;
+			return out;
 		}
 
 		bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point) {
@@ -99,7 +64,7 @@ namespace badEngine {
 			float overlapX = (first.halfWidth + second.halfWidth) - SDL_fabs(dx);
 			float overlapY = (first.halfHeight + second.halfHeight) - SDL_fabs(dy);
 
-			if (overlapX > 0 && overlapY > 0) {
+			if (overlapX > 0.0f && overlapY > 0.0f) {
 				output->x = dx;
 				output->y = dy;
 				output->w = overlapX;
@@ -108,7 +73,6 @@ namespace badEngine {
 			}
 			return false;
 		}
-
 		bool collisionRayProjection(const SDL_FPoint& rayOrigin, const SDL_FPoint& rayVector, const SDL_FRect& target, float& hitTime, SDL_FPoint* cp = nullptr, SDL_FPoint* cn = nullptr) {
 			// Inverse direction, idfk why, but it is OK to divide floats by 0, creates an infiniti and later creates a NaN
 			SDL_FPoint inverse = {
@@ -128,8 +92,8 @@ namespace badEngine {
 			if (SDL_isnan(tNear.x) || SDL_isnan(tNear.y) || SDL_isnan(tFar.x) || SDL_isnan(tFar.y)) return false;
 
 			// Swap near and far
-			if (tNear.x > tFar.x) std::swap(tNear.x, tFar.x);
-			if (tNear.y > tFar.y) std::swap(tNear.y, tFar.y);
+			if (tNear.x > tFar.x) swapFloat(tNear.x, tFar.x);
+			if (tNear.y > tFar.y) swapFloat(tNear.y, tFar.y);
 
 			// if no hit
 			if (tNear.x > tFar.y || tNear.y > tFar.x) return false;
@@ -150,19 +114,48 @@ namespace badEngine {
 			//get normalized Sign value
 			if (cn) {
 				if (tNear.x > tNear.y)
-					if (rayVector.x < 0)
-						*cn = { 1, 0 };
+					if (rayVector.x < 0.0f)
+						*cn = { 1.0f, 0.0f };
 					else
-						*cn = { -1, 0 };
+						*cn = { -1.0f, 0.0f };
 				else if (tNear.x < tNear.y)
-					if (rayVector.y < 0)
-						*cn = { 0, 1 };
+					if (rayVector.y < 0.0f)
+						*cn = { 0.0f, 1.0f };
 					else
-						*cn = { 0, -1 };
+						*cn = { 0.0f, -1.0f };
 			}
 
 			return true;
 		}
+		bool collisionEnhancedRayProjection(const HitBox& first, const HitBox& second, float& hitTime, SDL_FPoint* cp = nullptr, SDL_FPoint* cn = nullptr) {
+			// Relative motion
+			SDL_FPoint relVelocity = {
+				first.velocity.x - second.velocity.x,
+				first.velocity.y - second.velocity.y
+			};
+			// Early out if no motion
+			if (relVelocity.x == 0.0f && relVelocity.y == 0.0f) return false;
+
+			//adjust target rectangle since ray origin is from the center not top left
+			SDL_FRect expandedTarget = {
+				second.rectangle.x - first.halfWidth,
+				second.rectangle.y - first.halfHeight,
+				second.rectangle.w + first.rectangle.w,
+				second.rectangle.h + first.rectangle.h
+			};
+
+			// Ray origin is the center of this object
+			SDL_FPoint rayOrigin = {
+				first.rectangle.x + first.halfWidth,
+				first.rectangle.y + first.halfHeight
+			};
+
+			if (collisionRayProjection(rayOrigin, relVelocity, expandedTarget, hitTime, cp, cn)) {
+				return (hitTime >= 0.0f && hitTime < 1.0f);
+			}
+			return false;
+		}
+
 		void resolveAABB_overlapSecond(SDL_FRect& rect, const SDL_Rect& mutator) {
 			if (mutator.w < mutator.h) {
 				rect.x += mutator.w;
@@ -179,9 +172,20 @@ namespace badEngine {
 				rect.y -= mutator.h;
 			}
 		}
-
-		
-
+		void resolveOutOfBounds(const SDL_FRect& bounds, SDL_FRect& rect) {
+			if (rect.x < bounds.x) {
+				rect.x = bounds.x;
+			}
+			if (rect.y < bounds.y) {
+				rect.y = bounds.y;
+			}
+			if (rect.x + rect.w > bounds.w) {
+				rect.x = bounds.w - rect.w;
+			}
+			if (rect.y + rect.h > bounds.h) {
+				rect.y = bounds.h - rect.h;
+			}
+		}
 
 
 	}

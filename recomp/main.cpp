@@ -6,10 +6,10 @@
 #include "MyUtils.h"
 
 /*
+TODO:: little detour encapsulating the proj/clean up
+TODO:: quadtree
 
-basic ray cast collision detect -> get a bool and a distance out of it
-pepega AABB collision detection -> get normal and overlap rect
-done
+
 
 TODO:: Grid to scene
        retains grid functionality
@@ -83,27 +83,8 @@ int main() {
 
     //TESTCODE
     Transform worldBB;
-    worldBB.rect = { 0,0,500,500 };
-    RandomNumberGenerator rng;
-
-    std::vector<Transform> formers;
-    for (int i = 0; i < 50; i++) {
-        SDL_FRect rect;
-        rect.x = rng.getRand(0, 500);
-        rect.y = rng.getRand(0, 500);
-        rect.w = rng.getRand(5, 32);
-        rect.h = rng.getRand(5, 32);
-
-        SDL_FPoint vel;
-        vel.x = rng.getRand(1, 5);
-        vel.y = rng.getRand(1, 5);
-
-        Transform transform(rect, vel);
-
-        formers.push_back(transform);
-    }
-
     //###################################################################
+
     bool gameRunning = true;
     SDL_Event event;
 
@@ -158,9 +139,53 @@ int main() {
         //}
         //player->transform.updatePos();
         
-        //###############################################################################
+        //#################################################################################
         
-        //COLLISION TEMPLATE (SAVE IT LATER SOMEWHERE)
+        //CAMERA
+        window.updateCamera(player->transform.rect, worldBB.rect);//wrong clamp size btw
+        //#################################################################################
+
+        //MAIN LOGIC ENDING
+        player->applySourceBoxToRenderBox();
+        player->applyCollisionBoxToRenderBox();
+        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
+        player->events.flushEvents();
+        player->transform.velocity = { 0.0f,0.0f };//temporary
+        window.updateEnd();
+        //#################################################################################
+        
+        //HANDLE TASKS BETWEEN FRAMES
+        if (window.shouldDelay()) {
+
+            Uint64 delayTime = window.getDelayDuration();
+            Uint64 startDelay = SDL_GetTicks();
+
+            //DO SHIT HERE
+
+            //#################################################################################
+
+            Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
+
+            if (remaining > 0) {
+                SDL_Delay(remaining);
+            }
+        }
+        //#################################################################################
+    }
+    SDL_Quit();
+
+    //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
+    delete entityConfig;
+    delete stageConfig;
+    delete windowConfig;
+
+    delete player;
+
+    return 0;
+}
+/*
+RECTANGLE (or any entity) PROPER COLLISION TEMPLATE, 2 STAGED
+
         SDL_FPoint cp1{ 0,0 };
         SDL_FPoint cn1{ 0,0 };
         float hitTime1 = 0;
@@ -205,57 +230,4 @@ int main() {
                 each.velocity.y *= -1;
             }
         }
-        ///////////////////////////////////
-
-        //CAMERA
-        window.updateCamera(player->transform.rect, worldBB.rect);//wrong clamp size btw
-        //#################################################################################
-
-        //TESSTCODE
-        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 255, 255);
-        for (auto& each : formers) {
-            window.drawBasicRect(&each.rect);
-        }
-        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
-        //#######################
-
-
-        //MAIN LOGIC ENDING
-        player->applySourceBoxToRenderBox();
-        player->applyCollisionBoxToRenderBox();
-        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
-        player->events.flushEvents();
-        player->transform.velocity = { 0.0f,0.0f };//temporary
-        window.updateEnd();
-        ////#################################################################################
-
-   
-        //HANDLE TASKS BETWEEN FRAMES
-        if (window.shouldDelay()) {
-
-            Uint64 delayTime = window.getDelayDuration();
-            Uint64 startDelay = SDL_GetTicks();
-
-            //DO SHIT HERE
-
-            //#################################################################################
-
-            Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
-
-            if (remaining > 0) {
-                SDL_Delay(remaining);
-            }
-        }
-        //#################################################################################
-    }
-    SDL_Quit();
-
-    //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
-    delete entityConfig;
-    delete stageConfig;
-    delete windowConfig;
-
-    delete player;
-
-    return 0;
-}
+*/
