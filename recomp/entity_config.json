@@ -13,26 +13,8 @@
     },
     "frameWidth": 32,
     "frameHeight": 32,
-    "texturePath": "../Textures/player_sheet.png",
+    "texturePath": "../Textures/player_sheet_2.png",
     "animations": {
-      "walk_up": {
-        "clip_id": "walk_up",
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 32,
-        "frameCount": 8,
-        "loops": true
-      },
-      "walk_down": {
-        "clip_id": "walk_down",
-        "x": 0,
-        "y": 32,
-        "w": 32,
-        "h": 32,
-        "frameCount": 8,
-        "loops": true
-      },
       "walk_left": {
         "clip_id": "walk_left",
         "x": 0,
@@ -49,24 +31,6 @@
         "w": 32,
         "h": 32,
         "frameCount": 8,
-        "loops": true
-      },
-      "idle_up": {
-        "clip_id": "idle_up",
-        "x": 0,
-        "y": 128,
-        "w": 32,
-        "h": 32,
-        "frameCount": 2,
-        "loops": true
-      },
-      "idle_down": {
-        "clip_id": "idle_down",
-        "x": 64,
-        "y": 128,
-        "w": 32,
-        "h": 32,
-        "frameCount": 2,
         "loops": true
       },
       "idle_left": {

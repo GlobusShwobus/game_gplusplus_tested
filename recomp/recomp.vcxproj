@@ -143,15 +143,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="events.h" />
+    <ClInclude Include="AnimationHandler.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="HashKeys.h" />
     <ClInclude Include="MyUtils.h" />
     <ClInclude Include="BasicComponents.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="EntityFactory.h" />
     <ClInclude Include="CCPRect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationHandler.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyUtils.cpp" />

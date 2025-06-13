@@ -39,26 +39,7 @@ namespace MyUtils {
 
 		return outcome;
 	}
-	Direction directionOfVelocity(const SDL_FPoint& velocity) {
 
-		static constexpr float PI = 3.1415927410125732421875;
-		float angle = std::atan2(velocity.y, velocity.x) * 180.f / PI;
-		if (angle < 0)angle += 360.f;
-
-		int angleReal = (int)std::round(angle / 90.f) * 90 % 360;
-		Direction dir = Direction::none;
-
-		switch (angleReal) {
-		case 0:	  dir= Direction::right;  break;
-		case 90:  dir= Direction::up;	  break;
-		case 180: dir= Direction::left;	  break;
-		case 270: dir= Direction::down;	  break;
-		case 360: dir= Direction::right;  break;//not sure about this, same as 0 lol
-		default:printf("this should not happen, lol\n"); break;
-		}
-
-		return dir;
-	}
 
 	AnimID movableObjectSheetIDTable(const Direction movementDir, Uint64& flags) {
 		AnimID id = 0;
