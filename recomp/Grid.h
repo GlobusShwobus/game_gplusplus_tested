@@ -2,7 +2,6 @@
 
 
 #include "SDL3/SDL.h"
-#include "vec2.h"
 
 
 enum TileDataFlags {
@@ -57,4 +56,15 @@ private:
 	Grid& operator=(const Grid&) = delete;
 };
 
-
+/*
+GET THE CORNERS OF A RECT TO THEN USED TO GET THE TILES THE CORNERS ARE IN
+	std::array<SDL_FPoint, 4> getCorners(const SDL_FRect& position) {//move this helper somewhere better
+		std::array<SDL_FPoint, 4> corners = {
+			SDL_FPoint{position.x, position.y}, //left top
+			SDL_FPoint{position.x + position.w - 1, position.y},//right top
+			SDL_FPoint{position.x, position.y + position.h - 1}, //left bottom
+			SDL_FPoint{position.x + position.w - 1, position.y + position.h - 1}//right bottom
+		};
+		return corners;
+	}
+*/

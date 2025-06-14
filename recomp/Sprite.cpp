@@ -38,6 +38,27 @@ namespace badEngine {
 		SDL_FRect Animation::getCurrentFrameRect() {
 			return current->frames[frameIndex];
 		}
+
+		AnimationIDs animationIDTable(const StateM::State& state) {
+			AnimationIDs id = AnimationIDs::DEFAULT;
+			if (state.isMoving) {
+				if (state.isFacingLeft) {
+					id = AnimationIDs::WALK_LEFT;
+				}
+				else {
+					id = AnimationIDs::WALK_RIGHT;
+				}
+			}
+			else {
+				if (state.isFacingLeft) {
+					id = AnimationIDs::IDLE_LEFT;
+				}
+				else {
+					id = AnimationIDs::IDLE_RIGHT;
+				}
+			}
+			return id;
+		}
 	}
 
 }

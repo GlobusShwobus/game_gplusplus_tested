@@ -27,6 +27,19 @@ TODO:: decide wtf to do with the player, should it or should it not be at least 
 
 */
 
+static nlohmann::json* initJSON(const char* path) {
+    //look into assurances that the path is a json so we catch exception early
+    std::ifstream in(path);
+    nlohmann::json* json = nullptr;
+    if (in.good()) {
+        json = new nlohmann::json();
+        in >> *json;
+    }
+    in.close();
+
+    return json;
+}
+
 int main() {
     using namespace badEngine;
     
@@ -36,9 +49,9 @@ int main() {
     nlohmann::json* windowConfig    = nullptr;
 
     try {
-        entityConfig = MyUtils::initJSON("entity_config.json");
-        stageConfig = MyUtils::initJSON("stage_config.json");
-        windowConfig = MyUtils::initJSON("window_config.json");
+        entityConfig = initJSON("entity_config.json");
+        stageConfig = initJSON("stage_config.json");
+        windowConfig = initJSON("window_config.json");
     }
     catch (const std::exception& excpt) {
         printf(excpt.what());

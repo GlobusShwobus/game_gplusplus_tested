@@ -7,8 +7,8 @@
 
 namespace badEngine {
 
-	//animation handling controlls
-	namespace AHC {
+	//texture sprite animation
+	namespace TSA {
 
 		enum class AnimationIDs {
 			DEFAULT = 0,
@@ -16,6 +16,39 @@ namespace badEngine {
 			WALK_RIGHT = HKey::ANIMATION_WALK_RIGHT,
 			IDLE_LEFT = HKey::ANIMATION_IDLE_FACING_LEFT,
 			IDLE_RIGHT = HKey::ANIMATION_IDLE_FACING_RIGHT
+		};
+
+		struct Reel {
+			AnimationIDs id = AnimationIDs::DEFAULT;
+			std::vector<SDL_FPoint> frames;
+			bool isLooping = false;
+		};
+
+		class Sprite {
+			SDL_Texture* texture = nullptr;
+			SDL_FRect source{ 0,0,0,0 };
+			SDL_FRect dest  { 0,0,0,0 };
+
+
+			static constexpr int frameDelay = 6;
+			std::vector<Reel>* clips = nullptr;
+			const Reel* current = nullptr;
+
+		public:
+
+			bool initPlay(std::vector<Reel>* animationPoints) {
+				if (!animationPoints) return false;
+				if (animationPoints->empty()) return false;
+
+				clips = animationPoints;
+				current = &clips->front();
+
+				return true;
+			}
+			void play();
+			bool setNewAnimation(const AnimationIDs id);
+			void updateSource();
+
 		};
 
 		struct FrameMap {
@@ -41,21 +74,7 @@ namespace badEngine {
 		};
 
 
-		AnimationIDs animationIDTable(const StateM::State& state) {
-			if (state.isMoving) {
-				if (state.isFacingLeft) {
-
-				}
-				else {
-
-				}
-			}
-			else {
-
-			}
-		}
-
-
+		AnimationIDs animationIDTable(const StateM::State& state);
 	}
 
 

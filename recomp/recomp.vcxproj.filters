@@ -24,10 +24,7 @@
     <ClInclude Include="CCPRect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BasicComponents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyUtils.h">
+    <ClInclude Include="EntityData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityFactory.h">
@@ -36,10 +33,13 @@
     <ClInclude Include="State.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationHandler.h">
+    <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HashKeys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MuhRandom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,16 +56,16 @@
     <ClCompile Include="BasicComponents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EntityFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CCPRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationHandler.cpp">
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MuhRandom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 #include "SDL3/SDL.h"
 #include "SDL3_image/SDL_image.h"
 #include "json.hpp"
-#include "BasicComponents.h"
+
 
 /*
 * Data initalized by the factory should NEVER be cleaned up during runtime as entities will depend on the basic components

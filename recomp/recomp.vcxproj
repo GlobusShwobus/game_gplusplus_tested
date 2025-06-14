@@ -143,23 +143,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationHandler.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="HashKeys.h" />
-    <ClInclude Include="MyUtils.h" />
-    <ClInclude Include="BasicComponents.h" />
+    <ClInclude Include="EntityData.h" />
+    <ClInclude Include="MuhRandom.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="EntityFactory.h" />
     <ClInclude Include="CCPRect.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AnimationHandler.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MyUtils.cpp" />
     <ClCompile Include="BasicComponents.cpp" />
     <ClCompile Include="CCPRect.cpp" />
+    <ClCompile Include="MuhRandom.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="EntityFactory.cpp" />
   </ItemGroup>
