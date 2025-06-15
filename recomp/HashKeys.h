@@ -23,7 +23,7 @@ namespace badEngine {
 		constexpr ENTITY_CATEGORY_HKEY ENTITY_TYPE_PLAYER = createHashKey("player_type");
 		constexpr ENTITY_CATEGORY_HKEY ENTITY_TYPE_ENEMY  = createHashKey("enemy_type");
 
-		constexpr bool definedEntityType(ENTITY_CATEGORY_HKEY x) {
+		constexpr bool definedEntityCategory(ENTITY_CATEGORY_HKEY x) {
 			return x == ENTITY_TYPE_PLAYER || x == ENTITY_TYPE_ENEMY;
 		}
 

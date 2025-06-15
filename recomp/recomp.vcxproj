@@ -157,7 +157,7 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="BasicComponents.cpp" />
+    <ClCompile Include="EntityData.cpp" />
     <ClCompile Include="CCPRect.cpp" />
     <ClCompile Include="MuhRandom.cpp" />
     <ClCompile Include="Window.cpp" />

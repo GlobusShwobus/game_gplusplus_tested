@@ -25,58 +25,31 @@ namespace badEngine {
 		};
 
 		class Sprite {
-			SDL_Texture* texture = nullptr;
-			SDL_FRect source{ 0,0,0,0 };
-			SDL_FRect dest  { 0,0,0,0 };
-
-
-			static constexpr int frameDelay = 6;
-			std::vector<Reel>* clips = nullptr;
-			const Reel* current = nullptr;
-
+		
 		public:
+			SDL_Texture* texture = nullptr;//shallow copy is OK, not owner
+			SDL_FRect source{ 0,0,0,0 };
+			SDL_FRect dest{ 0,0,0,0 };
+		
+		private:
+			static constexpr int frameDelay = 6;
+			std::vector<Reel>* animations = nullptr;//shallow copy is OK, not owner
+			const Reel* current = nullptr;//shallow copy is OK, not owner
+			int frameIndex = 0;
+			int frameTimer = 0;
 
-			bool initPlay(std::vector<Reel>* animationPoints) {
-				if (!animationPoints) return false;
-				if (animationPoints->empty()) return false;
+		public:	
+			Sprite(SDL_Texture* texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
 
-				clips = animationPoints;
-				current = &clips->front();
-
-				return true;
-			}
-			void play();
+			bool initPlay(std::vector<Reel>* animationPoints);
+			void unInitPlay();
+			bool play();
 			bool setNewAnimation(const AnimationIDs id);
 			void updateSource();
 
 		};
 
-		struct FrameMap {
-			AnimationIDs id = AnimationIDs::DEFAULT;
-			std::vector<SDL_FRect> frames;
-			bool isLooping = false;
-		};
-
-		class Animation {
-			static constexpr int frameDelay = 6;
-
-			const std::vector<FrameMap>& clips;
-			const FrameMap* current = nullptr;
-
-			int frameIndex = 0;
-			int frameTimer = 0;
-		public:
-			Animation(const std::vector<FrameMap>& reels);
-			void moveFrame();
-			bool setIfNew(const AnimationIDs id);
-
-			SDL_FRect getCurrentFrameRect();
-		};
-
-
 		AnimationIDs animationIDTable(const StateM::State& state);
 	}
-
-
 
 }
