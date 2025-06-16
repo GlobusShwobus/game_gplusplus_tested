@@ -34,7 +34,7 @@ namespace badEngine {
 			}
 			return true;
 		}
-		bool Sprite::setNewAnimation(const AnimationIDs id) {
+		bool Sprite::setNewAnimation(const AnimationID id) {
 			if (!animations)return false;
 			if (current->id == id) return false;//early out if same animation
 
@@ -54,22 +54,22 @@ namespace badEngine {
 			source.y = current->frames[frameIndex].y;
 		}
 
-		AnimationIDs animationIDTable(const StateM::State& state) {
-			AnimationIDs id = AnimationIDs::DEFAULT;
+		AnimationID animationIDTable(const StateM::State& state) {
+			AnimationID id = AnimationID::DEFAULT;
 			if (state.isMoving) {
 				if (state.isFacingLeft) {
-					id = AnimationIDs::WALK_LEFT;
+					id = AnimationID::WALK_LEFT;
 				}
 				else {
-					id = AnimationIDs::WALK_RIGHT;
+					id = AnimationID::WALK_RIGHT;
 				}
 			}
 			else {
 				if (state.isFacingLeft) {
-					id = AnimationIDs::IDLE_LEFT;
+					id = AnimationID::IDLE_LEFT;
 				}
 				else {
-					id = AnimationIDs::IDLE_RIGHT;
+					id = AnimationID::IDLE_RIGHT;
 				}
 			}
 			return id;

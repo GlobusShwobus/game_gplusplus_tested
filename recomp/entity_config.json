@@ -1,7 +1,7 @@
 {
   "Player": {
     "type": "player_type",
-    "entity_id": "player_version1",
+    "entity_id": "player_main",
     "movement_speed": 2.5,
     "health_points": 100,
     "mass": 25,

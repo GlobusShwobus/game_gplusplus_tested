@@ -2,22 +2,16 @@
 
 #include "SDL3/SDL.h"
 #include "CCPRect.h"
-#include "HashKeys.h"
 #include "Sprite.h"
+#include "HashKeys.h"
 
 //cool new stuff
 namespace badEngine {
 
 	//entity data manager
 	namespace EDM {
-
-		enum class PlayerType {
-			PLAYER
-		};
-		enum class EnemyType {
-			ENEMY_SPEAR1,
-			ENEMY_SWORD1
-		};
+		typedef HKey::PLAYER_ENUM_KEY PlayerType;
+		typedef HKey::ENEMY_ENUM_KEY EnemyType;
 
 		class Player {
 
@@ -31,6 +25,7 @@ namespace badEngine {
 			void updateHitBoxToSourceTexture();
 			bool WASD_PlayerVelocity(SDL_FPoint& velocity, const float moveSpeed);
 		};
+
 
 		class EnemyBasic {
 		public:

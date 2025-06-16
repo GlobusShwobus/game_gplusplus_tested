@@ -9,17 +9,10 @@ namespace badEngine {
 
 	//texture sprite animation
 	namespace TSA {
-
-		enum class AnimationIDs {
-			DEFAULT = 0,
-			WALK_LEFT = HKey::ANIMATION_WALK_LEFT,
-			WALK_RIGHT = HKey::ANIMATION_WALK_RIGHT,
-			IDLE_LEFT = HKey::ANIMATION_IDLE_FACING_LEFT,
-			IDLE_RIGHT = HKey::ANIMATION_IDLE_FACING_RIGHT
-		};
+		typedef HKey::ANIMATION_ENUM_KEY AnimationID;
 
 		struct Reel {
-			AnimationIDs id = AnimationIDs::DEFAULT;
+			AnimationID id = AnimationID::UNKNOWN;
 			std::vector<SDL_FPoint> frames;
 			bool isLooping = false;
 		};
@@ -44,12 +37,12 @@ namespace badEngine {
 			bool initPlay(std::vector<Reel>* animationPoints);
 			void unInitPlay();
 			bool play();
-			bool setNewAnimation(const AnimationIDs id);
+			bool setNewAnimation(const AnimationID id);
 			void updateSource();
 
 		};
 
-		AnimationIDs animationIDTable(const StateM::State& state);
+		AnimationID animationIDTable(const StateM::State& state);
 	}
 
 }

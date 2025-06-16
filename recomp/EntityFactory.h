@@ -21,14 +21,14 @@ namespace badEngine {
 		void initAnimations(const nlohmann::json& animationData, const EntityGeneric entityID);
 		void initEntityData(std::map<EntityGeneric, EntityData>& container, const nlohmann::json& entityData, SDL_Renderer* renderer);
 
-		void createEntry(const nlohmann::json& entry, HKey::ENTITY_CATEGORY_HKEY key, SDL_Renderer* renderer){
-			switch (key) {
+		void createEntry(const nlohmann::json& entry, HKey::ENTITY_CATEGORY_HKEY category, SDL_Renderer* renderer){
+			switch (category) {
 			case HKey::ENTITY_TYPE_PLAYER:
 				break;
 			case HKey::ENTITY_TYPE_ENEMY:
 				break;
 			default:
-				printf("unknown type: <%s> <%d>", entry["type"].get<std::string>().c_str(), key);
+				printf("unknown type: <%s> <%d>", entry["type"].get<std::string>().c_str(), category);
 				break;
 			}
 		}
@@ -57,6 +57,7 @@ namespace badEngine {
 					continue;
 				}
 
+				createEntry(entry, category, renderer);
 			}
 
 			return true;
