@@ -67,45 +67,30 @@ namespace badEngine {
 			return id != ENTITY_CATEGORY_ENUM_KEY::UNKNOWN;
 		}
 
-		typedef unsigned int PLAYER_ID_HKEY;
-		constexpr PLAYER_ID_HKEY PLAYER_MAIN = createHashKey("player_main");
-		enum class PLAYER_ENUM_KEY {
+		typedef unsigned int ENTITY_TYPES_HKEY;
+		constexpr ENTITY_TYPES_HKEY PLAYER_MAIN = createHashKey("player_main");
+		constexpr ENTITY_TYPES_HKEY ENEMY_SPEAR1 = createHashKey("enemy_spear1");
+		constexpr ENTITY_TYPES_HKEY ENEMY_SWORD1 = createHashKey("enemy_sword1");
+
+		enum class ENTITY_TYPES {
 			UNKNOWN = 0,
 			PLAYER_MAIN = 1,
+			ENEMY_SPEAR1 = 2,
+			ENEMY_SWORD1 = 3
 		};
-		constexpr PLAYER_ENUM_KEY buildPlayerTypeID(const char* str) {
-			PLAYER_ENUM_KEY key;
+
+		constexpr ENTITY_TYPES buildEntityTypeID(const char* str) {
+			ENTITY_TYPES key;
 			switch (createHashKey(str)) {
-			case PLAYER_MAIN: key = PLAYER_ENUM_KEY::PLAYER_MAIN; break;
-			default:          key = PLAYER_ENUM_KEY::UNKNOWN;     break;
+			case PLAYER_MAIN:  key = ENTITY_TYPES::PLAYER_MAIN;  break;
+			case ENEMY_SPEAR1: key = ENTITY_TYPES::ENEMY_SPEAR1; break;
+			case ENEMY_SWORD1: key = ENTITY_TYPES::ENEMY_SWORD1; break;
+			default:           key = ENTITY_TYPES::UNKNOWN;      break;
 			}
 			return key;
 		}
-		constexpr bool isValidID(PLAYER_ENUM_KEY id) {
-			return id != PLAYER_ENUM_KEY::UNKNOWN;
-		}
-
-		typedef unsigned int ENEMY_ID_HKEY;
-		constexpr ENEMY_ID_HKEY ENEMY_SPEAR1 = createHashKey("enemy_spear1");
-		constexpr ENEMY_ID_HKEY ENEMY_SWORD1 = createHashKey("enemy_sword1");
-
-		enum class ENEMY_ENUM_KEY {
-			UNKNOWN = 0,
-			ENEMY_SPEAR1 = 1,
-			ENEMY_SWORD1 = 2
-		};
-
-		constexpr ENEMY_ENUM_KEY buildEnemyTypeID(const char* str) {
-			ENEMY_ENUM_KEY key;
-			switch (createHashKey(str)) {
-			case ENEMY_SPEAR1: key = ENEMY_ENUM_KEY::ENEMY_SPEAR1; break;
-			case ENEMY_SWORD1: key = ENEMY_ENUM_KEY::ENEMY_SWORD1; break;
-			default:           key = ENEMY_ENUM_KEY::UNKNOWN;      break;
-			}
-			return key;
-		}
-		constexpr bool isValidID(ENEMY_ENUM_KEY id) {
-			return id != ENEMY_ENUM_KEY::UNKNOWN;
+		constexpr bool isValidID(ENTITY_TYPES id) {
+			return id != ENTITY_TYPES::UNKNOWN;
 		}
 	}
 

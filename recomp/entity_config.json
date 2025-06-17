@@ -11,13 +11,9 @@
       "w": 32,
       "h": 32
     },
-    "Destination": {
-      "x": 100,
-      "y": 100,
-      "w": 32,
-      "h": 32
-    },
-    "texturePath": "../Textures/player_sheet_2.png",
+    "texture_path": "../Textures/player_sheet_2.png",
+    "texture_src": [ 0, 0, 32, 32 ],
+    "texture_dest": [ 0, 0, 32, 32 ],
     "animations": {
       "walk_left": {
         "clip_id": "walk_left",
@@ -69,13 +65,9 @@
       "w": 32,
       "h": 32
     },
-    "Destination": {
-      "x": 0,
-      "y": 0,
-      "w": 32,
-      "h": 32
-    },
-    "texturePath": "../Textures/enemy_spear1.png"
+    "texture_path": "../Textures/enemy_spear1.png",
+    "texture_src": [ 0, 0, 32, 32 ],
+    "texture_dest": [ 0, 0, 32, 32 ]
   },
   "enemy_sword1": {
     "type": "enemy_type",
@@ -89,12 +81,8 @@
       "w": 32,
       "h": 32
     },
-    "Destination": {
-      "x": 0,
-      "y": 0,
-      "w": 32,
-      "h": 32
-    },
-    "texturePath": "../Textures/enemy_sword1.png"
+    "texture_path": "../Textures/enemy_sword1.png",
+    "texture_src": [ 0, 0, 32, 32 ],
+    "texture_dest": [ 0, 0, 32, 32 ]
   }
 }

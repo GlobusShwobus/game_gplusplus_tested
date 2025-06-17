@@ -10,8 +10,6 @@ namespace badEngine {
 
 	//entity data manager
 	namespace EDM {
-		typedef HKey::PLAYER_ENUM_KEY PlayerType;
-		typedef HKey::ENEMY_ENUM_KEY EnemyType;
 
 		class Player {
 

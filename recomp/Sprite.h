@@ -32,6 +32,7 @@ namespace badEngine {
 			int frameTimer = 0;
 
 		public:	
+			Sprite() = default;
 			Sprite(SDL_Texture* texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
 
 			bool initPlay(std::vector<Reel>* animationPoints);
@@ -39,7 +40,6 @@ namespace badEngine {
 			bool play();
 			bool setNewAnimation(const AnimationID id);
 			void updateSource();
-
 		};
 
 		AnimationID animationIDTable(const StateM::State& state);
