@@ -1,6 +1,6 @@
 #include "EntityFactory.h"
 namespace badEngine {
-	bool EntityFactory::initFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
+	bool EntityFactory::componentInitalizationPhase(const nlohmann::json* const entityConfig, SDL_Renderer* renderer) {
 		if (!entityConfig) {//if null ptr, kill it
 			printf("\nentityConfig nullptr, cannot initalize components\n");
 			return false;
@@ -8,29 +8,19 @@ namespace badEngine {
 
 		for (const auto& entry : *entityConfig) {
 
-			if (!entry.contains("type") || !entry.contains("entity_id")) {
-				printf("entity missing type or id\n");
+			if (!entry.contains("type")) {
+				printf("\nentity missing type specification");
 				continue;
 			}
-			HKey::ENTITY_CATEGORY_ENUM_KEY category = HKey::buildCategoryID(entry["type"].get<std::string>().c_str());
+			std::string keyStr = entry["type"].get<std::string>();
+			HKey::ENTITY_TYPE key = HKey::buildEntityTypeID(keyStr.c_str());
 
-			if (!HKey::isValidID(category)) {
-				printf("\nunknown entity category, config not updated properly");
+			if (!HKey::isValidID(key)) {
+				printf("\ninvalid entity type unknown");
 				continue;
 			}
 
-			switch (entityType) {
-			case EntityType_ENEMY:
-				initEntityData(enemyData, entry, renderer);
-				break;
-			case EntityType_PLAYER:
-				initEntityData(playerData, entry, renderer);
-				break;
-				//others cases, like buildings, waterfalls, items GOES HERE
-			default:
-				printf("unknown type: <%s> <%d>", entry["type"].get<std::string>().c_str(), entityType);
-				continue;
-			}
+			componentConstructionTable(entry, renderer, key);
 		}
 		return true;
 	}

@@ -1,7 +1,6 @@
 {
   "Player": {
-    "type": "player_type",
-    "entity_id": "player_main",
+    "type": "player_main",
     "movement_speed": 2.5,
     "health_points": 100,
     "mass": 25,
@@ -16,46 +15,33 @@
     "texture_dest": [ 0, 0, 32, 32 ],
     "animations": {
       "walk_left": {
-        "clip_id": "walk_left",
-        "x": 0,
-        "y": 64,
-        "w": 32,
-        "h": 32,
+        "id": "walk_left",
+        "reel_xyw": [ 0, 64, 32 ],
         "frameCount": 8,
         "loops": true
       },
       "walk_right": {
-        "clip_id": "walk_right",
-        "x": 0,
-        "y": 96,
-        "w": 32,
-        "h": 32,
+        "id": "walk_right",
+        "reel_xyw": [ 0, 96, 32 ],
         "frameCount": 8,
         "loops": true
       },
       "idle_left": {
-        "clip_id": "idle_left",
-        "x": 128,
-        "y": 128,
-        "w": 32,
-        "h": 32,
+        "id": "idle_left",
+        "reel_xyw": [ 128, 128, 32 ],
         "frameCount": 2,
         "loops": true
       },
       "idle_right": {
-        "clip_id": "idle_right",
-        "x": 192,
-        "y": 128,
-        "w": 32,
-        "h": 32,
+        "id": "idle_right",
+        "reel_xyw": [ 192, 128, 32 ],
         "frameCount": 2,
         "loops": true
       }
     }
   },
   "enemy_spear1": {
-    "type": "enemy_type",
-    "entity_id": "enemy_spear1",
+    "type": "enemy_spear1",
     "movement_speed": 5,
     "health_points": 100,
     "mass": 10,
@@ -70,8 +56,7 @@
     "texture_dest": [ 0, 0, 32, 32 ]
   },
   "enemy_sword1": {
-    "type": "enemy_type",
-    "entity_id": "enemy_sword1",
+    "type": "enemy_sword1",
     "movement_speed": 10,
     "health_points": 200,
     "mass": 20,

@@ -17,6 +17,11 @@ namespace badEngine {
 			bool isLooping = false;
 		};
 
+		struct SpriteStriped {
+			SDL_FRect src{ 0,0,0,0 };
+			SDL_FRect dest{ 0,0,0,0 };
+		};
+
 		class Sprite {
 		
 		public:

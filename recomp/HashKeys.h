@@ -43,54 +43,30 @@ namespace badEngine {
 			return id != ANIMATION_ENUM_KEY::UNKNOWN;
 		}
 
-		typedef unsigned int ENTITY_CATEGORY_HKEY;
-		constexpr ENTITY_CATEGORY_HKEY ENTITY_TYPE_PLAYER = createHashKey("player_type");
-		constexpr ENTITY_CATEGORY_HKEY ENTITY_TYPE_ENEMY  = createHashKey("enemy_type");
-
-		enum class ENTITY_CATEGORY_ENUM_KEY {
-			UNKNOWN = 0,
-			PLAYER = 1,
-			ENEMY = 2,
-		};
-		constexpr ENTITY_CATEGORY_ENUM_KEY buildCategoryID(const char* str) {
-			ENTITY_CATEGORY_ENUM_KEY key;
-			
-			switch (createHashKey(str)) {
-			case ENTITY_TYPE_PLAYER:    key = ENTITY_CATEGORY_ENUM_KEY::PLAYER;   break;
-			case ENTITY_TYPE_ENEMY:     key = ENTITY_CATEGORY_ENUM_KEY::ENEMY;    break;
-			default:                    key = ENTITY_CATEGORY_ENUM_KEY::UNKNOWN;  break;
-			}
-
-			return key;
-		}
-		constexpr bool isValidID(ENTITY_CATEGORY_ENUM_KEY id) {
-			return id != ENTITY_CATEGORY_ENUM_KEY::UNKNOWN;
-		}
-
 		typedef unsigned int ENTITY_TYPES_HKEY;
 		constexpr ENTITY_TYPES_HKEY PLAYER_MAIN = createHashKey("player_main");
 		constexpr ENTITY_TYPES_HKEY ENEMY_SPEAR1 = createHashKey("enemy_spear1");
 		constexpr ENTITY_TYPES_HKEY ENEMY_SWORD1 = createHashKey("enemy_sword1");
 
-		enum class ENTITY_TYPES {
+		enum class ENTITY_TYPE {
 			UNKNOWN = 0,
 			PLAYER_MAIN = 1,
 			ENEMY_SPEAR1 = 2,
 			ENEMY_SWORD1 = 3
 		};
 
-		constexpr ENTITY_TYPES buildEntityTypeID(const char* str) {
-			ENTITY_TYPES key;
+		constexpr ENTITY_TYPE buildEntityTypeID(const char* str) {
+			ENTITY_TYPE key;
 			switch (createHashKey(str)) {
-			case PLAYER_MAIN:  key = ENTITY_TYPES::PLAYER_MAIN;  break;
-			case ENEMY_SPEAR1: key = ENTITY_TYPES::ENEMY_SPEAR1; break;
-			case ENEMY_SWORD1: key = ENTITY_TYPES::ENEMY_SWORD1; break;
-			default:           key = ENTITY_TYPES::UNKNOWN;      break;
+			case PLAYER_MAIN:  key = ENTITY_TYPE::PLAYER_MAIN;  break;
+			case ENEMY_SPEAR1: key = ENTITY_TYPE::ENEMY_SPEAR1; break;
+			case ENEMY_SWORD1: key = ENTITY_TYPE::ENEMY_SWORD1; break;
+			default:           key = ENTITY_TYPE::UNKNOWN;      break;
 			}
 			return key;
 		}
-		constexpr bool isValidID(ENTITY_TYPES id) {
-			return id != ENTITY_TYPES::UNKNOWN;
+		constexpr bool isValidID(ENTITY_TYPE id) {
+			return id != ENTITY_TYPE::UNKNOWN;
 		}
 	}
 
