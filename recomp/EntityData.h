@@ -25,13 +25,13 @@ namespace badEngine {
 		};
 
 
-		class EnemyBasic {
+		class Enemy {
 		public:
 
 			TSA::Sprite sprite;
 			CCP::HitBox hitbox;
 
-			EnemyBasic(const TSA::Sprite& sprite, const CCP::HitBox& hitbox);
+			Enemy(const TSA::Sprite& sprite, const CCP::HitBox& hitbox);
 		};
 
 	}

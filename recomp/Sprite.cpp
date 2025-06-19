@@ -3,7 +3,7 @@
 namespace badEngine {
 
 	namespace TSA {
-		bool Sprite::initPlay(std::vector<Reel>* animationPoints) {
+		bool Sprite::initPlay(const std::vector<Reel>* animationPoints) {
 			if (!animationPoints) return false;
 			if (animationPoints->empty()) return false;
 
@@ -55,7 +55,7 @@ namespace badEngine {
 		}
 
 		AnimationID animationIDTable(const StateM::State& state) {
-			AnimationID id = AnimationID::DEFAULT;
+			AnimationID id = AnimationID::UNKNOWN;
 			if (state.isMoving) {
 				if (state.isFacingLeft) {
 					id = AnimationID::WALK_LEFT;

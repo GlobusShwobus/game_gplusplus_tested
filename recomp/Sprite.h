@@ -31,7 +31,7 @@ namespace badEngine {
 		
 		private:
 			static constexpr int frameDelay = 6;
-			std::vector<Reel>* animations = nullptr;//shallow copy is OK, not owner
+			const std::vector<Reel>* animations = nullptr;//shallow copy is OK, not owner
 			const Reel* current = nullptr;//shallow copy is OK, not owner
 			int frameIndex = 0;
 			int frameTimer = 0;
@@ -40,7 +40,7 @@ namespace badEngine {
 			Sprite() = default;
 			Sprite(SDL_Texture* texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
 
-			bool initPlay(std::vector<Reel>* animationPoints);
+			bool initPlay(const std::vector<Reel>* animationPoints);
 			void unInitPlay();
 			bool play();
 			bool setNewAnimation(const AnimationID id);
