@@ -73,7 +73,7 @@ namespace badEngine {
 			}
 			return false;
 		}
-		bool collisionRayProjection(const SDL_FPoint& rayOrigin, const SDL_FPoint& rayVector, const SDL_FRect& target, float& hitTime, SDL_FPoint* cp = nullptr, SDL_FPoint* cn = nullptr) {
+		bool collisionRayProjection(const SDL_FPoint& rayOrigin, const SDL_FPoint& rayVector, const SDL_FRect& target, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn) {
 			// Inverse direction, idfk why, but it is OK to divide floats by 0, creates an infiniti and later creates a NaN
 			SDL_FPoint inverse = {
 				 1.0f / rayVector.x,
@@ -127,7 +127,7 @@ namespace badEngine {
 
 			return true;
 		}
-		bool collisionEnhancedRayProjection(const HitBox& first, const HitBox& second, float& hitTime, SDL_FPoint* cp = nullptr, SDL_FPoint* cn = nullptr) {
+		bool collisionEnhancedRayProjection(const HitBox& first, const HitBox& second, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn) {
 			// Relative motion
 			SDL_FPoint relVelocity = {
 				first.velocity.x - second.velocity.x,
@@ -189,5 +189,4 @@ namespace badEngine {
 
 
 	}
-
 }

@@ -26,7 +26,7 @@ namespace badEngine {
 			return outcome;
 		}
 
-		EnemyBasic::EnemyBasic(const TSA::Sprite& sprite, const CCP::HitBox& hitbox) :sprite(sprite), hitbox(hitbox) {}
+		Enemy::Enemy(const TSA::Sprite& sprite, const CCP::HitBox& hitbox) :sprite(sprite), hitbox(hitbox) {}
 	}
 
 

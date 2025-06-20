@@ -17,7 +17,7 @@ namespace badEngine {
 			bool isLooping = false;
 		};
 
-		struct SpriteStriped {
+		struct TTransfer {
 			SDL_FRect src{ 0,0,0,0 };
 			SDL_FRect dest{ 0,0,0,0 };
 		};
@@ -39,6 +39,7 @@ namespace badEngine {
 		public:	
 			Sprite() = default;
 			Sprite(SDL_Texture* texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
+			Sprite(SDL_Texture* texture, const TTransfer& ttransfer) :texture(texture), source(ttransfer.src), dest(ttransfer.dest) {}
 
 			bool initPlay(const std::vector<Reel>* animationPoints);
 			void unInitPlay();

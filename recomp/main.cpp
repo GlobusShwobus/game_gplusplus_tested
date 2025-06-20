@@ -2,29 +2,13 @@
 #include "Window.h"
 #include "Grid.h"
 
-
-#include "MyUtils.h"
+#include <fstream> //file reader?
 
 /*
-TODO:: little detour encapsulating the proj/clean up
-TODO:: quadtree
-
-
-
-TODO:: Grid to scene
-       retains grid functionality
-       stores the map and data describing what areas are walkable what not
-       stores entities
-       handles batch creation
-       handles batch clean up
-       (massive bonus points for batch behavior like movement/collision etc)
-       saves data in a config where what is
-       may need to store additional event type information for scrips but not necessarily scripts themselves
-
-TODO:: window frame counter and camera require a better constructor not init function, looks fugly
-TODO:: warp json objects so they get a more secure/automatic clean up when they're not desired any longer
-TODO:: decide wtf to do with the player, should it or should it not be at least in some shortcut way be tied to scenes?
-
+TODO:: rework the window, want more ability to create windows and window should only care about structly window related stuff
+TODO:: quadtree storage and lookup
+TODO:: scene class (the big ugh)
+TODO:: imgui
 */
 
 static nlohmann::json* initJSON(const char* path) {
@@ -39,25 +23,31 @@ static nlohmann::json* initJSON(const char* path) {
 
     return json;
 }
+class JSON_Wrapper {//temporary until file reader sometime tm
+public:
+    nlohmann::json* json = nullptr;
+
+    ~JSON_Wrapper() {
+        delete json;
+        json = nullptr;
+    }
+};
 
 int main() {
     using namespace badEngine;
     
     //configs
-    nlohmann::json* entityConfig    = nullptr;
-    nlohmann::json* stageConfig     = nullptr;
-    nlohmann::json* windowConfig    = nullptr;
+    JSON_Wrapper entityConfig;
+    JSON_Wrapper stageConfig;
+    JSON_Wrapper windowConfig;
 
     try {
-        entityConfig = initJSON("entity_config.json");
-        stageConfig = initJSON("stage_config.json");
-        windowConfig = initJSON("window_config.json");
+        entityConfig.json = initJSON("entity_config.json");
+        stageConfig.json  = initJSON("stage_config.json");
+        windowConfig.json = initJSON("window_config.json");
     }
     catch (const std::exception& excpt) {
         printf(excpt.what());
-        delete entityConfig;
-        delete stageConfig;
-        delete windowConfig;
         return -1;
     }
     //initalize SDL and RenderWIndow
@@ -65,11 +55,13 @@ int main() {
         printf("\nCRASH:: SDL_init Failure");
         return -1;
     }
-    Window window(windowConfig);
+    Window window(windowConfig.json);
 
     //initialize EntityFactory
-    EntityFactory entityFactory;
-    if (!entityFactory.initFactory(entityConfig, window.getRenderer())) {
+    EFM::EntityFactory entityFactory(entityConfig.json, window.getRenderer()) ;
+
+    if (!entityFactory.isInitalized()) {
+        entityFactory.wipeMemory();
         return -1;
     }
 
@@ -87,12 +79,7 @@ int main() {
 
     //player
     //WRAP THIS SHIT UP
-    PlayerID id = HASH("player_version1");
-    Player* player = entityFactory.createPlayer(id);
-    if (!player) {
-        printf("player nullptr GG WP\n");
-        return -1;
-    }
+    EDM::Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
 
     //TESTCODE
     Transform worldBB;
@@ -188,14 +175,12 @@ int main() {
     SDL_Quit();
 
     //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
-    delete entityConfig;
-    delete stageConfig;
-    delete windowConfig;
 
     delete player;
 
     return 0;
 }
+
 /*
 RECTANGLE (or any entity) PROPER COLLISION TEMPLATE, 2 STAGED
 
