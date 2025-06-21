@@ -16,25 +16,25 @@
     "animations": {
       "walk_left": {
         "id": "walk_left",
-        "reel_xyw": [ 0, 64, 32 ],
+        "reel_xyw": [ 0, 0, 32 ],
         "frameCount": 8,
         "loops": true
       },
       "walk_right": {
         "id": "walk_right",
-        "reel_xyw": [ 0, 96, 32 ],
+        "reel_xyw": [ 0, 32, 32 ],
         "frameCount": 8,
         "loops": true
       },
       "idle_left": {
         "id": "idle_left",
-        "reel_xyw": [ 128, 128, 32 ],
+        "reel_xyw": [ 128, 64, 32 ],
         "frameCount": 2,
         "loops": true
       },
       "idle_right": {
         "id": "idle_right",
-        "reel_xyw": [ 192, 128, 32 ],
+        "reel_xyw": [ 192, 64, 32 ],
         "frameCount": 2,
         "loops": true
       }

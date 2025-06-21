@@ -102,6 +102,7 @@ int main() {
             }
         }
         player->sprite.play();
+        EDM::setCoordinates(player->hitbox);
         //###############################################################################
         
 

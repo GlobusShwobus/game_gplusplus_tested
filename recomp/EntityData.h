@@ -34,7 +34,10 @@ namespace badEngine {
 
 			Enemy(const TSA::Sprite& sprite, const CCP::HitBox& hitbox);
 		};
-
+		static void setCoordinates(CCP::HitBox& hitbox) {
+			hitbox.rectangle.x += hitbox.velocity.x;
+			hitbox.rectangle.y += hitbox.velocity.y;
+		}
 		static SMS::Facing facingDirection(const SDL_FPoint& velocity) {
 			SMS::Facing f = SMS::Facing::UNKNOWN;
 			if (velocity.x < 0)
