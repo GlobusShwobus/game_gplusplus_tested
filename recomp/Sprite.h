@@ -45,10 +45,13 @@ namespace badEngine {
 			void unInitPlay();
 			bool play();
 			bool setNewAnimation(const AnimationID id);
-			void updateSource();
+			SDL_FRect getAnimatedTextureSource();
+			AnimationID getCurrentAnimationID();
 		};
 
-		AnimationID animationIDTable(const StateM::State& state);
+		AnimationID animationIDTable(const SMS::State& state);
+		void setTTransferField_coordinates(const SDL_FRect& origin, SDL_FRect& dest);
+		void setTTransferField_full(const SDL_FRect& origin, SDL_FRect& dest);
 	}
 
 }

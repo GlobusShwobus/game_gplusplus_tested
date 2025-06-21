@@ -2,20 +2,18 @@
 
 namespace badEngine{
 
-	//state machine
-	namespace StateM {
+	//state machine system
+	namespace SMS {
 
+		enum class Facing {
+			UNKNOWN,
+			LEFT,
+			RIGHT
+		};
 		struct State {
 			bool isMoving     = false;
-			bool isFacingLeft = false;
+			Facing facing     = Facing::UNKNOWN;
 		};
-
-		static bool isFacingLeft(float x) {
-			return x < 0.0f;
-		}
-		static bool isMoving(float x, float y) {
-			return x != 0.0f || y != 0.0f;
-		}
 
 	}
 

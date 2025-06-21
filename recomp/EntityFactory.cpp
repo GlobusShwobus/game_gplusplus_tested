@@ -46,21 +46,21 @@ namespace badEngine {
 				}
 			}
 			else {
-				printf("\nwarning: entity construction without texture: <%s>", keyStr);
+				printf("\nwarning: entity construction without texture: <%s>", keyStr.c_str());
 			}
 
 			if (data.contains("animations")) {
 				constructComponent_Animations(data["animations"], key, keyStr);
 			}
 			else {
-				printf("\nwarning: entity construction without animation: <%s>", keyStr);
+				printf("\nwarning: entity construction without animation: <%s>", keyStr.c_str());
 			}
 
 			if (data.contains("Hitbox")) {
 				constructComponent_Hitbox(data["Hitbox"], key, keyStr);
 			}
 			else {
-				printf("\nwarning: entity construction without hitbox: <%s>", keyStr);
+				printf("\nwarning: entity construction without hitbox: <%s>", keyStr.c_str());
 			}
 
 			/*
@@ -121,15 +121,15 @@ namespace badEngine {
 			for (const auto& rData : data) {
 
 				if (!rData.contains("id") || !rData.contains("reel_xyw") && rData["reel_xyw"].is_object()) {
-					printf("\nerror: animation reel missing id or invalid reel setup: <%s>", keyStr);
+					printf("\nerror: animation reel missing id or invalid reel setup: <%s>", keyStr.c_str());
 					continue;
 				}
 
 				TSA::Reel clip;
 
-				std::string aids = data["id"].get<std::string>();//animation id string
+				std::string aids = rData["id"].get<std::string>();//animation id string
 				clip.id = HKey::buildAnimationID(aids.c_str());
-				clip.isLooping = data.value("loops", false);
+				clip.isLooping = rData.value("loops", false);
 
 				const int frameCount = data.value("frameCount", 1);
 
@@ -147,7 +147,7 @@ namespace badEngine {
 					}
 				}
 				catch (std::exception& expt) {
-					printf("\nerror: aniamtion clip invalid index: <%s>\t<%s>", keyStr, aids);
+					printf("\nerror: aniamtion clip invalid index: <%s>\t<%s>", keyStr.c_str(), aids);
 					continue;
 				}
 

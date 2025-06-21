@@ -4,11 +4,7 @@ namespace badEngine {
 	namespace EDM {
 		Player::Player(const TSA::Sprite& sprite, const CCP::HitBox& hitbox) :sprite(sprite), hitbox(hitbox) {}
 
-		void Player::updateHitBoxToSourceTexture() {
-			sprite.dest.x = hitbox.rectangle.x;
-			sprite.dest.y = hitbox.rectangle.y;
-		}
-		bool Player::WASD_PlayerVelocity(SDL_FPoint& velocity, const float moveSpeed) {
+		bool Player::WASD_PlayerVelocity(const float moveSpeed) {
 			const auto* keystate = SDL_GetKeyboardState(nullptr);
 
 			bool w = keystate[SDL_SCANCODE_W];
@@ -18,10 +14,10 @@ namespace badEngine {
 
 			bool outcome = false;
 
-			if (w) { velocity.y -= moveSpeed; outcome = true; }
-			else if (a) { velocity.x -= moveSpeed; outcome = true; }
-			else if (s) { velocity.y += moveSpeed; outcome = true; }
-			else if (d) { velocity.x += moveSpeed; outcome = true; }
+			if (w)      { hitbox.velocity.y -= moveSpeed; outcome = true; }
+			else if (a) { hitbox.velocity.x -= moveSpeed; outcome = true; }
+			else if (s) { hitbox.velocity.y += moveSpeed; outcome = true; }
+			else if (d) { hitbox.velocity.x += moveSpeed; outcome = true; }
 
 			return outcome;
 		}

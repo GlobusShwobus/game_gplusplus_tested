@@ -4,14 +4,16 @@ namespace badEngine {
 
 	//cartesian coordinate physics
 	namespace CCP {
-		float dotProduct(const SDL_FPoint& point) {
+		float dotProduct(const SDL_FPoint& point)
+		{
 			return (point.x * point.x) + (point.y * point.y);
 		}
-		float lenght(const SDL_FPoint& point) {
+		float lenght(const SDL_FPoint& point)
+		{
 			return SDL_sqrtf(dotProduct(point));
 		}
-		SDL_FPoint unitVector(const SDL_FPoint& point) {
-
+		SDL_FPoint unitVector(const SDL_FPoint& point)
+		{
 			float lenght = dotProduct(point);
 
 			lenght = SDL_sqrtf(lenght);
@@ -20,7 +22,8 @@ namespace badEngine {
 
 			return { point.x / lenght, point.y / lenght };
 		}
-		SDL_FPoint signVector(const SDL_FPoint& point) {
+		SDL_FPoint signVector(const SDL_FPoint& point) 
+		{
 			SDL_FPoint out = { 0.0f, 0.0f };
 			if (point.x > 0.0f)
 				out.x = 1.0f;
@@ -33,21 +36,24 @@ namespace badEngine {
 			return out;
 		}
 
-		bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point) {
+		bool containsPoint(const SDL_FRect& rect, const SDL_FPoint& point)
+		{
 			return (
 				point.x >= rect.x &&
 				point.y >= rect.y &&
 				point.x < rect.x + rect.w &&
 				point.y < rect.y + rect.h);
 		}
-		bool containsRect(const SDL_FRect& outer, const SDL_FRect& inner) {
+		bool containsRect(const SDL_FRect& outer, const SDL_FRect& inner)
+		{
 			return (
 				inner.x >= outer.x &&
 				inner.y >= outer.y &&
 				inner.x + inner.w <= outer.x + outer.w &&
 				inner.y + inner.h <= outer.y + outer.h);
 		}
-		bool collisionAABB(const SDL_FRect& a, const SDL_FRect& b) {
+		bool collisionAABB(const SDL_FRect& a, const SDL_FRect& b)
+		{
 			return (
 				a.x < b.x + b.w &&
 				a.x + a.w > b.x &&
@@ -55,7 +61,8 @@ namespace badEngine {
 				a.y + a.h > b.y
 				);
 		}
-		bool collisionEnhancedAABB(const HitBox& first, const HitBox& second, SDL_Rect* output) {
+		bool collisionEnhancedAABB(const HitBox& first, const HitBox& second, SDL_Rect* output) 
+		{
 			if (!output) return false;
 
 			float dx = (first.rectangle.x + first.halfWidth) - (second.rectangle.x + second.halfWidth);
@@ -73,7 +80,8 @@ namespace badEngine {
 			}
 			return false;
 		}
-		bool collisionRayProjection(const SDL_FPoint& rayOrigin, const SDL_FPoint& rayVector, const SDL_FRect& target, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn) {
+		bool collisionRayProjection(const SDL_FPoint& rayOrigin, const SDL_FPoint& rayVector, const SDL_FRect& target, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn)
+		{
 			// Inverse direction, idfk why, but it is OK to divide floats by 0, creates an infiniti and later creates a NaN
 			SDL_FPoint inverse = {
 				 1.0f / rayVector.x,
@@ -127,7 +135,8 @@ namespace badEngine {
 
 			return true;
 		}
-		bool collisionEnhancedRayProjection(const HitBox& first, const HitBox& second, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn) {
+		bool collisionEnhancedRayProjection(const HitBox& first, const HitBox& second, float& hitTime, SDL_FPoint* cp, SDL_FPoint* cn)
+		{
 			// Relative motion
 			SDL_FPoint relVelocity = {
 				first.velocity.x - second.velocity.x,
@@ -156,35 +165,30 @@ namespace badEngine {
 			return false;
 		}
 
-		void resolveAABB_overlapSecond(SDL_FRect& rect, const SDL_Rect& mutator) {
-			if (mutator.w < mutator.h) {
+		void resolveAABB_overlapSecond(SDL_FRect& rect, const SDL_Rect& mutator)
+		{
+			if (mutator.w < mutator.h) 
 				rect.x += mutator.w;
-			}
-			else {
+			else 
 				rect.y += mutator.h;
-			}
 		}
-		void resolveAABB_overlapFirst(SDL_FRect& rect, const SDL_Rect& mutator) {
-			if (mutator.w < mutator.h) {
+		void resolveAABB_overlapFirst(SDL_FRect& rect, const SDL_Rect& mutator)
+		{
+			if (mutator.w < mutator.h)
 				rect.x -= mutator.w;
-			}
-			else {
+			else 
 				rect.y -= mutator.h;
-			}
 		}
-		void resolveOutOfBounds(const SDL_FRect& bounds, SDL_FRect& rect) {
-			if (rect.x < bounds.x) {
+		void resolveOutOfBounds(const SDL_FRect& bounds, SDL_FRect& rect)
+		{
+			if (rect.x < bounds.x) 
 				rect.x = bounds.x;
-			}
-			if (rect.y < bounds.y) {
+			if (rect.y < bounds.y) 
 				rect.y = bounds.y;
-			}
-			if (rect.x + rect.w > bounds.w) {
+			if (rect.x + rect.w > bounds.w) 
 				rect.x = bounds.w - rect.w;
-			}
-			if (rect.y + rect.h > bounds.h) {
+			if (rect.y + rect.h > bounds.h) 
 				rect.y = bounds.h - rect.h;
-			}
 		}
 
 

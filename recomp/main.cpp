@@ -6,6 +6,7 @@
 
 /*
 TODO:: rework the window, want more ability to create windows and window should only care about structly window related stuff
+       then we can make sprite field private (with slight consequences but that's minor)
 TODO:: quadtree storage and lookup
 TODO:: scene class (the big ugh)
 TODO:: imgui
@@ -65,24 +66,12 @@ int main() {
         return -1;
     }
 
-    //###################################################
-    // 
-    // Grid to become scene, which holds the map and any entities associated with it.
-    // 
-    // 
-    // Sprite worldMap = textureManager.createSprite(SpriteID::world_map);
-     Grid grid = Grid(2560, 1440);
-    // 
-    // 
-    //#####################################################################
-
-
     //player
     //WRAP THIS SHIT UP
     EDM::Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
 
     //TESTCODE
-    Transform worldBB;
+    CCP::HitBox world(0, 0, 2560, 1440);
     //###################################################################
 
     bool gameRunning = true;
@@ -92,65 +81,44 @@ int main() {
 
         window.updateBegin();
 
+        //LISTEN TO EVENTS
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 gameRunning = false;
             }
         }
-        //VELOCITY AND FRAME
-        if (MyUtils::WASD_PlayerVelocity(player->transform.velocity, 5)) {
-            player->events.setEvent(MPE_movingObject | MPE_checkDirection);
-        }
-        player->events.setEvent(MPE_checkAnimation);//otherwise if idle it doesn't change it
+        //###############################################################################
 
-        if (player->events.containsEvent(MPE_checkDirection)) {
-            player->direction = MyUtils::directionOfVelocity(player->transform.velocity);
-        }
+        //BULLSHIT
+        player->WASD_PlayerVelocity(5.0f);
+        player->state.isMoving = EDM::isMoving(player->hitbox.velocity);
+        player->state.facing = EDM::facingDirection(player->hitbox.velocity);
 
-        if (player->events.containsEvent(MPE_checkAnimation)) {
-            AnimID id = MyUtils::movableObjectSheetIDTable(player->direction, player->events.events);
-            player->animControlls.setIfNew(id);
+        TSA::AnimationID animationID = TSA::animationIDTable(player->state);
+        
+        if (animationID != TSA::AnimationID::UNKNOWN && player->sprite.getCurrentAnimationID() != animationID) {
+            if (!player->sprite.setNewAnimation(animationID)) {
+                printf("\nerror: attempt to set invalid animation id");
+            }
         }
-
-        player->animControlls.moveFrame();
+        player->sprite.play();
         //###############################################################################
         
 
         //COLLISION
-        std::vector<std::pair<int, float>> collisions;
-
-        //for (int i = 0; i < rects.size();i++) {
-        //    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-        //    float hitTime = 0;
-        //    if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
-        //        collisions.push_back({ i, hitTime });
-        //    }
-        //}
-        //std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-        //    return a.second < b.second;
-        //    });
-        //for (auto& j : collisions) {
-        //    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-        //    float hitTime = 0;
-        //    if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
-        //        player->transform.clampNextTo(rects[j.first].rect, contactN);
-        //        player->transform.clearVelocity();
-        //    }
-        //}
-        //player->transform.updatePos();
-        
+        //...        
         //#################################################################################
         
         //CAMERA
-        window.updateCamera(player->transform.rect, worldBB.rect);//wrong clamp size btw
+        window.updateCamera(player->hitbox.rectangle, world.rectangle);//wrong clamp size btw
         //#################################################################################
 
         //MAIN LOGIC ENDING
-        player->applySourceBoxToRenderBox();
-        player->applyCollisionBoxToRenderBox();
-        window.drawTexture(player->texture, &player->textureSrc, &player->textureDest);
-        player->events.flushEvents();
-        player->transform.velocity = { 0.0f,0.0f };//temporary
+        TSA::setTTransferField_coordinates(player->sprite.getAnimatedTextureSource(), player->sprite.source);
+        TSA::setTTransferField_coordinates(player->hitbox.rectangle, player->sprite.dest);
+
+        window.drawTexture(player->sprite.texture, &player->sprite.source, &player->sprite.dest);
+        player->hitbox.velocity = { 0.0f,0.0f };//temporary bullshit
         window.updateEnd();
         //#################################################################################
         
@@ -180,6 +148,29 @@ int main() {
 
     return 0;
 }
+
+
+//std::vector<std::pair<int, float>> collisions;
+//for (int i = 0; i < rects.size();i++) {
+//    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+//    float hitTime = 0;
+//    if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
+//        collisions.push_back({ i, hitTime });
+//    }
+//}
+//std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+//    return a.second < b.second;
+//    });
+//for (auto& j : collisions) {
+//    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
+//    float hitTime = 0;
+//    if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
+//        player->transform.clampNextTo(rects[j.first].rect, contactN);
+//        player->transform.clearVelocity();
+//    }
+//}
+//player->transform.updatePos();
+
 
 /*
 RECTANGLE (or any entity) PROPER COLLISION TEMPLATE, 2 STAGED

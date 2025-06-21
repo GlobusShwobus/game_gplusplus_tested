@@ -3,7 +3,8 @@
 namespace badEngine {
 
 	namespace TSA {
-		bool Sprite::initPlay(const std::vector<Reel>* animationPoints) {
+		bool Sprite::initPlay(const std::vector<Reel>* animationPoints)
+		{
 			if (!animationPoints) return false;
 			if (animationPoints->empty()) return false;
 
@@ -12,11 +13,13 @@ namespace badEngine {
 
 			return true;
 		}
-		void Sprite::unInitPlay() {
+		void Sprite::unInitPlay()
+		{
 			current = nullptr;
 			animations = nullptr;
 		}
-		bool Sprite::play() {
+		bool Sprite::play()
+		{
 			if (!animations) return false;
 
 			frameTimer++;
@@ -34,9 +37,9 @@ namespace badEngine {
 			}
 			return true;
 		}
-		bool Sprite::setNewAnimation(const AnimationID id) {
+		bool Sprite::setNewAnimation(const AnimationID id)
+		{
 			if (!animations)return false;
-			if (current->id == id) return false;//early out if same animation
 
 			for (auto& each : *animations) {
 				if (each.id == id) {
@@ -47,32 +50,52 @@ namespace badEngine {
 			}
 			return false;
 		}
-		void Sprite::updateSource() {
-			if (!animations)return;
+		SDL_FRect Sprite::getAnimatedTextureSource()
+		{
+			if (!animations) return source;
 
-			source.x = current->frames[frameIndex].x;
-			source.y = current->frames[frameIndex].y;
+			return { current->frames[frameIndex].x,current->frames[frameIndex].y, source.w, source.h };
 		}
-
-		AnimationID animationIDTable(const StateM::State& state) {
+		AnimationID Sprite::getCurrentAnimationID()
+		{
 			AnimationID id = AnimationID::UNKNOWN;
+			if (current)
+				id = current->id;
+			return id;
+		}
+		AnimationID animationIDTable(const SMS::State& state)
+		{
+			AnimationID id = AnimationID::UNKNOWN;
+
 			if (state.isMoving) {
-				if (state.isFacingLeft) {
+				if (state.facing == SMS::Facing::LEFT) {
 					id = AnimationID::WALK_LEFT;
 				}
-				else {
+				else if(state.facing == SMS::Facing::RIGHT) {
 					id = AnimationID::WALK_RIGHT;
 				}
 			}
 			else {
-				if (state.isFacingLeft) {
+				if (state.facing == SMS::Facing::LEFT) {
 					id = AnimationID::IDLE_LEFT;
 				}
-				else {
+				else if(state.facing == SMS::Facing::RIGHT){
 					id = AnimationID::IDLE_RIGHT;
 				}
 			}
 			return id;
+		}
+		void setTTransferField_coordinates(const SDL_FRect& origin, SDL_FRect& dest)
+		{
+			dest.x = origin.x;
+			dest.y = origin.y;
+		}
+		void setTTransferField_full(const SDL_FRect& origin, SDL_FRect& dest)
+		{
+			dest.x = origin.x;
+			dest.y = origin.y;
+			dest.w = origin.w;
+			dest.h = origin.h;
 		}
 
 	}

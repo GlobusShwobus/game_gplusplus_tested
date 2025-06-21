@@ -4,6 +4,7 @@
 #include "CCPRect.h"
 #include "Sprite.h"
 #include "HashKeys.h"
+#include "State.h"
 
 //cool new stuff
 namespace badEngine {
@@ -14,14 +15,14 @@ namespace badEngine {
 		class Player {
 
 		public:
-
+			
 			TSA::Sprite sprite;
 			CCP::HitBox hitbox;
+			SMS::State state;
 
 			Player(const TSA::Sprite& sprite, const CCP::HitBox& hitbox);
 
-			void updateHitBoxToSourceTexture();
-			bool WASD_PlayerVelocity(SDL_FPoint& velocity, const float moveSpeed);
+			bool WASD_PlayerVelocity(const float moveSpeed);
 		};
 
 
@@ -33,6 +34,18 @@ namespace badEngine {
 
 			Enemy(const TSA::Sprite& sprite, const CCP::HitBox& hitbox);
 		};
+
+		static SMS::Facing facingDirection(const SDL_FPoint& velocity) {
+			SMS::Facing f = SMS::Facing::UNKNOWN;
+			if (velocity.x < 0)
+				f = SMS::Facing::LEFT;
+			else if (velocity.x > 0)
+				f = SMS::Facing::RIGHT;
+			return f;
+		}
+		static bool isMoving(const SDL_FPoint& velocity) {
+			return velocity.x != 0.0f || velocity.y != 0.0f;
+		}
 
 	}
 }
