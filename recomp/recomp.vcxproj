@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FrameControlls.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="HashKeys.h" />
