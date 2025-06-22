@@ -131,7 +131,8 @@ namespace badEngine {
 				clip.id = HKey::buildAnimationID(aids.c_str());
 				clip.isLooping = rData.value("loops", false);
 
-				const int frameCount = data.value("frameCount", 1);
+				const int frameCount = rData.value("frameCount", 1);
+				printf("\n%d", frameCount);
 
 				try {
 					const int x = rData["reel_xyw"][0];
@@ -147,7 +148,7 @@ namespace badEngine {
 					}
 				}
 				catch (std::exception& expt) {
-					printf("\nerror: aniamtion clip invalid index: <%s>\t<%s>", keyStr.c_str(), aids);
+					printf("\nerror: aniamtion clip invalid index: <%s>\t<%s>", keyStr.c_str(), aids.c_str());
 					continue;
 				}
 

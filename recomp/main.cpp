@@ -69,7 +69,7 @@ int main() {
     //player
     //WRAP THIS SHIT UP
     EDM::Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
-
+    player->sprite.debugPRINT();
     //TESTCODE
     CCP::HitBox world(0, 0, 2560, 1440);
     //###################################################################
