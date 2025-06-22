@@ -75,7 +75,7 @@ namespace badEngine {
 					id = AnimationID::WALK_RIGHT;
 				}
 			}
-			else {
+			else if(!state.isMoving) {
 				if (state.facing == SMS::Facing::LEFT) {
 					id = AnimationID::IDLE_LEFT;
 				}

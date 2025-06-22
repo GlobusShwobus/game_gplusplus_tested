@@ -132,7 +132,6 @@ namespace badEngine {
 				clip.isLooping = rData.value("loops", false);
 
 				const int frameCount = rData.value("frameCount", 1);
-				printf("\n%d", frameCount);
 
 				try {
 					const int x = rData["reel_xyw"][0];

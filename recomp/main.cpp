@@ -69,7 +69,6 @@ int main() {
     //player
     //WRAP THIS SHIT UP
     EDM::Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
-    player->sprite.debugPRINT();
     //TESTCODE
     CCP::HitBox world(0, 0, 2560, 1440);
     //###################################################################
@@ -90,9 +89,14 @@ int main() {
         //###############################################################################
 
         //BULLSHIT
+
         player->WASD_PlayerVelocity(5.0f);
         player->state.isMoving = EDM::isMoving(player->hitbox.velocity);
-        player->state.facing = EDM::facingDirection(player->hitbox.velocity);
+        SMS::Facing safetyCheck = EDM::facingDirection(player->hitbox.velocity);
+        
+        if (safetyCheck != SMS::Facing::UNKNOWN) {
+            player->state.facing = safetyCheck;
+        }
 
         TSA::AnimationID animationID = TSA::animationIDTable(player->state);
         
@@ -119,7 +123,8 @@ int main() {
         TSA::setTTransferField_coordinates(player->hitbox.rectangle, player->sprite.dest);
 
         window.drawTexture(player->sprite.texture, &player->sprite.source, &player->sprite.dest);
-        player->hitbox.velocity = { 0.0f,0.0f };//temporary bullshit
+        player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
+
         window.updateEnd();
         //#################################################################################
         

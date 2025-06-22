@@ -47,14 +47,6 @@ namespace badEngine {
 			bool setNewAnimation(const AnimationID id);
 			SDL_FRect getAnimatedTextureSource();
 			AnimationID getCurrentAnimationID();
-
-			inline void debugPRINT() {
-				for (auto& each : *animations) {
-					for (auto& each2 : each.frames) {
-						printf("x<%f>\ty<%f>\n", each2.x, each2.y);
-					}
-				}
-			}
 		};
 
 		AnimationID animationIDTable(const SMS::State& state);
