@@ -1,11 +1,10 @@
-#include "EntityFactory.h"
+#include "Entity.h"
 #include "Timer.h"
 
 #include "Window.h"
 
 #include <fstream> //file reader?
 #include <thread>
-#include <iostream>
 
 /*
 TODO:: rework the window, want more ability to create windows and window should only care about structly window related stuff
@@ -62,7 +61,7 @@ int main() {
     Window window(windowConfig.json);
 
     //initialize EntityFactory
-    EFM::EntityFactory entityFactory(entityConfig.json, window.getRenderer()) ;
+    EntityFactory entityFactory(entityConfig.json, window.getRenderer()) ;
 
     if (!entityFactory.isInitalized()) {
         entityFactory.wipeMemory();
@@ -71,7 +70,7 @@ int main() {
 
     //player
     //WRAP THIS SHIT UP
-    EDM::Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
+    Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
     //TESTCODE
     CCP::HitBox world(0, 0, 2560, 1440);
     //###################################################################
@@ -80,8 +79,8 @@ int main() {
     SDL_Event event;
 
     while (gameRunning) {
-        FrameTimer timer;
-        timer.start();
+        FrameTimer gameLogicTimer;
+        gameLogicTimer.start();
 
 
         window.updateBegin();
@@ -97,14 +96,14 @@ int main() {
         //BULLSHIT
 
         player->WASD_PlayerVelocity(5.0f);
-        player->state.isMoving = EDM::isMoving(player->hitbox.velocity);
-        SMS::Facing safetyCheck = EDM::facingDirection(player->hitbox.velocity);
+        player->state.isMoving = isMoving(player->hitbox.velocity);
+        SMS::Facing safetyCheck = facingDirection(player->hitbox.velocity);
         
         if (safetyCheck != SMS::Facing::UNKNOWN) {
             player->state.facing = safetyCheck;
         }
 
-        TSA::AnimationID animationID = TSA::animationIDTable(player->state);
+        TSA::AnimationID animationID = animationIDTable(player->state);
         
         if (animationID != TSA::AnimationID::UNKNOWN && player->sprite.getCurrentAnimationID() != animationID) {
             if (!player->sprite.setNewAnimation(animationID)) {
@@ -112,7 +111,7 @@ int main() {
             }
         }
         player->sprite.play();
-        EDM::setCoordinates(player->hitbox);
+        setCoordinates(player->hitbox);
         //###############################################################################
         
 
@@ -132,32 +131,30 @@ int main() {
         player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
 
         window.updateEnd();
-        timer.end();
-        std::cout << "untill sleep duration:: " << timer.getDuration_microseconds()<<"\n";
+        gameLogicTimer.end();
         //#################################################################################
         
         //HANDLE TASKS BETWEEN FRAMES
-        if (timer.isSpareTime()) {
+        if (gameLogicTimer.isSpareTime()) {
 
-            const auto spareTime = timer.getMaxFrameDuration_milliseconds() - timer.getDuration_millisecond();
+            const auto spareTime = gameLogicTimer.getMaxFrameDuration_milliseconds() - gameLogicTimer.getDuration_millisecond();
 
-            Timer betweenFrames;
-            betweenFrames.start();
+            Timer supplementaryLogicTimer;
+            supplementaryLogicTimer.start();
 
-            //DO SHIT HERE.. ALSO IF LOOPITY ACTION THEN THE TIMER SHOULD PROBABLY BE PART OF THE LOOP INSTEAD
+            //DO SHIT HERE.. ALSO IF LOOPITY ACTION THEN THE TIMER SHOULD PROBABLY BE PART OF THE LOOP INSTEAD 
 
             //#################################################################################
 
-            betweenFrames.end();
-            const auto remainingTime = spareTime - betweenFrames.getDuration_millisecond();
+            supplementaryLogicTimer.end();
+
+            const auto remainingTime = spareTime - supplementaryLogicTimer.getDuration_millisecond();
+            
             if (remainingTime.count() > 0) {
                 std::this_thread::sleep_for(remainingTime);
             }
         }
         //#################################################################################
-
-        timer.end();
-        std::cout << "after sleep duration: " << timer.getDuration_microseconds() << "\n";
     }
     SDL_Quit();
 

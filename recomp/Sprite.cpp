@@ -63,28 +63,6 @@ namespace badEngine {
 				id = current->id;
 			return id;
 		}
-		AnimationID animationIDTable(const SMS::State& state)
-		{
-			AnimationID id = AnimationID::UNKNOWN;
-
-			if (state.isMoving) {
-				if (state.facing == SMS::Facing::LEFT) {
-					id = AnimationID::WALK_LEFT;
-				}
-				else if(state.facing == SMS::Facing::RIGHT) {
-					id = AnimationID::WALK_RIGHT;
-				}
-			}
-			else if(!state.isMoving) {
-				if (state.facing == SMS::Facing::LEFT) {
-					id = AnimationID::IDLE_LEFT;
-				}
-				else if(state.facing == SMS::Facing::RIGHT){
-					id = AnimationID::IDLE_RIGHT;
-				}
-			}
-			return id;
-		}
 		void setTTransferField_coordinates(const SDL_FRect& origin, SDL_FRect& dest)
 		{
 			dest.x = origin.x;

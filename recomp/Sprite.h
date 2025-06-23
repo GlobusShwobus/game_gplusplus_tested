@@ -3,7 +3,7 @@
 #include <vector>
 #include "HashKeys.h"
 #include "SDL3/SDL.h"
-#include "State.h"
+
 
 namespace badEngine {
 
@@ -49,7 +49,6 @@ namespace badEngine {
 			AnimationID getCurrentAnimationID();
 		};
 
-		AnimationID animationIDTable(const SMS::State& state);
 		void setTTransferField_coordinates(const SDL_FRect& origin, SDL_FRect& dest);
 		void setTTransferField_full(const SDL_FRect& origin, SDL_FRect& dest);
 	}

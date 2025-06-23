@@ -143,27 +143,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="HashKeys.h" />
-    <ClInclude Include="EntityData.h" />
     <ClInclude Include="MuhRandom.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="EntityFactory.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="CCPRect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="EntityData.cpp" />
     <ClCompile Include="CCPRect.cpp" />
     <ClCompile Include="MuhRandom.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="EntityFactory.cpp" />
+    <ClCompile Include="Entity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="entity_config.json" />
