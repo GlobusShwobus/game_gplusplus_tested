@@ -8,28 +8,31 @@ namespace badEngine {
 		std::chrono::time_point<std::chrono::steady_clock> startPoint;
 		std::chrono::time_point<std::chrono::steady_clock> endPoint;
 
-		std::chrono::milliseconds duration;
+		std::chrono::duration<float> duration;
 	public:
 		Timer() = default;
 
 		void start();
 		void end();
-		std::chrono::milliseconds getDuration()const;
+		std::chrono::duration<float> getDuration()const;
 	};
 
 	class FrameTimer: public Timer {
-		static constexpr uint32_t millisecondsPerSecond = 1000;
+		static constexpr float ONE_SECOND = 1.0f;
 		static constexpr uint32_t defaultFPS = 60;
 		
-		std::chrono::milliseconds maxFrameDuration;
-
+		std::chrono::duration<float> maxFrameDuration;
 		uint32_t fps = 0;
 
 	public:
-		FrameTimer(uint32_t fps = defaultFPS) :fps(fps), maxFrameDuration(std::chrono::milliseconds(millisecondsPerSecond / fps)) {}
+		FrameTimer(uint32_t fps = defaultFPS) :fps(fps), maxFrameDuration(ONE_SECOND /fps) {}
+
+		uint32_t getFPS()const;
+		void setFPS(uint32_t FPS);
 
 		bool isSpareTime();
-		std::chrono::milliseconds getDelayDuration();
-
+		std::chrono::duration<float> getDelay_default()const;
+		std::chrono::milliseconds getDelay_milliseconds()const;
+		std::chrono::microseconds getDelay_microseconds()const;
 	};
 }
