@@ -13,7 +13,8 @@ namespace badEngine {
 		public:
 			RandomNumberGenerator() : rng(std::make_unique<std::mt19937>(rd())) {}
 
-			int getRand(int min, int max);
+			int getRandInt(int min, int max);
+			float getRandFloat(float min, float max);
 		};
 
 	}

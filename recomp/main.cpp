@@ -1,8 +1,11 @@
 #include "EntityFactory.h"
+#include "Timer.h"
+
 #include "Window.h"
-#include "Grid.h"
 
 #include <fstream> //file reader?
+#include <thread>
+#include <iostream>
 
 /*
 TODO:: rework the window, want more ability to create windows and window should only care about structly window related stuff
@@ -77,6 +80,9 @@ int main() {
     SDL_Event event;
 
     while (gameRunning) {
+        FrameTimer timer;
+        timer.start();
+
 
         window.updateBegin();
 
@@ -126,23 +132,30 @@ int main() {
         player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
 
         window.updateEnd();
+        timer.end();
+        std::cout << "frame duration: " << timer.getDelay_default()<<"\n";
         //#################################################################################
         
         //HANDLE TASKS BETWEEN FRAMES
-        if (window.shouldDelay()) {
+        if (timer.isSpareTime()) {
 
-            Uint64 delayTime = window.getDelayDuration();
-            Uint64 startDelay = SDL_GetTicks();
+            const auto frameDuration = timer.getDelay_milliseconds();
 
-            //DO SHIT HERE
+            Timer betweenFrameTimer;
+            betweenFrameTimer.start();
+
+            //DO SHIT HERE.. ALSO IF LOOPITY ACTION THEN THE TIMER SHOULD PROBABLY BE PART OF THE LOOP INSTEAD
 
             //#################################################################################
 
-            Uint32 remaining = delayTime - (SDL_GetTicks() - startDelay);
+            betweenFrameTimer.end();
+            const auto spareTime = frameDuration - betweenFrameTimer.getDuration_millisecond();
 
-            if (remaining > 0) {
-                SDL_Delay(remaining);
+            if (spareTime.count() > 0) {
+                std::this_thread::sleep_for(spareTime);
             }
+            betweenFrameTimer.end();//TEST 
+            std::cout << "between frames: " << betweenFrameTimer.getDuration_default() << "\n";
         }
         //#################################################################################
     }

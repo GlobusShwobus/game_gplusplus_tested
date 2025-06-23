@@ -14,7 +14,9 @@ namespace badEngine {
 
 		void start();
 		void end();
-		std::chrono::duration<float> getDuration()const;
+		std::chrono::duration<float> getDuration_default()const;
+		std::chrono::milliseconds getDuration_millisecond()const;
+		std::chrono::microseconds getDuration_microseconds()const;
 	};
 
 	class FrameTimer: public Timer {
@@ -30,7 +32,7 @@ namespace badEngine {
 		uint32_t getFPS()const;
 		void setFPS(uint32_t FPS);
 
-		bool isSpareTime();
+		bool isSpareTime()const;
 		std::chrono::duration<float> getDelay_default()const;
 		std::chrono::milliseconds getDelay_milliseconds()const;
 		std::chrono::microseconds getDelay_microseconds()const;
