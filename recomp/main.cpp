@@ -133,31 +133,31 @@ int main() {
 
         window.updateEnd();
         timer.end();
-        std::cout << "frame duration: " << timer.getDelay_default()<<"\n";
+        std::cout << "untill sleep duration:: " << timer.getDuration_microseconds()<<"\n";
         //#################################################################################
         
         //HANDLE TASKS BETWEEN FRAMES
         if (timer.isSpareTime()) {
 
-            const auto frameDuration = timer.getDelay_milliseconds();
+            const auto spareTime = timer.getMaxFrameDuration_milliseconds() - timer.getDuration_millisecond();
 
-            Timer betweenFrameTimer;
-            betweenFrameTimer.start();
+            Timer betweenFrames;
+            betweenFrames.start();
 
             //DO SHIT HERE.. ALSO IF LOOPITY ACTION THEN THE TIMER SHOULD PROBABLY BE PART OF THE LOOP INSTEAD
 
             //#################################################################################
 
-            betweenFrameTimer.end();
-            const auto spareTime = frameDuration - betweenFrameTimer.getDuration_millisecond();
-
-            if (spareTime.count() > 0) {
-                std::this_thread::sleep_for(spareTime);
+            betweenFrames.end();
+            const auto remainingTime = spareTime - betweenFrames.getDuration_millisecond();
+            if (remainingTime.count() > 0) {
+                std::this_thread::sleep_for(remainingTime);
             }
-            betweenFrameTimer.end();//TEST 
-            std::cout << "between frames: " << betweenFrameTimer.getDuration_default() << "\n";
         }
         //#################################################################################
+
+        timer.end();
+        std::cout << "after sleep duration: " << timer.getDuration_microseconds() << "\n";
     }
     SDL_Quit();
 
