@@ -35,6 +35,20 @@ public:
         json = nullptr;
     }
 };
+/// <summary>
+float fOffsetX = 0.0f;
+float fOffsetY = 0.0f;
+
+void worldToScreen(float fWorldX, float fWorldY, float& nScreenX, float& nScreenY) {
+    nScreenX = (fWorldX - fOffsetX);
+    nScreenY = (fWorldY - fOffsetY);
+}
+void screenToWorld(float nScreenX, float nScreenY, float& fWorldX, float& fWorldY) {
+    fWorldX = (nScreenX)+fOffsetX;
+    fWorldY = (nScreenY)+fOffsetY;
+}
+/// </summary>
+/// <returns></returns>
 
 int main() {
     using namespace badEngine;
@@ -71,15 +85,55 @@ int main() {
     //player
     //WRAP THIS SHIT UP
     Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
-    //TESTCODE
-    CCP::HitBox world(0, 0, 2560, 1440);
     //###################################################################
 
     bool gameRunning = true;
     SDL_Event event;
 
+    //
+    int w,h;
+    SDL_GetWindowSize(window.getWindow(), &w, &h);
+    fOffsetX = -w / 2;
+    fOffsetY = -h / 2;
+    //
+
     while (gameRunning) {
-        FrameTimer gameLogicTimer;
+       
+        SDL_RenderClear(window.getRenderer());
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+
+        //horizontal
+        for (float y = 0.0f; y <= 10.f; y++)
+        {
+            SDL_FRect rect{ 0,y * 12,100,10 };
+
+            SDL_FRect realSpace;
+            worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
+            worldToScreen(rect.w, rect.h, realSpace.w, realSpace.h);
+
+            SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+            SDL_RenderFillRect(window.getRenderer(), &realSpace);
+
+        }
+        //vertical
+        for (float x = 0.0f; x <= 10.f; x++)
+        {
+            SDL_FRect rect{ x * 12,0,10,100 };
+
+            SDL_FRect realSpace;
+            worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
+            worldToScreen(rect.w, rect.h, realSpace.w, realSpace.h);
+
+            SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+            SDL_RenderFillRect(window.getRenderer(), &realSpace);
+
+        }
+
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+        SDL_RenderPresent(window.getRenderer());
+
+
+        /*FrameTimer gameLogicTimer;
         gameLogicTimer.start();
 
 
@@ -155,6 +209,7 @@ int main() {
             }
         }
         //#################################################################################
+        */
     }
     SDL_Quit();
 

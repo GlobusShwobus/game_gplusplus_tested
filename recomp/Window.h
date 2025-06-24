@@ -54,6 +54,9 @@ public:
 	}
 
 	SDL_Renderer* getRenderer();
+	SDL_Window* getWindow() {
+		return window;
+	}
 	bool shouldDelay()const;
 	Uint64 getDelayDuration()const;
 	void updateCamera(const SDL_FRect& target, SDL_FRect clamp);
