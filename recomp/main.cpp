@@ -158,9 +158,9 @@ int main() {
 
 
 
-        float wx=0, wy=0, ww=0, wh = 0;
-        screenToWorld(0, 0, wx, wy);
-        screenToWorld(screenW, screenH, ww, wh);
+        float wleft=0, wtop=0, wright=0, wbottom = 0;
+        screenToWorld(0, 0, wleft, wtop);
+        screenToWorld(screenW, screenH, wright, wbottom);
 
         int linesDrawn = 0;
 
@@ -170,7 +170,8 @@ int main() {
         //horizontal
         for (float y = 0.0f; y <= 10.f; y++)
         {
-            if (y >= wy && y <= wh) {
+            float lineY = y * 12;
+            if (lineY + 10 >= wtop && lineY <= wbottom) {
                 SDL_FRect rect{ 0,y * 12,100,10 };
 
                 SDL_FRect realSpace;
@@ -187,7 +188,8 @@ int main() {
         //vertical
         for (float x = 0.0f; x <= 10.f; x++)
         {
-            if (x >= wx && x <= ww) {
+            float lineX = x * 12;
+            if (lineX +10 >= wleft && lineX <= wright) {
                 SDL_FRect rect{ x * 12,0,10,100 };
 
                 SDL_FRect realSpace;
