@@ -165,7 +165,7 @@ namespace badEngine {
 
 
 		if (hitbox.rectangle.w == 0 || hitbox.rectangle.h == 0) {
-			printf("\nwarning: hitbox invalid initalization. default 0: <%s>", keyStr);
+			printf("\nwarning: hitbox invalid initalization. default 0: <%s>", keyStr.c_str());
 		}
 
 		hitboxes.emplace(key, std::move(hitbox));

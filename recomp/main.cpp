@@ -36,16 +36,20 @@ public:
     }
 };
 /// <summary>
-float fOffsetX = 0.0f;
-float fOffsetY = 0.0f;
+float offsetX = 0.0f;
+float offsetY = 0.0f;
+
+float startPanX = 0.0f;
+float startPanY = 0.0f;
+
 
 void worldToScreen(float fWorldX, float fWorldY, float& nScreenX, float& nScreenY) {
-    nScreenX = (fWorldX - fOffsetX);
-    nScreenY = (fWorldY - fOffsetY);
+    nScreenX = (fWorldX - offsetX);
+    nScreenY = (fWorldY - offsetY);
 }
 void screenToWorld(float nScreenX, float nScreenY, float& fWorldX, float& fWorldY) {
-    fWorldX = (nScreenX)+fOffsetX;
-    fWorldY = (nScreenY)+fOffsetY;
+    fWorldX = (nScreenX)+offsetX;
+    fWorldY = (nScreenY)+offsetY;
 }
 /// </summary>
 /// <returns></returns>
@@ -93,12 +97,41 @@ int main() {
     //
     int w,h;
     SDL_GetWindowSize(window.getWindow(), &w, &h);
-    fOffsetX = -w / 2;
-    fOffsetY = -h / 2;
+    offsetX = -w / 2;
+    offsetY = -h / 2;
+
+    bool mouseDown = false;
     //
 
     while (gameRunning) {
        
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EVENT_QUIT) {
+                gameRunning = false;
+            }
+
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
+                mouseDown = true;
+                startPanX = event.button.x;
+                startPanY = event.button.y;
+            }
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_LEFT) {
+                mouseDown = false;
+            }
+
+            if (event.type == SDL_EVENT_MOUSE_MOTION && mouseDown) {
+                float currentX = event.motion.x;
+                float currentY = event.motion.y;
+
+                offsetX -= (currentX - startPanX);
+                offsetY -= (currentY - startPanY);
+
+                startPanX = currentX;
+                startPanY = currentY;
+            }
+        }
+
+
         SDL_RenderClear(window.getRenderer());
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
 
@@ -109,12 +142,14 @@ int main() {
 
             SDL_FRect realSpace;
             worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            worldToScreen(rect.w, rect.h, realSpace.w, realSpace.h);
+            realSpace.w = rect.w;
+            realSpace.h = rect.h;
 
             SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
             SDL_RenderFillRect(window.getRenderer(), &realSpace);
 
         }
+        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //vertical
         for (float x = 0.0f; x <= 10.f; x++)
         {
@@ -122,7 +157,8 @@ int main() {
 
             SDL_FRect realSpace;
             worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            worldToScreen(rect.w, rect.h, realSpace.w, realSpace.h);
+            realSpace.w = rect.w;
+            realSpace.h = rect.h;
 
             SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
             SDL_RenderFillRect(window.getRenderer(), &realSpace);
