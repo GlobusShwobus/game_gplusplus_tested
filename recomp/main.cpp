@@ -97,10 +97,10 @@ int main() {
     SDL_Event event;
 
     // this just sets the object to start athe middle of the screen, irrelevant to the camera
-    int w,h;
-    SDL_GetWindowSize(window.getWindow(), &w, &h);
-    offsetX = -w / 2;
-    offsetY = -h / 2;
+    int screenW, screenH;
+    SDL_GetWindowSize(window.getWindow(), &screenW, &screenH);
+    offsetX = -screenW / 2;
+    offsetY = -screenH / 2;
 
     bool mouseDown = false;
     //
@@ -125,27 +125,44 @@ int main() {
                 float currentX = event.motion.x;
                 float currentY = event.motion.y;
 
-                offsetX -= (currentX - startPanX);
-                offsetY -= (currentY - startPanY);
+                offsetX -= (currentX - startPanX)/scaleX;
+                offsetY -= (currentY - startPanY)/scaleY;
 
                 startPanX = currentX;
                 startPanY = currentY;
             }
 
+            float mouseX = 0, mouseY = 0;
+            float wmouseX_before = 0, wmouseY_before = 0;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            screenToWorld(mouseX, mouseY, wmouseX_before, wmouseY_before);
+
             if (event.type == SDL_EVENT_MOUSE_WHEEL) {
 
                 if (event.wheel.y > 0) {
-                    scaleX *= 1.01f;
-                    scaleY *= 1.01f;
+                    scaleX *= 1.03f;
+                    scaleY *= 1.03f;
                 }
                 else if (event.wheel.y < 0) {
-                    scaleX *= 0.99f;
-                    scaleY *= 0.99f;
+                    scaleX *= 0.97f;
+                    scaleY *= 0.97f;
                 }
             }
+            float wmouseX_after = 0, wmouseY_after = 0;
+            screenToWorld(mouseX, mouseY, wmouseX_after, wmouseY_after);
 
+            offsetX += (wmouseX_before - wmouseX_after);
+            offsetY += (wmouseY_before - wmouseY_after);
         }
 
+
+
+
+        float wx=0, wy=0, ww=0, wh = 0;
+        screenToWorld(0, 0, wx, wy);
+        screenToWorld(screenW, screenH, ww, wh);
+
+        int linesDrawn = 0;
 
         SDL_RenderClear(window.getRenderer());
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
@@ -153,35 +170,40 @@ int main() {
         //horizontal
         for (float y = 0.0f; y <= 10.f; y++)
         {
-            SDL_FRect rect{ 0,y * 12,100,10 };
+            if (y >= wy && y <= wh) {
+                SDL_FRect rect{ 0,y * 12,100,10 };
 
-            SDL_FRect realSpace;
-            worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            realSpace.w = rect.w*scaleX;
-            realSpace.h = rect.h*scaleY;
+                SDL_FRect realSpace;
+                worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
+                realSpace.w = rect.w * scaleX;
+                realSpace.h = rect.h * scaleY;
 
-            SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-            SDL_RenderFillRect(window.getRenderer(), &realSpace);
-
+                SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+                SDL_RenderFillRect(window.getRenderer(), &realSpace);
+                linesDrawn++;
+            }
         }
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         //vertical
         for (float x = 0.0f; x <= 10.f; x++)
         {
-            SDL_FRect rect{ x * 12,0,10,100 };
+            if (x >= wx && x <= ww) {
+                SDL_FRect rect{ x * 12,0,10,100 };
 
-            SDL_FRect realSpace;
-            worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            realSpace.w = rect.w*scaleX;
-            realSpace.h = rect.h*scaleY;
+                SDL_FRect realSpace;
+                worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
+                realSpace.w = rect.w * scaleX;
+                realSpace.h = rect.h * scaleY;
 
-            SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-            SDL_RenderFillRect(window.getRenderer(), &realSpace);
-
+                SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
+                SDL_RenderFillRect(window.getRenderer(), &realSpace);
+                linesDrawn++;
+            }
         }
 
         SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
         SDL_RenderPresent(window.getRenderer());
+        printf("lines drawn: %d\n", linesDrawn);
 
 
         /*FrameTimer gameLogicTimer;
@@ -263,9 +285,6 @@ int main() {
         */
     }
     SDL_Quit();
-
-    //OR GET RID OF THEM AFTER USING THEM, FOOD FOR THOUGHT LATER
-
     delete player;
 
     return 0;
