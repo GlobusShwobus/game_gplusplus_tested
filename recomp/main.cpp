@@ -35,21 +35,23 @@ public:
         json = nullptr;
     }
 };
-/// <summary>
+/// <this should become the camera object, also remember to grap the event code as they're also related>
 float offsetX = 0.0f;
 float offsetY = 0.0f;
 
 float startPanX = 0.0f;
 float startPanY = 0.0f;
 
+float scaleX = 1.0f;
+float scaleY = 1.0f;
 
 void worldToScreen(float fWorldX, float fWorldY, float& nScreenX, float& nScreenY) {
-    nScreenX = (fWorldX - offsetX);
-    nScreenY = (fWorldY - offsetY);
+    nScreenX = (fWorldX - offsetX)*scaleX;
+    nScreenY = (fWorldY - offsetY)*scaleY;
 }
 void screenToWorld(float nScreenX, float nScreenY, float& fWorldX, float& fWorldY) {
-    fWorldX = (nScreenX)+offsetX;
-    fWorldY = (nScreenY)+offsetY;
+    fWorldX = nScreenX / scaleX + offsetX;
+    fWorldY = nScreenY / scaleY + offsetY;
 }
 /// </summary>
 /// <returns></returns>
@@ -94,7 +96,7 @@ int main() {
     bool gameRunning = true;
     SDL_Event event;
 
-    //
+    // this just sets the object to start athe middle of the screen, irrelevant to the camera
     int w,h;
     SDL_GetWindowSize(window.getWindow(), &w, &h);
     offsetX = -w / 2;
@@ -129,6 +131,19 @@ int main() {
                 startPanX = currentX;
                 startPanY = currentY;
             }
+
+            if (event.type == SDL_EVENT_MOUSE_WHEEL) {
+
+                if (event.wheel.y > 0) {
+                    scaleX *= 1.01f;
+                    scaleY *= 1.01f;
+                }
+                else if (event.wheel.y < 0) {
+                    scaleX *= 0.99f;
+                    scaleY *= 0.99f;
+                }
+            }
+
         }
 
 
@@ -142,8 +157,8 @@ int main() {
 
             SDL_FRect realSpace;
             worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            realSpace.w = rect.w;
-            realSpace.h = rect.h;
+            realSpace.w = rect.w*scaleX;
+            realSpace.h = rect.h*scaleY;
 
             SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
             SDL_RenderFillRect(window.getRenderer(), &realSpace);
@@ -157,8 +172,8 @@ int main() {
 
             SDL_FRect realSpace;
             worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-            realSpace.w = rect.w;
-            realSpace.h = rect.h;
+            realSpace.w = rect.w*scaleX;
+            realSpace.h = rect.h*scaleY;
 
             SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
             SDL_RenderFillRect(window.getRenderer(), &realSpace);
