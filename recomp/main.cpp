@@ -103,6 +103,9 @@ int main() {
     offsetY = -screenH / 2;
 
     bool mouseDown = false;
+    SDL_Texture* texture = entityFactory.getTexture(HKey::ENTITY_TYPE::PLAYER_MAIN);
+    SDL_FRect tSrc{ 0,0,32,32 };
+    SDL_FRect tDest{ 250,250,32,32 };
     //
 
     while (gameRunning) {
@@ -155,58 +158,15 @@ int main() {
             offsetY += (wmouseY_before - wmouseY_after);
         }
 
-
-
-
-        float wleft=0, wtop=0, wright=0, wbottom = 0;
-        screenToWorld(0, 0, wleft, wtop);
-        screenToWorld(screenW, screenH, wright, wbottom);
-
-        int linesDrawn = 0;
-
         SDL_RenderClear(window.getRenderer());
-        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
 
-        //horizontal
-        for (float y = 0.0f; y <= 10.f; y++)
-        {
-            float lineY = y * 12;
-            if (lineY + 10 >= wtop && lineY <= wbottom) {
-                SDL_FRect rect{ 0,y * 12,100,10 };
+        SDL_FRect adjustedDest = tDest;
+        worldToScreen(tDest.x, tDest.y, adjustedDest.x, adjustedDest.y);
+        adjustedDest.w = tDest.w * scaleX;
+        adjustedDest.h = tDest.h * scaleY;
 
-                SDL_FRect realSpace;
-                worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-                realSpace.w = rect.w * scaleX;
-                realSpace.h = rect.h * scaleY;
-
-                SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-                SDL_RenderFillRect(window.getRenderer(), &realSpace);
-                linesDrawn++;
-            }
-        }
-        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
-        //vertical
-        for (float x = 0.0f; x <= 10.f; x++)
-        {
-            float lineX = x * 12;
-            if (lineX +10 >= wleft && lineX <= wright) {
-                SDL_FRect rect{ x * 12,0,10,100 };
-
-                SDL_FRect realSpace;
-                worldToScreen(rect.x, rect.y, realSpace.x, realSpace.y);
-                realSpace.w = rect.w * scaleX;
-                realSpace.h = rect.h * scaleY;
-
-                SDL_SetRenderDrawColor(window.getRenderer(), 255, 0, 0, 255);
-                SDL_RenderFillRect(window.getRenderer(), &realSpace);
-                linesDrawn++;
-            }
-        }
-
-        SDL_SetRenderDrawColor(window.getRenderer(), 0, 0, 0, 255);
+        SDL_RenderTexture(window.getRenderer(), texture, &tSrc, &adjustedDest);
         SDL_RenderPresent(window.getRenderer());
-        printf("lines drawn: %d\n", linesDrawn);
-
 
         /*FrameTimer gameLogicTimer;
         gameLogicTimer.start();
