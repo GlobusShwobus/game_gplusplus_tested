@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Timer.h"
+#include "Camera.h"
 
 #include "Window.h"
 
@@ -35,26 +36,6 @@ public:
         json = nullptr;
     }
 };
-/// <this should become the camera object, also remember to grap the event code as they're also related>
-float offsetX = 0.0f;
-float offsetY = 0.0f;
-
-float startPanX = 0.0f;
-float startPanY = 0.0f;
-
-float scaleX = 1.0f;
-float scaleY = 1.0f;
-
-void worldToScreen(float fWorldX, float fWorldY, float& nScreenX, float& nScreenY) {
-    nScreenX = (fWorldX - offsetX)*scaleX;
-    nScreenY = (fWorldY - offsetY)*scaleY;
-}
-void screenToWorld(float nScreenX, float nScreenY, float& fWorldX, float& fWorldY) {
-    fWorldX = nScreenX / scaleX + offsetX;
-    fWorldY = nScreenY / scaleY + offsetY;
-}
-/// </summary>
-/// <returns></returns>
 
 int main() {
     using namespace badEngine;
@@ -91,84 +72,17 @@ int main() {
     //player
     //WRAP THIS SHIT UP
     Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
+    int x, y;
+    SDL_GetWindowSize(window.getWindow(), &x, &y);
+    Camera2D camera(x,y);
     //###################################################################
 
     bool gameRunning = true;
     SDL_Event event;
 
-    // this just sets the object to start athe middle of the screen, irrelevant to the camera
-    int screenW, screenH;
-    SDL_GetWindowSize(window.getWindow(), &screenW, &screenH);
-    offsetX = -screenW / 2;
-    offsetY = -screenH / 2;
-
-    bool mouseDown = false;
-    SDL_Texture* texture = entityFactory.getTexture(HKey::ENTITY_TYPE::PLAYER_MAIN);
-    SDL_FRect tSrc{ 0,0,32,32 };
-    SDL_FRect tDest{ 250,250,32,32 };
-    //
-
     while (gameRunning) {
        
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
-                gameRunning = false;
-            }
-
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
-                mouseDown = true;
-                startPanX = event.button.x;
-                startPanY = event.button.y;
-            }
-            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP && event.button.button == SDL_BUTTON_LEFT) {
-                mouseDown = false;
-            }
-
-            if (event.type == SDL_EVENT_MOUSE_MOTION && mouseDown) {
-                float currentX = event.motion.x;
-                float currentY = event.motion.y;
-
-                offsetX -= (currentX - startPanX)/scaleX;
-                offsetY -= (currentY - startPanY)/scaleY;
-
-                startPanX = currentX;
-                startPanY = currentY;
-            }
-
-            float mouseX = 0, mouseY = 0;
-            float wmouseX_before = 0, wmouseY_before = 0;
-            SDL_GetMouseState(&mouseX, &mouseY);
-            screenToWorld(mouseX, mouseY, wmouseX_before, wmouseY_before);
-
-            if (event.type == SDL_EVENT_MOUSE_WHEEL) {
-
-                if (event.wheel.y > 0) {
-                    scaleX *= 1.03f;
-                    scaleY *= 1.03f;
-                }
-                else if (event.wheel.y < 0) {
-                    scaleX *= 0.97f;
-                    scaleY *= 0.97f;
-                }
-            }
-            float wmouseX_after = 0, wmouseY_after = 0;
-            screenToWorld(mouseX, mouseY, wmouseX_after, wmouseY_after);
-
-            offsetX += (wmouseX_before - wmouseX_after);
-            offsetY += (wmouseY_before - wmouseY_after);
-        }
-
-        SDL_RenderClear(window.getRenderer());
-
-        SDL_FRect adjustedDest = tDest;
-        worldToScreen(tDest.x, tDest.y, adjustedDest.x, adjustedDest.y);
-        adjustedDest.w = tDest.w * scaleX;
-        adjustedDest.h = tDest.h * scaleY;
-
-        SDL_RenderTexture(window.getRenderer(), texture, &tSrc, &adjustedDest);
-        SDL_RenderPresent(window.getRenderer());
-
-        /*FrameTimer gameLogicTimer;
+        FrameTimer gameLogicTimer;
         gameLogicTimer.start();
 
 
@@ -179,6 +93,17 @@ int main() {
             if (event.type == SDL_EVENT_QUIT) {
                 gameRunning = false;
             }
+            if (event.type == SDL_EVENT_MOUSE_WHEEL) {
+
+                if (event.wheel.y > 0) {
+                    printf("zoomzoom\n");
+                    camera.zoom(1.03f);
+                }
+                else if (event.wheel.y < 0) {
+                    camera.zoom(0.97f);
+                }
+            }
+
         }
         //###############################################################################
 
@@ -209,14 +134,19 @@ int main() {
         //#################################################################################
         
         //CAMERA
-        window.updateCamera(player->hitbox.rectangle, world.rectangle);//wrong clamp size btw
+        camera.centerOn(player->hitbox.rectangle.x, player->hitbox.rectangle.y);
+        //window.updateCamera(player->hitbox.rectangle, world.rectangle);//wrong clamp size btw
         //#################################################################################
 
         //MAIN LOGIC ENDING
         TSA::setTTransferField_coordinates(player->sprite.getAnimatedTextureSource(), player->sprite.source);
         TSA::setTTransferField_coordinates(player->hitbox.rectangle, player->sprite.dest);
 
-        window.drawTexture(player->sprite.texture, &player->sprite.source, &player->sprite.dest);
+        SDL_FRect adjustedDest = player->sprite.dest;
+        camera.worldToScreen(player->sprite.dest.x, player->sprite.dest.y, adjustedDest.x, adjustedDest.y);
+        adjustedDest.w *= camera.getScaleX();
+        adjustedDest.h *= camera.getScaleY();
+        SDL_RenderTexture(window.getRenderer(), player->sprite.texture.get(), &player->sprite.source, &adjustedDest);
         player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
 
         window.updateEnd();
@@ -244,7 +174,7 @@ int main() {
             }
         }
         //#################################################################################
-        */
+        
     }
     SDL_Quit();
     delete player;

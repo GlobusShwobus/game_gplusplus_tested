@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "HashKeys.h"
 #include "SDL3/SDL.h"
-
 
 namespace badEngine {
 
@@ -25,23 +25,23 @@ namespace badEngine {
 		class Sprite {
 		
 		public:
-			SDL_Texture* texture = nullptr;//shallow copy is OK, not owner
+			std::shared_ptr<SDL_Texture> texture;
 			SDL_FRect source{ 0,0,0,0 };
 			SDL_FRect dest{ 0,0,0,0 };
 		
 		private:
 			static constexpr int frameDelay = 6;
-			const std::vector<Reel>* animations = nullptr;//shallow copy is OK, not owner
-			const Reel* current = nullptr;//shallow copy is OK, not owner
+			std::shared_ptr<const std::vector<Reel>> animations;
+			const Reel* current = nullptr;//points to the current animation
 			int frameIndex = 0;
 			int frameTimer = 0;
 
 		public:	
 			Sprite() = default;
-			Sprite(SDL_Texture* texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
-			Sprite(SDL_Texture* texture, const TTransfer& ttransfer) :texture(texture), source(ttransfer.src), dest(ttransfer.dest) {}
+			Sprite(std::shared_ptr<SDL_Texture> texture, const SDL_FRect& src, const SDL_FRect& dest) :texture(texture), source(src), dest(dest) {}
+			Sprite(std::shared_ptr<SDL_Texture> texture, const TTransfer& ttransfer) :texture(texture), source(ttransfer.src), dest(ttransfer.dest) {}
 
-			bool initPlay(const std::vector<Reel>* animationPoints);
+			bool initPlay(std::shared_ptr<const std::vector<Reel>> animationPoints);
 			void unInitPlay();
 			bool play();
 			bool setNewAnimation(const AnimationID id);

@@ -18,39 +18,44 @@ namespace badEngine {
 	class Player;
 	class Enemy;
 
+	typedef HKey::ENTITY_TYPE EntityType;
+	typedef std::shared_ptr<SDL_Texture> pTexture;
+	typedef std::shared_ptr<const std::vector<TSA::Reel>> pAnimations;
+
+
 	class EntityFactory {
 
-		std::map<HKey::ENTITY_TYPE, SDL_Texture*>             textures;     //requires cleanup in destructor
-		std::map<HKey::ENTITY_TYPE, TSA::TTransfer>           ttransfers;
-		std::map<HKey::ENTITY_TYPE, std::vector<TSA::Reel>>   animations;
-		std::map<HKey::ENTITY_TYPE, CCP::HitBox>              hitboxes;
+		std::map<EntityType, pTexture>          textures;
+		std::map<EntityType, pAnimations>       animations;
+		std::map<EntityType, TSA::TTransfer>    ttransfers;
+		std::map<EntityType, CCP::HitBox>       hitboxes;
 
 		bool isInit = false;
 
 		bool componentValidationPhase(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
-		void componentConstructionPhase(const nlohmann::json& data, SDL_Renderer* renderer, const HKey::ENTITY_TYPE key, const std::string& keyStr);
+		void componentConstructionPhase(const nlohmann::json& data, SDL_Renderer* renderer, const EntityType key, const std::string& keyStr);
 
 
-		bool	  constructComponent_Texture(const nlohmann::json& data, SDL_Renderer* renderer, const HKey::ENTITY_TYPE key, const std::string& keyStr);
-		void	  constructComponent_TTransfer(const nlohmann::json& data, const HKey::ENTITY_TYPE key);
+		bool	  constructComponent_Texture(const nlohmann::json& data, SDL_Renderer* renderer, const EntityType key, const std::string& keyStr);
+		void	  constructComponent_TTransfer(const nlohmann::json& data, const EntityType key);
 		SDL_FRect constructComponent_TTransfer(const nlohmann::json& data, const char* field);
-		void	  constructComponent_Animations(const nlohmann::json& data, const HKey::ENTITY_TYPE key, const std::string& keyStr);
-		void	  constructComponent_Hitbox(const nlohmann::json& data, const HKey::ENTITY_TYPE key, const std::string& keyStr);
+		void	  constructComponent_Animations(const nlohmann::json& data, const EntityType key, const std::string& keyStr);
+		void	  constructComponent_Hitbox(const nlohmann::json& data, const EntityType key, const std::string& keyStr);
 
 	public:
 
 		EntityFactory(const nlohmann::json* const entityConfig, SDL_Renderer* renderer);
+
 		bool isInitalized()const;
 		void wipeMemory();
-		Player* createPlayer(HKey::ENTITY_TYPE key)const;			//caller is the owner, can return nullptr
-		Enemy* createEnemy(HKey::ENTITY_TYPE key)const;			//caller is the owner, can return nullptr
+		Player* createPlayer(EntityType key)const;			//caller is the owner, can return nullptr
+		Enemy* createEnemy(EntityType key)const;			    //caller is the owner, can return nullptr
 
-		SDL_Texture* getTexture(HKey::ENTITY_TYPE key)const;   //returns a pointer to, reciever is not the owner
-		TSA::TTransfer                getTTransfer(HKey::ENTITY_TYPE key)const;
-		const std::vector<TSA::Reel>* getAnimation(HKey::ENTITY_TYPE key)const;	//returns a pointer to, reciever is not the owner
-		CCP::HitBox                   getHitbox(HKey::ENTITY_TYPE key)const;
+		pTexture             getTexture(EntityType key)const;
+		TSA::TTransfer       getTTransfer(EntityType key)const;
+		pAnimations          getAnimation(EntityType key)const;
+		CCP::HitBox          getHitbox(EntityType key)const;
 
-		~EntityFactory();
 	public:
 		EntityFactory(const EntityFactory&) = delete;
 		EntityFactory(EntityFactory&&)noexcept = delete;

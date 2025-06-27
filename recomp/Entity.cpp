@@ -5,12 +5,6 @@ namespace badEngine {
 	{
 		isInit = componentValidationPhase(entityConfig, renderer);
 	}
-	EntityFactory::~EntityFactory()
-	{
-		for (auto& [id, texture] : textures) {
-			SDL_DestroyTexture(texture);
-		}
-	}
 	bool EntityFactory::componentValidationPhase(const nlohmann::json* const entityConfig, SDL_Renderer* renderer)
 	{
 		if (!entityConfig) {//if null ptr, kill it
@@ -25,7 +19,7 @@ namespace badEngine {
 				continue;
 			}
 			std::string keyStr = entry["type"].get<std::string>();
-			HKey::ENTITY_TYPE key = HKey::buildEntityTypeID(keyStr.c_str());
+			EntityType key = HKey::buildEntityTypeID(keyStr.c_str());
 
 			if (!HKey::isValidID(key)) {
 				printf("\ninvalid entity type unknown");
@@ -36,7 +30,7 @@ namespace badEngine {
 		}
 		return true;
 	}
-	void EntityFactory::componentConstructionPhase(const nlohmann::json& data, SDL_Renderer* renderer, const HKey::ENTITY_TYPE key, const std::string& keyStr)
+	void EntityFactory::componentConstructionPhase(const nlohmann::json& data, SDL_Renderer* renderer, const EntityType key, const std::string& keyStr)
 	{
 
 		if (data.contains("texture_path")) {
@@ -67,20 +61,23 @@ namespace badEngine {
 		*/
 	}
 
-	bool EntityFactory::constructComponent_Texture(const nlohmann::json& data, SDL_Renderer* renderer, const HKey::ENTITY_TYPE key, const std::string& keyStr)
+	bool EntityFactory::constructComponent_Texture(const nlohmann::json& data, SDL_Renderer* renderer, const EntityType key, const std::string& keyStr)
 	{
 		std::string path = data["texture_path"].get<std::string>();
-		SDL_Texture* texture = IMG_LoadTexture(renderer, path.c_str());
+		std::shared_ptr<SDL_Texture> texture = std::shared_ptr<SDL_Texture>(
+			IMG_LoadTexture(renderer, path.c_str()),
+			SDL_DestroyTexture
+		);
 
 		if (!texture) {
-			printf("\nerror: entity texture missing physical file: <type: %s>\t<path: %s>", path, keyStr);
+			printf("\nerror: entity texture missing physical file: <type: %s>\t<path: %s>", path.c_str(), keyStr.c_str());
 			return false;
 		}
 
 		textures.emplace(key, texture);
 		return true;
 	}
-	void EntityFactory::constructComponent_TTransfer(const nlohmann::json& data, const HKey::ENTITY_TYPE key)
+	void EntityFactory::constructComponent_TTransfer(const nlohmann::json& data, const EntityType key)
 	{
 		TSA::TTransfer ss;
 
@@ -113,10 +110,9 @@ namespace badEngine {
 
 		return rect;
 	}
-	void EntityFactory::constructComponent_Animations(const nlohmann::json& data, const HKey::ENTITY_TYPE key, const std::string& keyStr)
+	void EntityFactory::constructComponent_Animations(const nlohmann::json& data, const EntityType key, const std::string& keyStr)
 	{
-		std::vector<TSA::Reel> animationCollections;
-
+		std::shared_ptr<std::vector<TSA::Reel>> animationCollections = std::make_shared<std::vector<TSA::Reel>>();
 		for (const auto& rData : data) {
 
 			if (!rData.contains("id") || !rData.contains("reel_xyw") && rData["reel_xyw"].is_object()) {
@@ -150,11 +146,14 @@ namespace badEngine {
 				continue;
 			}
 
-			animationCollections.push_back(std::move(clip));
+			animationCollections->push_back(std::move(clip));
 		}
-		animations.emplace(key, std::move(animationCollections));
+		animations.emplace(
+			key,
+			std::static_pointer_cast<const std::vector<TSA::Reel>>(animationCollections)
+			);
 	}
-	void EntityFactory::constructComponent_Hitbox(const nlohmann::json& data, const HKey::ENTITY_TYPE key, const std::string& keyStr) {
+	void EntityFactory::constructComponent_Hitbox(const nlohmann::json& data, const EntityType key, const std::string& keyStr) {
 		CCP::HitBox hitbox;
 
 
@@ -172,11 +171,11 @@ namespace badEngine {
 	}
 
 
-	SDL_Texture* EntityFactory::getTexture(HKey::ENTITY_TYPE key)const
+	pTexture EntityFactory::getTexture(EntityType key)const
 	{
 		return textures.find(key) != textures.end() ? textures.at(key) : nullptr;
 	}
-	TSA::TTransfer EntityFactory::getTTransfer(HKey::ENTITY_TYPE key)const
+	TSA::TTransfer EntityFactory::getTTransfer(EntityType key)const
 	{
 		TSA::TTransfer ttransfer;
 
@@ -187,17 +186,11 @@ namespace badEngine {
 
 		return ttransfer;
 	}
-	const std::vector<TSA::Reel>* EntityFactory::getAnimation(HKey::ENTITY_TYPE key)const
+	pAnimations EntityFactory::getAnimation(EntityType key)const
 	{
-		const std::vector<TSA::Reel>* animations = nullptr;
-
-		if (this->animations.find(key) != this->animations.end()) {
-			animations = &this->animations.at(key);
-		}
-
-		return animations;
+		return animations.find(key) != animations.end() ? animations.at(key) : nullptr;
 	}
-	CCP::HitBox EntityFactory::getHitbox(HKey::ENTITY_TYPE key)const
+	CCP::HitBox EntityFactory::getHitbox(EntityType key)const
 	{
 		CCP::HitBox hitbox;
 
@@ -210,17 +203,16 @@ namespace badEngine {
 
 
 	//caller is the owner, can return nullptr
-	Player* EntityFactory::createPlayer(HKey::ENTITY_TYPE key)const
+	Player* EntityFactory::createPlayer(EntityType key)const
 	{
-
-		SDL_Texture* texture = getTexture(key);
+		pTexture texture = getTexture(key);
 		TSA::TTransfer ttransfer = getTTransfer(key);
-		const std::vector<TSA::Reel>* animations = getAnimation(key);
+		pAnimations animations = getAnimation(key);
 		CCP::HitBox hitbox = getHitbox(key);
 
 		Player* player = new Player({ texture, ttransfer }, hitbox);
 
-		bool isValidTexture = player->sprite.texture;
+		bool isValidTexture = texture != nullptr;
 
 		if (!isValidTexture) {
 			printf("\nwarning: attempt to init sprite texture failure: PLAYER");
@@ -233,15 +225,15 @@ namespace badEngine {
 		return player;
 	}
 	//caller is the owner, can return nullptr
-	Enemy* EntityFactory::createEnemy(HKey::ENTITY_TYPE key)const
+	Enemy* EntityFactory::createEnemy(EntityType key)const
 	{
-		SDL_Texture* texture = getTexture(key);
+		pTexture texture = getTexture(key);
 		TSA::TTransfer ttransfer = getTTransfer(key);
 		CCP::HitBox hitbox = getHitbox(key);
 
 		Enemy* enemy = new Enemy({ texture, ttransfer }, hitbox);
 
-		bool isValidTexture = enemy->sprite.texture;
+		bool isValidTexture = texture != nullptr;
 
 		if (!isValidTexture) {
 			printf("\nwarning: attempt to init sprite texture failure: ENEMY");
@@ -256,10 +248,6 @@ namespace badEngine {
 		return isInit;
 	}
 	void EntityFactory::wipeMemory() {
-		for (auto& [id, texture] : textures)
-		{
-			SDL_DestroyTexture(texture);
-		}
 		textures.clear();
 		ttransfers.clear();
 		animations.clear();

@@ -3,7 +3,7 @@
 namespace badEngine {
 
 	namespace TSA {
-		bool Sprite::initPlay(const std::vector<Reel>* animationPoints)
+		bool Sprite::initPlay(std::shared_ptr<const std::vector<Reel>> animationPoints)
 		{
 			if (!animationPoints) return false;
 			if (animationPoints->empty()) return false;
@@ -16,7 +16,7 @@ namespace badEngine {
 		void Sprite::unInitPlay()
 		{
 			current = nullptr;
-			animations = nullptr;
+			animations.reset();
 		}
 		bool Sprite::play()
 		{
