@@ -85,8 +85,7 @@ int main() {
         FrameTimer gameLogicTimer;
         gameLogicTimer.start();
 
-
-        window.updateBegin();
+        window.displayClear();
 
         //LISTEN TO EVENTS
         while (SDL_PollEvent(&event)) {
@@ -145,7 +144,7 @@ int main() {
         SDL_RenderTexture(window.getRenderer(), player->sprite.texture.get(), &player->sprite.source, &adjustedDest);
         player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
 
-        window.updateEnd();
+        window.displayPresent();
         gameLogicTimer.end();
         //#################################################################################
         
