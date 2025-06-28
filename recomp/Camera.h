@@ -15,33 +15,15 @@ namespace badEngine {
 
 		Camera2D(int screenW, int screenH) :screenW(screenW), screenH(screenH) {}
 
-		void setScreenSize(int width, int height) {
-			screenW = width;
-			screenH = height;
-		}
-		void centerOn(float worldX, float worldY) {
-			offsetX = worldX - (screenW / 2.0f) / scaleX;
-			offsetY = worldY - (screenH / 2.0f) / scaleY;
-		}
-		void move(float dx, float dy) {
-			offsetX += dx / scaleX;
-			offsetY += dy / scaleY;
-		}
-		void zoom(float factor) {
-			scaleX *= factor;
-			scaleY *= factor;
-		}
-		void worldToScreen(float worldX, float worldY, float& screenX, float& screenY) const {
-			screenX = (worldX - offsetX) * scaleX;
-			screenY = (worldY - offsetY) * scaleY;
-		}
-		void screenToWorld(float screenX, float screenY, float& worldX, float& worldY) const {
-			worldX = screenX / scaleX + offsetX;
-			worldY = screenY / scaleY + offsetY;
-		}
+		void setScreenSize(int width, int height);
+		void centerOn(float worldX, float worldY);
+		void move(float dx, float dy);
+		void zoom(float factor);
+		void worldToScreen(float worldX, float worldY, float& screenX, float& screenY)const;
+		void screenToWorld(float screenX, float screenY, float& worldX, float& worldY)const;
 
-		float getScaleX() const { return scaleX; }
-		float getScaleY() const { return scaleY; }
+		float getScaleX() const;
+		float getScaleY() const;
 	};
 
 	class Camera2DSDL :public Camera2D {
@@ -49,16 +31,8 @@ namespace badEngine {
 	public:
 		Camera2DSDL(int width, int height):Camera2D(width, height) {}
 
-		void centerOn(const SDL_FRect& rect) {
-			Camera2D::centerOn(rect.x + (rect.w * 0.5f), rect.y + (rect.h * 0.5f));
-		}
-		SDL_FRect worldToScreen(const SDL_FRect& rect) {
-			SDL_FRect adjusted = rect;
-			Camera2D::worldToScreen(rect.x, rect.y, adjusted.x, adjusted.y);
-			adjusted.w *= getScaleX();
-			adjusted.h *= getScaleY();
-			return adjusted;
-		}
+		void centerOn(const SDL_FRect& rect);
+		SDL_FRect worldToScreen(const SDL_FRect& rect)const;
 	};
 
 }
