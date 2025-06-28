@@ -9,10 +9,6 @@
 #include "CCPRect.h"
 #include "State.h"
 
-
-/*
-* Data initalized by the factory should NEVER be cleaned up during runtime as entities will depend on the basic components
-*/
 namespace badEngine {
 
 	class Player;

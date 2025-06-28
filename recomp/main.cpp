@@ -74,7 +74,7 @@ int main() {
     Player* player = entityFactory.createPlayer(HKey::ENTITY_TYPE::PLAYER_MAIN);
     int x, y;
     SDL_GetWindowSize(window.getWindow(), &x, &y);
-    Camera2D camera(x,y);
+    Camera2DSDL camera(x,y);
     //###################################################################
 
     bool gameRunning = true;
@@ -134,18 +134,14 @@ int main() {
         //#################################################################################
         
         //CAMERA
-        camera.centerOn(player->hitbox.rectangle.x, player->hitbox.rectangle.y);
-        //window.updateCamera(player->hitbox.rectangle, world.rectangle);//wrong clamp size btw
+        camera.centerOn(player->hitbox.rectangle);
         //#################################################################################
 
         //MAIN LOGIC ENDING
         TSA::setTTransferField_coordinates(player->sprite.getAnimatedTextureSource(), player->sprite.source);
         TSA::setTTransferField_coordinates(player->hitbox.rectangle, player->sprite.dest);
 
-        SDL_FRect adjustedDest = player->sprite.dest;
-        camera.worldToScreen(player->sprite.dest.x, player->sprite.dest.y, adjustedDest.x, adjustedDest.y);
-        adjustedDest.w *= camera.getScaleX();
-        adjustedDest.h *= camera.getScaleY();
+        SDL_FRect adjustedDest = camera.worldToScreen(player->sprite.dest);
         SDL_RenderTexture(window.getRenderer(), player->sprite.texture.get(), &player->sprite.source, &adjustedDest);
         player->hitbox.velocity = { 0.f, 0.f };//temporary bullshit
 
@@ -181,29 +177,6 @@ int main() {
 
     return 0;
 }
-
-
-//std::vector<std::pair<int, float>> collisions;
-//for (int i = 0; i < rects.size();i++) {
-//    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-//    float hitTime = 0;
-//    if (player->transform.projectionHitBoxAdjusted(rects[i].rect, contactP, contactN, hitTime)) {
-//        collisions.push_back({ i, hitTime });
-//    }
-//}
-//std::sort(collisions.begin(), collisions.end(), [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-//    return a.second < b.second;
-//    });
-//for (auto& j : collisions) {
-//    SDL_FPoint contactP{ 0,0 }, contactN{ 0,0 };
-//    float hitTime = 0;
-//    if (player->transform.projectionHitBoxAdjusted(rects[j.first].rect, contactP, contactN, hitTime)) {
-//        player->transform.clampNextTo(rects[j.first].rect, contactN);
-//        player->transform.clearVelocity();
-//    }
-//}
-//player->transform.updatePos();
-
 
 /*
 RECTANGLE (or any entity) PROPER COLLISION TEMPLATE, 2 STAGED

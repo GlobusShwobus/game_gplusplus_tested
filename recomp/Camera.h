@@ -1,5 +1,5 @@
 #pragma once
-
+#include "SDL3/SDL.h"
 namespace badEngine {
 
 	class Camera2D {
@@ -13,9 +13,7 @@ namespace badEngine {
 
 	public:
 
-		Camera2D(int screenW, int screenH) :screenW(screenW), screenH(screenH) {
-			centerOn(0.0f, 0.0f);
-		}
+		Camera2D(int screenW, int screenH) :screenW(screenW), screenH(screenH) {}
 
 		void setScreenSize(int width, int height) {
 			screenW = width;
@@ -44,6 +42,23 @@ namespace badEngine {
 
 		float getScaleX() const { return scaleX; }
 		float getScaleY() const { return scaleY; }
+	};
+
+	class Camera2DSDL :public Camera2D {
+	
+	public:
+		Camera2DSDL(int width, int height):Camera2D(width, height) {}
+
+		void centerOn(const SDL_FRect& rect) {
+			Camera2D::centerOn(rect.x + (rect.w * 0.5f), rect.y + (rect.h * 0.5f));
+		}
+		SDL_FRect worldToScreen(const SDL_FRect& rect) {
+			SDL_FRect adjusted = rect;
+			Camera2D::worldToScreen(rect.x, rect.y, adjusted.x, adjusted.y);
+			adjusted.w *= getScaleX();
+			adjusted.h *= getScaleY();
+			return adjusted;
+		}
 	};
 
 }
