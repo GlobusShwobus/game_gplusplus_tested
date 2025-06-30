@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="point.h" />
+    <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Grid.h" />
@@ -157,7 +158,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="point.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />

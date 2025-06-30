@@ -51,6 +51,9 @@
     <ClInclude Include="point.h">
       <Filter>cartesian</Filter>
     </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>cartesian</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Grid.cpp">
@@ -79,9 +82,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="point.cpp">
-      <Filter>cartesian</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
