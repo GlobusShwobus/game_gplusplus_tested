@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cmath>
 namespace badEngine {
 
 	class Point {
@@ -58,7 +58,7 @@ namespace badEngine {
 
 		inline float dot()const
 		{
-			return (x * x) + (y * y);
+			return Point::dot(*this);
 		}
 		static inline float dot(const Point& p)
 		{
@@ -66,19 +66,15 @@ namespace badEngine {
 		}
 		inline float lenght()const
 		{
-			return std::sqrtf(dot());
+			return Point::lenght(*this);
 		}
 		static inline float lenght(const Point& p)
 		{
-			return std::sqrtf(Point::dot(p));
+			return std::sqrtf(dot(p));
 		}
 		inline Point unitVector()const
 		{
-			float len = lenght();
-			if (len == 0.0f)
-				return{ 0.0f,0.0f };
-			else
-				return { x / len,y / len };
+			return Point::unitVector(*this);
 		}
 		static inline Point unitVector(const Point& p)
 		{
@@ -90,16 +86,7 @@ namespace badEngine {
 		}
 		inline Point signVector()const
 		{
-			Point p{ 0.0f,0.0f };
-			if (x > 0.0f)
-				p.x = 1.0f;
-			else if (x < 0.0f)
-				p.x = -1.0f;
-			if (y > 0.0f)
-				p.y = 1.0f;
-			else if (y < 0.0f)
-				p.y = -1.0f;
-			return p;
+			return Point::signVector(*this);
 		}
 		static inline Point signVector(const Point& p)
 		{
