@@ -2,21 +2,21 @@
 
 namespace badEngine {
 
-	class RawRectangle {
+	class Rectangle {
 	public:
 		float x = 0.0f;
 		float y = 0.0f;
 		float w = 0.0f;
 		float h = 0.0f;
 
-		RawRectangle() = default;
-		RawRectangle(float x, float y, float w, float h) :x(x), y(y), w(w), h(h) {}
+		Rectangle() = default;
+		Rectangle(float x, float y, float w, float h) :x(x), y(y), w(w), h(h) {}
 
 		inline bool containsPoint(float cordX, float cordY)const 
 		{
-			return RawRectangle::containsPoint(*this, cordX, cordY);
+			return Rectangle::containsPoint(*this, cordX, cordY);
 		}
-		static inline bool containsPoint(const RawRectangle& rect, float cordX, float cordY)
+		static inline bool containsPoint(const Rectangle& rect, float cordX, float cordY)
 		{
 			return (
 				cordX >= rect.x &&
@@ -25,11 +25,11 @@ namespace badEngine {
 				cordY < rect.y + rect.h);
 		}
 
-		inline bool containsRect(const RawRectangle& other)const
+		inline bool containsRect(const Rectangle& other)const
 		{
-			return RawRectangle::containsRect(*this, other);
+			return Rectangle::containsRect(*this, other);
 		}
-		static inline bool containsRect(const RawRectangle& larger, const RawRectangle& smaller)
+		static inline bool containsRect(const Rectangle& larger, const Rectangle& smaller)
 		{
 			return (
 				smaller.x >= larger.x &&
@@ -38,11 +38,11 @@ namespace badEngine {
 				smaller.y + smaller.h <= larger.y + larger.h);
 		}
 
-		inline bool intersects(const RawRectangle& other)const
+		inline bool intersects(const Rectangle& other)const
 		{
-			return RawRectangle::intersects(*this, other);
+			return Rectangle::intersects(*this, other);
 		}
-		static inline bool intersects(const RawRectangle& a, const RawRectangle& b)
+		static inline bool intersects(const Rectangle& a, const Rectangle& b)
 		{
 			return (
 				a.x < b.x + b.w &&

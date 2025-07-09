@@ -152,6 +152,7 @@
     <ClInclude Include="HashKeys.h" />
     <ClInclude Include="MuhRandom.h" />
     <ClInclude Include="State.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="CCPRect.h" />
