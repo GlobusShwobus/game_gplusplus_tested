@@ -24,6 +24,7 @@ namespace badEngine {
 				cordX < rect.x + rect.w &&
 				cordY < rect.y + rect.h);
 		}
+
 		inline bool containsRect(const RawRectangle& other)const
 		{
 			return RawRectangle::containsRect(*this, other);
@@ -35,6 +36,20 @@ namespace badEngine {
 				smaller.y >= larger.y &&
 				smaller.x + smaller.w <= larger.x + larger.w &&
 				smaller.y + smaller.h <= larger.y + larger.h);
+		}
+
+		inline bool intersects(const RawRectangle& other)const
+		{
+			return RawRectangle::intersects(*this, other);
+		}
+		static inline bool intersects(const RawRectangle& a, const RawRectangle& b)
+		{
+			return (
+				a.x < b.x + b.w &&
+				a.x + a.w > b.x &&
+				a.y < b.y + b.h &&
+				a.y + a.h > b.y
+				);
 		}
 	};
 
