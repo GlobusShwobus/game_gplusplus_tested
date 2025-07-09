@@ -44,7 +44,7 @@ namespace badEngine {
 
 		bool isInitalized()const;
 		void wipeMemory();
-		Player* createPlayer(EntityType key)const;			//caller is the owner, can return nullptr
+		Player* createPlayer(EntityType key)const;		     	//caller is the owner, can return nullptr
 		Enemy* createEnemy(EntityType key)const;			    //caller is the owner, can return nullptr
 
 		pTexture             getTexture(EntityType key)const;

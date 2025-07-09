@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="box">
+    <Filter Include="planeStuff">
       <UniqueIdentifier>{c8938a00-20a2-4553-b44a-af3ac8c74e4e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -49,13 +49,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="point.h">
-      <Filter>box</Filter>
+      <Filter>planeStuff</Filter>
     </ClInclude>
     <ClInclude Include="Rectangle.h">
-      <Filter>box</Filter>
+      <Filter>planeStuff</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
-      <Filter>box</Filter>
+      <Filter>planeStuff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

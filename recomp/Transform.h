@@ -23,8 +23,7 @@ namespace badEngine {
 		{
 			return velocity;
 		}
-		/*
-		// THIS TYPE OF FUNCTIONALITY SHOULD BE IN SDL VERSION SUBCLASS
+		
 		Rectangle* DataRectangle()
 		{
 			return &rectangle;
@@ -33,7 +32,7 @@ namespace badEngine {
 		{
 			return &velocity;
 		}
-		*/
+		
 
 		void setRectangle(const Rectangle& rectangle)
 		{
