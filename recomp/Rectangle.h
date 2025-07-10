@@ -52,8 +52,10 @@ namespace badEngine {
 				a.y + a.h > b.y
 				);
 		}
-
-		static inline bool intersectsEnhanced(const Rectangle& a, const Rectangle& b, Rectangle* output) {
+		bool intersectsEnhanced(const Rectangle& other, Rectangle* output)const {
+			return Rectangle::intersectsEnhanced(*this, other, output);
+		}
+		static bool intersectsEnhanced(const Rectangle& a, const Rectangle& b, Rectangle* output) {
 
 			float dx = center(a.x, a.w) - center(b.x, b.w);
 			float dy = center(a.y, a.h) - center(b.y, b.h);
@@ -70,15 +72,30 @@ namespace badEngine {
 			return true;
 		}
 
+		inline float centerX()const {
+			return Rectangle::center(x, w);
+		}
+		inline float centerY()const {
+			return Rectangle::center(y, h);
+		}
+		inline float halfWidth()const {
+			return Rectangle::half(w);
+		}
+		inline float halfHeight()const {
+			return Rectangle::half(h);
+		}
+
 	private:
 
+		static inline float half(float lenght) {
+			return lenght * 0.5f;
+		}
 		static inline float center(float pos, float lenght) {
-			return pos + (lenght * 0.5f);
+			return pos + Rectangle::half(lenght);
 		}
 		static inline float overlap(float dim1, float dim2, float dx) {
-			return (dim1 * 0.5) + (dim2 * 0.5) - std::fabs(dx);
+			return Rectangle::half(dim1) + Rectangle::half(dim2) - std::fabs(dx);
 		}
-
 
 	};
 

@@ -64,6 +64,7 @@ namespace badEngine {
 		{
 			return(p.x * p.x) + (p.y * p.y);
 		}
+
 		inline float lenght()const
 		{
 			return Point::lenght(*this);
@@ -72,6 +73,15 @@ namespace badEngine {
 		{
 			return std::sqrtf(dot(p));
 		}
+
+		inline Point inverse()const
+		{
+			return Point::inverse(*this);
+		}
+		static inline Point inverse(const Point& p) {
+			return{ 1.0f / p.x, 1.0f / p.y };
+		}
+
 		inline Point unitVector()const
 		{
 			return Point::unitVector(*this);
@@ -84,6 +94,7 @@ namespace badEngine {
 			else
 				return { p.x / len, p.y / len };
 		}
+
 		inline Point signVector()const
 		{
 			return Point::signVector(*this);
