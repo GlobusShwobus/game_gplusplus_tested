@@ -84,15 +84,35 @@ namespace badEngine {
 		{
 			Point p = worldToScreen(rect.x, rect.y);
 			float w = rect.w * scaleX;
-			float h = rect.w * scaleY;
+			float h = rect.h * scaleY;
 
 			return { p.x, p.y, w,h };
 		}
-		//don't quite know it yet
+
 		void screenToWorld(float screenX, float screenY, float& worldX, float& worldY) const
 		{
 			worldX = screenX / scaleX + offsetX;
 			worldY = screenY / scaleY + offsetY;
+		}
+		Point screenToWorld(const Point& position) const
+		{
+			Point p;
+			screenToWorld(position.x, position.y, p.x, p.y);
+			return p;
+		}
+		Point screenToWorld(float x, float y) const
+		{
+			Point p;
+			screenToWorld(x, y, p.x, p.y);
+			return p;
+		}
+		Rectangle screenToWorld(const Rectangle& rect)const
+		{
+			Point p = screenToWorld(rect.x, rect.y);
+			float w = rect.w / scaleX;
+			float h = rect.h / scaleY;
+
+			return { p.x, p.y, w,h };
 		}
 
 		inline float getScaleX() const { return scaleX; }
