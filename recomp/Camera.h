@@ -68,52 +68,18 @@ namespace badEngine {
 			screenX = (worldX - offsetX) * scaleX;
 			screenY = (worldY - offsetY) * scaleY;
 		}
-		Point worldToScreen(const Point& position) const
-		{
-			Point p;
-			worldToScreen(position.x, position.y, p.x, p.y);
-			return p;
-		}
-		Point worldToScreen(float x, float y) const
-		{
-			Point p;
-			worldToScreen(x, y, p.x, p.y);
-			return p;
-		}
-		Rectangle worldToScreen(const Rectangle& rect)const
-		{
-			Point p = worldToScreen(rect.x, rect.y);
-			float w = rect.w * scaleX;
-			float h = rect.h * scaleY;
+		Point worldToScreen(const Point& position)const;
+		Point worldToScreen(float x, float y)const;
+		Rectangle worldToScreen(const Rectangle& rect)const;
 
-			return { p.x, p.y, w,h };
-		}
-
-		void screenToWorld(float screenX, float screenY, float& worldX, float& worldY) const
+		inline void screenToWorld(float screenX, float screenY, float& worldX, float& worldY) const
 		{
 			worldX = screenX / scaleX + offsetX;
 			worldY = screenY / scaleY + offsetY;
 		}
-		Point screenToWorld(const Point& position) const
-		{
-			Point p;
-			screenToWorld(position.x, position.y, p.x, p.y);
-			return p;
-		}
-		Point screenToWorld(float x, float y) const
-		{
-			Point p;
-			screenToWorld(x, y, p.x, p.y);
-			return p;
-		}
-		Rectangle screenToWorld(const Rectangle& rect)const
-		{
-			Point p = screenToWorld(rect.x, rect.y);
-			float w = rect.w / scaleX;
-			float h = rect.h / scaleY;
-
-			return { p.x, p.y, w,h };
-		}
+		Point screenToWorld(const Point& position) const;
+		Point screenToWorld(float x, float y) const;
+		Rectangle screenToWorld(const Rectangle& rect)const;
 
 		inline float getScaleX() const { return scaleX; }
 		inline float getScaleY() const { return scaleY; }

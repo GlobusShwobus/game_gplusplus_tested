@@ -4,37 +4,37 @@
     "movement_speed": 2.5,
     "health_points": 100,
     "mass": 25,
-    "Hitbox": {
-      "x": 100,
-      "y": 100,
-      "w": 32,
-      "h": 32
-    },
+    "position_x": 100,
+    "position_y": 100,
     "texture_path": "../Textures/player_sheet_2.png",
-    "texture_src": [ 0, 0, 32, 32 ],
-    "texture_dest": [ 0, 0, 32, 32 ],
+    "frame_width": 32,
+    "frame_height": 32,
     "animations": {
       "walk_left": {
         "id": "walk_left",
-        "reel_xyw": [ 0, 0, 32 ],
+        "x": 0,
+        "y": 0,
         "frameCount": 8,
         "loops": true
       },
       "walk_right": {
         "id": "walk_right",
-        "reel_xyw": [ 0, 32, 32 ],
+        "x": 0,
+        "y": 32,
         "frameCount": 8,
         "loops": true
       },
       "idle_left": {
         "id": "idle_left",
-        "reel_xyw": [ 128, 64, 32 ],
+        "x": 128,
+        "y": 64,
         "frameCount": 2,
         "loops": true
       },
       "idle_right": {
         "id": "idle_right",
-        "reel_xyw": [ 192, 64, 32 ],
+        "x": 192,
+        "y": 64,
         "frameCount": 2,
         "loops": true
       }
@@ -45,29 +45,17 @@
     "movement_speed": 5,
     "health_points": 100,
     "mass": 10,
-    "Hitbox": {
-      "x": 0,
-      "y": 0,
-      "w": 32,
-      "h": 32
-    },
     "texture_path": "../Textures/enemy_spear1.png",
-    "texture_src": [ 0, 0, 32, 32 ],
-    "texture_dest": [ 0, 0, 32, 32 ]
+    "frame_width": 32,
+    "frame_height": 32
   },
   "enemy_sword1": {
     "type": "enemy_sword1",
     "movement_speed": 10,
     "health_points": 200,
     "mass": 20,
-    "Hitbox": {
-      "x": 0,
-      "y": 0,
-      "w": 32,
-      "h": 32
-    },
     "texture_path": "../Textures/enemy_sword1.png",
-    "texture_src": [ 0, 0, 32, 32 ],
-    "texture_dest": [ 0, 0, 32, 32 ]
+    "frame_width": 32,
+    "frame_height": 32
   }
 }

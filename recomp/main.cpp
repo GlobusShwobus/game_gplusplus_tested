@@ -8,10 +8,15 @@
 #include <thread>
 
 /*
-TODO:: rework the window, want more ability to create windows and window should only care about structly window related stuff
-       then we can make sprite field private (with slight consequences but that's minor)
-TODO:: quadtree storage and lookup
-TODO:: scene class (the big ugh)
+JOB ORDER:
+    serialize json data into structs (window, entities, etc in the future)
+    Entity factory reads serialized structs (so now it doesn't care about readon json, still takes ownership)
+    redo sprite to work with my types instead + sepparate animation
+    now that the components are set, encapsulate collision logic in collision.h (the whole 2 step thing)
+    seppara on user create and on user update for main logic
+
+TODO:: quadtree storage and lookup 
+TODO:: scene class (the big one)
 TODO:: imgui
 */
 
