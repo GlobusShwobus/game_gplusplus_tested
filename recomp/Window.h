@@ -5,6 +5,9 @@
 
 #include "CCPRect.h"
 
+/*
+SERIALIZE THE WINDOW INIT STRUCT IN SERIALIZE
+*/
 
 class Window {
 

@@ -143,28 +143,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BMPHeader.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="Components.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="Rectangle.h" />
-    <ClInclude Include="Timer.h" />
+    <ClInclude Include="Serialization.h" />
+    <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Grid.h" />
     <ClInclude Include="HashKeys.h" />
-    <ClInclude Include="MuhRandom.h" />
+    <ClInclude Include="NumberGenerator.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="CCPRect.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="CCPRect.cpp" />
-    <ClCompile Include="MuhRandom.cpp" />
-    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="NumberGenerator.cpp" />
+    <ClCompile Include="Stopwatch.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Entity.cpp" />
   </ItemGroup>

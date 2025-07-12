@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include "Point.h"
 
 namespace badEngine {
 
@@ -12,11 +13,11 @@ namespace badEngine {
 
 		Rectangle() = default;
 		Rectangle(float x, float y, float w, float h) :x(x), y(y), w(w), h(h) {}
+		Rectangle(const Point& position, const Point& dimensions) :x(position.x), y(position.y), w(dimensions.x), h(dimensions.y) {}
+		Rectangle(const Point& position, float w, float h) :x(position.x), y(position.y), w(w), h(h) {}
+		Rectangle(float x, float y, const Point& dimensions) :x(x), y(y), w(dimensions.x), h(dimensions.y) {}
 
-		inline bool containsPoint(float cordX, float cordY)const 
-		{
-			return Rectangle::containsPoint(*this, cordX, cordY);
-		}
+
 		static inline bool containsPoint(const Rectangle& rect, float cordX, float cordY)
 		{
 			return (
@@ -25,11 +26,19 @@ namespace badEngine {
 				cordX < rect.x + rect.w &&
 				cordY < rect.y + rect.h);
 		}
-
-		inline bool containsRect(const Rectangle& other)const
+		static inline bool containsPoint(const Rectangle& rect, const Point& position)
 		{
-			return Rectangle::containsRect(*this, other);
+			return Rectangle::containsPoint(rect, position.x, position.y);
 		}
+		inline bool        containsPoint(float cordX, float cordY)const
+		{
+			return Rectangle::containsPoint(*this, cordX, cordY);
+		}
+		inline bool        containsPoint(const Point& position)const
+		{
+			return Rectangle::containsPoint(*this, position.x, position.y);
+		}
+
 		static inline bool containsRect(const Rectangle& larger, const Rectangle& smaller)
 		{
 			return (
@@ -38,11 +47,11 @@ namespace badEngine {
 				smaller.x + smaller.w <= larger.x + larger.w &&
 				smaller.y + smaller.h <= larger.y + larger.h);
 		}
-
-		inline bool intersects(const Rectangle& other)const
+		inline bool        containsRect(const Rectangle& other)const
 		{
-			return Rectangle::intersects(*this, other);
+			return Rectangle::containsRect(*this, other);
 		}
+
 		static inline bool intersects(const Rectangle& a, const Rectangle& b)
 		{
 			return (
@@ -52,51 +61,45 @@ namespace badEngine {
 				a.y + a.h > b.y
 				);
 		}
-		bool intersectsEnhanced(const Rectangle& other, Rectangle* output)const {
-			return Rectangle::intersectsEnhanced(*this, other, output);
-		}
-		static bool intersectsEnhanced(const Rectangle& a, const Rectangle& b, Rectangle* output) {
-
-			float dx = center(a.x, a.w) - center(b.x, b.w);
-			float dy = center(a.y, a.h) - center(b.y, b.h);
-
-			float overlapX = overlap(a.w, b.w, dx);
-			float overlapY = overlap(a.h, b.h, dy);
-
-			if (overlapX < 0.0f && overlapY < 0.0f)
-				return false;
-
-			if (output)
-				*output = { dx,dy,overlapX, overlapY };
-		
-			return true;
+		inline bool        intersects(const Rectangle& other)const
+		{
+			return Rectangle::intersects(*this, other);
 		}
 
-		inline float centerX()const {
+		static bool        intersectsEnhanced(const Rectangle& a, const Rectangle& b, Rectangle* output = nullptr);
+		bool               intersectsEnhanced(const Rectangle& other, Rectangle* output = nullptr)const;
+
+		inline float centerX()const
+		{
 			return Rectangle::center(x, w);
 		}
-		inline float centerY()const {
+		inline float centerY()const
+		{
 			return Rectangle::center(y, h);
 		}
-		inline float halfWidth()const {
+		inline float halfWidth()const
+		{
 			return Rectangle::half(w);
 		}
-		inline float halfHeight()const {
+		inline float halfHeight()const
+		{
 			return Rectangle::half(h);
 		}
 
 	private:
 
-		static inline float half(float lenght) {
+		static inline float half(float lenght)
+		{
 			return lenght * 0.5f;
 		}
-		static inline float center(float pos, float lenght) {
+		static inline float center(float pos, float lenght)
+		{
 			return pos + Rectangle::half(lenght);
 		}
-		static inline float overlap(float dim1, float dim2, float dx) {
+		static inline float overlap(float dim1, float dim2, float dx)
+		{
 			return Rectangle::half(dim1) + Rectangle::half(dim2) - std::fabs(dx);
 		}
 
 	};
-
 }

@@ -9,7 +9,7 @@ namespace badEngine {
 		float y = 0.0f;
 
 		Point() = default;
-		Point(const float x, const float y) :x(x), y(y) {}
+		Point(float x, float y) :x(x), y(y) {}
 
 		inline Point operator+(const Point& p)const
 		{
