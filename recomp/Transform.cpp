@@ -2,17 +2,17 @@
 
 namespace badEngine {
 
-	bool Transform::rayCollision(const Point& rayOrigin, const Point& rayVector, const Rectangle& target, float& hitTime, Point* contantPoint, Point* contactNormal)
+	bool Transform::rayCollision(const Vek2& rayOrigin, const Vek2& rayVector, const Rectangle& target, float& hitTime, Vek2* contantPoint, Vek2* contactNormal)
 	{
 		// Inverse direction, idfk why, but it is OK to divide floats by 0, creates an infiniti or NaN
-		Point inverse = rayVector.inverse();
+		Vek2 inverse = rayVector.inverse();
 
 		// Calculate intersections with rectangle bounding axes
-		Point tNear = {
+		Vek2 tNear = {
 			(target.x - rayOrigin.x) * inverse.x,
 			(target.y - rayOrigin.y) * inverse.y
 		};
-		Point tFar = {
+		Vek2 tFar = {
 			(target.x + target.w - rayOrigin.x) * inverse.x,
 			(target.y + target.h - rayOrigin.y) * inverse.y
 		};
@@ -59,7 +59,7 @@ namespace badEngine {
 
 		return true;
 	}
-	bool Transform::rayCollisionEnhanced(const Rectangle& bRect, const Point& bVel, float& hitTime, Point* contactPoint, Point* contactNormal)const
+	bool Transform::rayCollisionEnhanced(const Rectangle& bRect, const Vek2& bVel, float& hitTime, Vek2* contactPoint, Vek2* contactNormal)const
 	{
 		return Transform::rayCollisionEnhanced(
 			this->rectangle,
@@ -71,7 +71,7 @@ namespace badEngine {
 			contactNormal
 		);
 	}
-	bool Transform::rayCollisionEnhanced(const Transform& target, float& hitTime, Point* contactPoint, Point* contactNormal)const
+	bool Transform::rayCollisionEnhanced(const Transform& target, float& hitTime, Vek2* contactPoint, Vek2* contactNormal)const
 	{
 		return Transform::rayCollisionEnhanced(
 			this->rectangle,
@@ -83,7 +83,7 @@ namespace badEngine {
 			contactNormal
 		);
 	}
-	bool Transform::rayCollisionEnhanced(const Transform& a, const Transform& b, float& hitTime, Point* contactPoint, Point* contactNormal)
+	bool Transform::rayCollisionEnhanced(const Transform& a, const Transform& b, float& hitTime, Vek2* contactPoint, Vek2* contactNormal)
 	{
 		return Transform::rayCollisionEnhanced(
 			a.rectangle,
@@ -95,10 +95,10 @@ namespace badEngine {
 			contactNormal
 		);
 	}
-	bool Transform::rayCollisionEnhanced(const Rectangle& aRect, const Point& aVel, const Rectangle& bRect, const Point& bVel, float& hitTime, Point* contactPoint, Point* contactNormal)
+	bool Transform::rayCollisionEnhanced(const Rectangle& aRect, const Vek2& aVel, const Rectangle& bRect, const Vek2& bVel, float& hitTime, Vek2* contactPoint, Vek2* contactNormal)
 	{
 		// relative motion
-		Point relativeVelocity = aVel - bVel;
+		Vek2 relativeVelocity = aVel - bVel;
 
 		// Early out if no motion
 		if (relativeVelocity.x == 0.0f && relativeVelocity.y == 0.0f)
@@ -113,7 +113,7 @@ namespace badEngine {
 		};
 
 		// Ray origin is the center of this object
-		Point rayOrigin = { aRect.centerX(), aRect.centerY() };
+		Vek2 rayOrigin = { aRect.centerX(), aRect.centerY() };
 
 		if (Transform::rayCollision(rayOrigin, relativeVelocity, expandedTarget, hitTime, contactPoint, contactNormal)) {
 			return (hitTime >= 0.0f && hitTime < 1.0f);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Rectangle.h"
-#include "Point.h"
+#include "Vek2.h"
 
 namespace badEngine {
 	class Camera2D {
@@ -24,7 +24,7 @@ namespace badEngine {
 			screenW = width;
 			screenH = height;
 		}
-		inline void updateScreenSize(const Point& dimensions)
+		inline void updateScreenSize(const Vek2& dimensions)
 		{
 			updateScreenSize(dimensions.x, dimensions.y);
 		}
@@ -34,7 +34,7 @@ namespace badEngine {
 			offsetX = x - (screenW * 0.5f) / scaleX;	//abs
 			offsetY = y - (screenH * 0.5f) / scaleY;	//abs
 		}
-		inline void focusPoint(const Point& position)
+		inline void focusPoint(const Vek2& position)
 		{
 			focusPoint(position.x, position.y);
 		}
@@ -52,7 +52,7 @@ namespace badEngine {
 			offsetX += deltaX / scaleX;
 			offsetY += deltaY / scaleY;
 		}
-		inline void move(const Point& delta)
+		inline void move(const Vek2& delta)
 		{
 			move(delta.x, delta.y);
 		}
@@ -68,8 +68,8 @@ namespace badEngine {
 			screenX = (worldX - offsetX) * scaleX;
 			screenY = (worldY - offsetY) * scaleY;
 		}
-		Point worldToScreen(const Point& position)const;
-		Point worldToScreen(float x, float y)const;
+		Vek2 worldToScreen(const Vek2& position)const;
+		Vek2 worldToScreen(float x, float y)const;
 		Rectangle worldToScreen(const Rectangle& rect)const;
 
 		inline void screenToWorld(float screenX, float screenY, float& worldX, float& worldY) const
@@ -77,8 +77,8 @@ namespace badEngine {
 			worldX = screenX / scaleX + offsetX;
 			worldY = screenY / scaleY + offsetY;
 		}
-		Point screenToWorld(const Point& position) const;
-		Point screenToWorld(float x, float y) const;
+		Vek2 screenToWorld(const Vek2& position) const;
+		Vek2 screenToWorld(float x, float y) const;
 		Rectangle screenToWorld(const Rectangle& rect)const;
 
 		inline float getScaleX() const { return scaleX; }

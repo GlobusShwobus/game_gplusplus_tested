@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -22,21 +18,15 @@
     <Filter Include="utilitiez">
       <UniqueIdentifier>{6ca8d284-1e57-4950-9a38-ca4f64f0760f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{9427f2b5-c035-49fa-a87a-6fdafac1330e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Serialize">
       <UniqueIdentifier>{c43e9a2e-bc9d-49ac-bec0-8544cbde1371}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Character">
+      <UniqueIdentifier>{9427f2b5-c035-49fa-a87a-6fdafac1330e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="State.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="point.h">
+    <ClInclude Include="Vek2.h">
       <Filter>planeStuff</Filter>
     </ClInclude>
     <ClInclude Include="Rectangle.h">
@@ -57,30 +47,30 @@
     <ClInclude Include="NumberGenerator.h">
       <Filter>utilitiez</Filter>
     </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="BMPHeader.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="HashKeys.h">
-      <Filter>utilitiez</Filter>
-    </ClInclude>
-    <ClInclude Include="Components.h">
-      <Filter>Serialize</Filter>
+    <ClInclude Include="Animation.h">
+      <Filter>Character</Filter>
     </ClInclude>
     <ClInclude Include="Serialization.h">
       <Filter>Serialize</Filter>
     </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BMPHeader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Character</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rectangle.cpp">
@@ -95,17 +85,23 @@
     <ClCompile Include="NumberGenerator.cpp">
       <Filter>utilitiez</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Rendering</Filter>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Character</Filter>
     </ClCompile>
     <ClCompile Include="Serialization.cpp">
       <Filter>Serialize</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

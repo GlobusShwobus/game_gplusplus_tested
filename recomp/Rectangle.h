@@ -1,6 +1,6 @@
 #pragma once
 #include <cmath>
-#include "Point.h"
+#include "Vek2.h"
 
 namespace badEngine {
 
@@ -13,9 +13,9 @@ namespace badEngine {
 
 		Rectangle() = default;
 		Rectangle(float x, float y, float w, float h) :x(x), y(y), w(w), h(h) {}
-		Rectangle(const Point& position, const Point& dimensions) :x(position.x), y(position.y), w(dimensions.x), h(dimensions.y) {}
-		Rectangle(const Point& position, float w, float h) :x(position.x), y(position.y), w(w), h(h) {}
-		Rectangle(float x, float y, const Point& dimensions) :x(x), y(y), w(dimensions.x), h(dimensions.y) {}
+		Rectangle(const Vek2& position, const Vek2& dimensions) :x(position.x), y(position.y), w(dimensions.x), h(dimensions.y) {}
+		Rectangle(const Vek2& position, float w, float h) :x(position.x), y(position.y), w(w), h(h) {}
+		Rectangle(float x, float y, const Vek2& dimensions) :x(x), y(y), w(dimensions.x), h(dimensions.y) {}
 
 
 		static inline bool containsPoint(const Rectangle& rect, float cordX, float cordY)
@@ -26,7 +26,7 @@ namespace badEngine {
 				cordX < rect.x + rect.w &&
 				cordY < rect.y + rect.h);
 		}
-		static inline bool containsPoint(const Rectangle& rect, const Point& position)
+		static inline bool containsPoint(const Rectangle& rect, const Vek2& position)
 		{
 			return Rectangle::containsPoint(rect, position.x, position.y);
 		}
@@ -34,7 +34,7 @@ namespace badEngine {
 		{
 			return Rectangle::containsPoint(*this, cordX, cordY);
 		}
-		inline bool        containsPoint(const Point& position)const
+		inline bool        containsPoint(const Vek2& position)const
 		{
 			return Rectangle::containsPoint(*this, position.x, position.y);
 		}
