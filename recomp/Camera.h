@@ -31,8 +31,8 @@ namespace badEngine {
 
 		inline void focusPoint(float x, float y)
 		{
-			offsetX = x - (screenW * 0.5f) / scaleX;	//abs
-			offsetY = y - (screenH * 0.5f) / scaleY;	//abs
+			offsetX = x - (screenW * 0.5f) / scaleX;	
+			offsetY = y - (screenH * 0.5f) / scaleY;	
 		}
 		inline void focusPoint(const Vek2& position)
 		{

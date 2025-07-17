@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Rectangle.h"
 #include "Vek2.h"
 
 namespace badEngine {
@@ -15,7 +16,8 @@ namespace badEngine {
 	private:
 		void advance();
 	public:
-		Animation(int x, int y, int w, int h, int count, float holdTime);
+		Animation(const Vek2& pos, const Vek2& imageSize, int frameWidth, int frameHeight, int count, float holdTime = 0.16f);
 		void update(float dt);
+		Rectangle getFrame();
 	};
 }
