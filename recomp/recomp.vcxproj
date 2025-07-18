@@ -146,7 +146,10 @@
     <ClInclude Include="BMPHeader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
-    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Colors.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="GPUSprite.h" />
+    <ClInclude Include="Surface.h" />
     <ClInclude Include="Vek2.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Serialization.h" />
@@ -160,13 +163,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NumberGenerator.cpp" />
-    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="GPUSprite.cpp" />
     <ClCompile Include="Stopwatch.cpp" />
+    <ClCompile Include="Surface.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Entity.cpp" />
